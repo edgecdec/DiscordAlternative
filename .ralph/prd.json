@@ -199,10 +199,21 @@
       "description": "Create src/app/api/servers/[serverId]/route.ts \u2014 GET handler. Validates user is a member. Returns full server with channels and members (including user info)."
     },
     {
+      "id": "TASK-058",
+      "title": "Create maintenance.html page with minigame",
+      "spec": "specs/deployment.md",
+      "priority": 19,
+      "status": "open",
+      "dependencies": [
+        "TASK-055"
+      ],
+      "description": "Create maintenance.html at project root \u2014 a self-contained HTML page (no external deps) shown by nginx when the app is down (502/503/504). Include a fun minigame (e.g. simple snake, pong, or click counter) to keep users entertained during deploys. Style it to match the app theme (dark bg #121212, primary #5865F2). nginx is already configured to serve it via error_page directive. Same pattern as MarchMadness maintenance.html."
+    },
+    {
       "id": "TASK-016",
       "title": "Build server sidebar component",
       "spec": "specs/ui-layout.md",
-      "priority": 19,
+      "priority": 20,
       "status": "open",
       "dependencies": [
         "TASK-014",
@@ -214,7 +225,7 @@
       "id": "TASK-017",
       "title": "Build create server dialog",
       "spec": "specs/servers.md",
-      "priority": 20,
+      "priority": 21,
       "status": "open",
       "dependencies": [
         "TASK-016"
@@ -225,7 +236,7 @@
       "id": "TASK-018",
       "title": "Implement create channel API route",
       "spec": "specs/servers.md",
-      "priority": 21,
+      "priority": 22,
       "status": "open",
       "dependencies": [
         "TASK-013"
@@ -236,7 +247,7 @@
       "id": "TASK-019",
       "title": "Implement update and delete channel API routes",
       "spec": "specs/servers.md",
-      "priority": 22,
+      "priority": 23,
       "status": "open",
       "dependencies": [
         "TASK-018"
@@ -247,7 +258,7 @@
       "id": "TASK-020",
       "title": "Build channel list panel component",
       "spec": "specs/ui-layout.md",
-      "priority": 23,
+      "priority": 24,
       "status": "open",
       "dependencies": [
         "TASK-018",
@@ -259,7 +270,7 @@
       "id": "TASK-021",
       "title": "Build user info panel in channel panel",
       "spec": "specs/ui-layout.md",
-      "priority": 24,
+      "priority": 25,
       "status": "open",
       "dependencies": [
         "TASK-020"
@@ -270,7 +281,7 @@
       "id": "TASK-022",
       "title": "Create the three-column layout shell and server pages",
       "spec": "specs/ui-layout.md",
-      "priority": 25,
+      "priority": 26,
       "status": "open",
       "dependencies": [
         "TASK-021"
@@ -281,7 +292,7 @@
       "id": "TASK-023",
       "title": "Implement get messages API route",
       "spec": "specs/servers.md",
-      "priority": 26,
+      "priority": 27,
       "status": "open",
       "dependencies": [
         "TASK-005",
@@ -293,7 +304,7 @@
       "id": "TASK-024",
       "title": "Implement create message API route",
       "spec": "specs/servers.md",
-      "priority": 27,
+      "priority": 28,
       "status": "open",
       "dependencies": [
         "TASK-023"
@@ -304,7 +315,7 @@
       "id": "TASK-025",
       "title": "Implement edit and delete message API routes",
       "spec": "specs/servers.md",
-      "priority": 28,
+      "priority": 29,
       "status": "open",
       "dependencies": [
         "TASK-024"
@@ -315,7 +326,7 @@
       "id": "TASK-026",
       "title": "Create Socket.io type definitions",
       "spec": "specs/socket-events.md",
-      "priority": 29,
+      "priority": 30,
       "status": "open",
       "dependencies": [
         "TASK-002"
@@ -326,7 +337,7 @@
       "id": "TASK-027",
       "title": "Add Socket.io to server.js with auth",
       "spec": "specs/socket-events.md",
-      "priority": 30,
+      "priority": 31,
       "status": "open",
       "dependencies": [
         "TASK-055",
@@ -339,7 +350,7 @@
       "id": "TASK-028",
       "title": "Implement Socket.io channel join/leave handlers",
       "spec": "specs/socket-events.md",
-      "priority": 31,
+      "priority": 32,
       "status": "open",
       "dependencies": [
         "TASK-027"
@@ -350,7 +361,7 @@
       "id": "TASK-029",
       "title": "Implement Socket.io message:create handler",
       "spec": "specs/socket-events.md",
-      "priority": 32,
+      "priority": 33,
       "status": "open",
       "dependencies": [
         "TASK-028"
@@ -361,7 +372,7 @@
       "id": "TASK-030",
       "title": "Implement Socket.io message:update and message:delete handlers",
       "spec": "specs/socket-events.md",
-      "priority": 33,
+      "priority": 34,
       "status": "open",
       "dependencies": [
         "TASK-029"
@@ -372,7 +383,7 @@
       "id": "TASK-031",
       "title": "Implement Socket.io presence tracking",
       "spec": "specs/socket-events.md",
-      "priority": 34,
+      "priority": 35,
       "status": "open",
       "dependencies": [
         "TASK-028"
@@ -383,7 +394,7 @@
       "id": "TASK-032",
       "title": "Implement Socket.io typing indicators",
       "spec": "specs/socket-events.md",
-      "priority": 35,
+      "priority": 36,
       "status": "open",
       "dependencies": [
         "TASK-028"
@@ -394,7 +405,7 @@
       "id": "TASK-033",
       "title": "Create useSocket hook",
       "spec": "specs/socket-events.md",
-      "priority": 36,
+      "priority": 37,
       "status": "open",
       "dependencies": [
         "TASK-026",
@@ -406,7 +417,7 @@
       "id": "TASK-034",
       "title": "Build MessageList component with initial fetch",
       "spec": "specs/ui-layout.md",
-      "priority": 37,
+      "priority": 38,
       "status": "open",
       "dependencies": [
         "TASK-033",
@@ -418,7 +429,7 @@
       "id": "TASK-035",
       "title": "Add real-time message listeners to MessageList",
       "spec": "specs/socket-events.md",
-      "priority": 38,
+      "priority": 39,
       "status": "open",
       "dependencies": [
         "TASK-034"
@@ -429,7 +440,7 @@
       "id": "TASK-036",
       "title": "Add cursor-based pagination to MessageList",
       "spec": "specs/ui-layout.md",
-      "priority": 39,
+      "priority": 40,
       "status": "open",
       "dependencies": [
         "TASK-035"
@@ -440,7 +451,7 @@
       "id": "TASK-037",
       "title": "Build MessageInput component",
       "spec": "specs/ui-layout.md",
-      "priority": 40,
+      "priority": 41,
       "status": "open",
       "dependencies": [
         "TASK-033"
@@ -451,7 +462,7 @@
       "id": "TASK-038",
       "title": "Add typing indicator emission to MessageInput",
       "spec": "specs/socket-events.md",
-      "priority": 41,
+      "priority": 42,
       "status": "open",
       "dependencies": [
         "TASK-037"
@@ -462,7 +473,7 @@
       "id": "TASK-039",
       "title": "Build TypingIndicator component",
       "spec": "specs/socket-events.md",
-      "priority": 42,
+      "priority": 43,
       "status": "open",
       "dependencies": [
         "TASK-038"
@@ -473,7 +484,7 @@
       "id": "TASK-040",
       "title": "Assemble the text channel page",
       "spec": "specs/ui-layout.md",
-      "priority": 43,
+      "priority": 44,
       "status": "open",
       "dependencies": [
         "TASK-036",
@@ -486,7 +497,7 @@
       "id": "TASK-041",
       "title": "Implement invite code API routes",
       "spec": "specs/servers.md",
-      "priority": 44,
+      "priority": 45,
       "status": "open",
       "dependencies": [
         "TASK-013"
@@ -497,7 +508,7 @@
       "id": "TASK-042",
       "title": "Build invite page",
       "spec": "specs/servers.md",
-      "priority": 45,
+      "priority": 46,
       "status": "open",
       "dependencies": [
         "TASK-041",
@@ -509,7 +520,7 @@
       "id": "TASK-043",
       "title": "Implement list members API route",
       "spec": "specs/servers.md",
-      "priority": 46,
+      "priority": 47,
       "status": "open",
       "dependencies": [
         "TASK-013"
@@ -520,7 +531,7 @@
       "id": "TASK-044",
       "title": "Implement change role and kick member API routes",
       "spec": "specs/servers.md",
-      "priority": 47,
+      "priority": 48,
       "status": "open",
       "dependencies": [
         "TASK-043"
@@ -531,7 +542,7 @@
       "id": "TASK-045",
       "title": "Build online members sidebar",
       "spec": "specs/ui-layout.md",
-      "priority": 48,
+      "priority": 49,
       "status": "open",
       "dependencies": [
         "TASK-043",
@@ -544,7 +555,7 @@
       "id": "TASK-046",
       "title": "Implement LiveKit token generation API route",
       "spec": "specs/webrtc.md",
-      "priority": 49,
+      "priority": 50,
       "status": "open",
       "dependencies": [
         "TASK-005",
@@ -556,7 +567,7 @@
       "id": "TASK-047",
       "title": "Build VoiceChannel component",
       "spec": "specs/webrtc.md",
-      "priority": 50,
+      "priority": 51,
       "status": "open",
       "dependencies": [
         "TASK-046",
@@ -568,7 +579,7 @@
       "id": "TASK-048",
       "title": "Wire voice channel into channel page",
       "spec": "specs/webrtc.md",
-      "priority": 51,
+      "priority": 52,
       "status": "open",
       "dependencies": [
         "TASK-047",
@@ -580,7 +591,7 @@
       "id": "TASK-049",
       "title": "Implement update server API route",
       "spec": "specs/servers.md",
-      "priority": 52,
+      "priority": 53,
       "status": "open",
       "dependencies": [
         "TASK-015"
@@ -591,7 +602,7 @@
       "id": "TASK-050",
       "title": "Implement delete server API route",
       "spec": "specs/servers.md",
-      "priority": 53,
+      "priority": 54,
       "status": "open",
       "dependencies": [
         "TASK-015"
@@ -602,7 +613,7 @@
       "id": "TASK-051",
       "title": "Build server settings dialog \u2014 general tab",
       "spec": "specs/servers.md",
-      "priority": 54,
+      "priority": 55,
       "status": "open",
       "dependencies": [
         "TASK-049",
@@ -614,7 +625,7 @@
       "id": "TASK-052",
       "title": "Add members tab to server settings",
       "spec": "specs/servers.md",
-      "priority": 55,
+      "priority": 56,
       "status": "open",
       "dependencies": [
         "TASK-051",
@@ -626,7 +637,7 @@
       "id": "TASK-053",
       "title": "Add danger zone tab to server settings",
       "spec": "specs/servers.md",
-      "priority": 56,
+      "priority": 57,
       "status": "open",
       "dependencies": [
         "TASK-051",
@@ -638,7 +649,7 @@
       "id": "TASK-054",
       "title": "Add mobile responsive layout with Drawer",
       "spec": "specs/ui-layout.md",
-      "priority": 57,
+      "priority": 58,
       "status": "open",
       "dependencies": [
         "TASK-040"
