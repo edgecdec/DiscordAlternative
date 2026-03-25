@@ -370,3 +370,10 @@
 - Channel type is fetched from server API; non-TEXT channels show a placeholder message for future voice support.
 - Deploy took ~40s to return 200 (500s during rebuild are expected during webhook deploy).
 - Lesson: Keep the channel info fetch and socket lifecycle in separate useEffects to avoid coupling data loading with room join/leave.
+
+## TASK-041: Implement invite code API routes (2026-03-25)
+- Created GET /api/servers/[serverId]/invite — returns inviteCode for members only
+- Created POST /api/servers/invite/[code] — joins server via invite code, creates GUEST member, rejects if already member or invalid code
+- Both routes follow existing patterns: auth check, membership validation, proper HTTP status codes (201 for join, 409 for already member, 404 for invalid code)
+- Deploy took ~40s to return 200 (500 during rebuild, normal)
+- Lessons: Keep routes minimal — no need for extra validation when Prisma unique constraints handle duplicates naturally, but explicit check gives better error messages

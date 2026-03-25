@@ -538,7 +538,7 @@
       "title": "Implement invite code API routes",
       "spec": "specs/servers.md",
       "priority": 49,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-013"
       ],
