@@ -85,8 +85,7 @@ These are mistakes Ralph has made on previous projects. Do not repeat them.
 - Same applies to any interactive scaffolding tool — always create files manually.
 
 ## Git Hygiene
-- NEVER use `git push --force` or `git push --force-with-lease`. Force pushing can cause the webhook to deploy stale code.
-- NEVER use `git commit --amend`. Each push triggers a deploy — amend + force push skips a deploy cycle.
-- Multiple commits per task is fine: one for the code, one for bug fixes, one for marking done. Each triggers a fresh deploy.
-- Always `git push` after every commit. Never batch multiple commits before pushing.
+- NEVER use `git push --force` or `git push --force-with-lease` EXCEPT for the final status update amend after deploy verification passes.
+- The ONLY allowed amend is: deploy verified → update prd.json/progress.txt → `git commit --amend --no-edit && git push --force-with-lease`. This keeps one clean commit per task.
+- Never amend a commit that hasn't been deployed and verified yet.
 - Always `git pull` before committing if you suspect the human or another process pushed changes.
