@@ -40,3 +40,11 @@
 - Used Next.js `cookies()` API (async) in getAuthUser instead of raw request header parsing — cleaner for App Router route handlers.
 - Exported cookie builder helpers so route handlers can set/clear cookies consistently.
 - All 3 validation commands pass (prisma validate, tsc --noEmit, npm test).
+
+## TASK-006: Implement registration API route (2026-03-24)
+- Created src/app/api/auth/register/route.ts — POST handler
+- Validates username (3-20 alphanumeric), email format, password (min 6 chars)
+- Hashes password with bcryptjs (10 rounds), creates User via Prisma
+- Signs JWT, sets httpOnly cookie via Set-Cookie header, returns user object with 201
+- Checks for duplicate username/email before creating, returns 409 if taken
+- All 3 validation commands pass (prisma validate, tsc --noEmit, npm test)
