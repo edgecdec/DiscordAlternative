@@ -208,3 +208,11 @@
 - Followed existing pattern from servers/route.ts — no permissions.ts or responses.ts helpers exist yet, kept inline
 - Next.js 15 dynamic route params require `params: Promise<{...}>` and `await params`
 - All validation passed first try, deploy returned 200
+
+## TASK-019: Implement update and delete channel API routes (2026-03-25)
+- Created src/app/api/channels/[channelId]/route.ts with PATCH and DELETE handlers.
+- PATCH accepts { name }, validates OWNER/ADMIN role on the channel's server, updates channel name.
+- DELETE validates OWNER/ADMIN, prevents deleting the last TEXT channel (counts TEXT channels in server), soft-deletes via Prisma delete (cascade handles messages).
+- Extracted shared `getChannelAndValidateAdmin` helper within the file to avoid duplicating channel lookup + auth + role check logic.
+- All validation passed first try (prisma validate, tsc --noEmit, npm test). Deploy returned 200.
+- Lesson: Discriminated union return type (`{ error, status } | { channel }`) with `"error" in result` check is a clean pattern for shared validation helpers.

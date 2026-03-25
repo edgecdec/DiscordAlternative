@@ -288,7 +288,7 @@
       "title": "Implement update and delete channel API routes",
       "spec": "specs/servers.md",
       "priority": 27,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-018"
       ],
