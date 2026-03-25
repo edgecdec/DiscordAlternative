@@ -277,7 +277,7 @@
       "title": "Implement create channel API route",
       "spec": "specs/servers.md",
       "priority": 26,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-013"
       ],

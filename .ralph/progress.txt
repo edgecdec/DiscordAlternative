@@ -201,3 +201,10 @@
 - Created minimal /servers page to wire ServerSidebar + CreateServerDialog together (ServerSidebar already had onCreateClick prop).
 - All validation passed first try. Deploy returned 200.
 - Lesson: ServerSidebar was already designed with the onCreateClick prop, so integration was straightforward. Keep components composable with callback props.
+
+## TASK-018: Implement create channel API route (2026-03-25)
+- Created POST /api/servers/[serverId]/channels with auth + OWNER/ADMIN role check
+- Validates channel name (1-50 chars) and type (TEXT/VOICE/VIDEO)
+- Followed existing pattern from servers/route.ts — no permissions.ts or responses.ts helpers exist yet, kept inline
+- Next.js 15 dynamic route params require `params: Promise<{...}>` and `await params`
+- All validation passed first try, deploy returned 200
