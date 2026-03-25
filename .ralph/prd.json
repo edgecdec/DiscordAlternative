@@ -525,7 +525,7 @@
       "title": "Assemble the text channel page",
       "spec": "specs/ui-layout.md",
       "priority": 48,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-036",
         "TASK-039",

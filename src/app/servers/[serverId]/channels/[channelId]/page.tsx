@@ -4,12 +4,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Box, Typography } from "@mui/material";
 import { Tag } from "@mui/icons-material";
+import { useSocket } from "@/hooks/useSocket";
+import MessageList from "@/components/chat/MessageList";
+import MessageInput from "@/components/chat/MessageInput";
+import TypingIndicator from "@/components/chat/TypingIndicator";
+
+interface ChannelInfo {
+  name: string;
+  type: string;
+}
 
 export default function ChannelPage() {
   const params = useParams();
   const channelId = params?.channelId as string;
   const serverId = params?.serverId as string;
-  const [channelName, setChannelName] = useState<string | null>(null);
+  const [channel, setChannel] = useState<ChannelInfo | null>(null);
+  const { joinChannel, leaveChannel } = useSocket();
 
   useEffect(() => {
     if (!serverId) return;
@@ -18,11 +28,21 @@ export default function ChannelPage() {
       .then((data) => {
         if (!data) return;
         const ch = data.server.channels.find(
-          (c: { id: string; name: string }) => c.id === channelId
+          (c: { id: string; name: string; type: string }) => c.id === channelId
         );
-        if (ch) setChannelName(ch.name);
+        if (ch) setChannel({ name: ch.name, type: ch.type });
       });
   }, [serverId, channelId]);
+
+  useEffect(() => {
+    if (!channelId) return;
+    joinChannel(channelId);
+    return () => {
+      leaveChannel(channelId);
+    };
+  }, [channelId, joinChannel, leaveChannel]);
+
+  const isText = !channel || channel.type === "TEXT";
 
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
@@ -39,21 +59,26 @@ export default function ChannelPage() {
       >
         <Tag sx={{ color: "text.secondary", fontSize: 20 }} />
         <Typography variant="subtitle1" fontWeight={700}>
-          {channelName ?? "Loading..."}
+          {channel?.name ?? "Loading..."}
         </Typography>
       </Box>
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Typography color="text.secondary">
-          {channelName ? `Welcome to #${channelName}` : ""}
-        </Typography>
-      </Box>
+      {isText && channel ? (
+        <>
+          <MessageList channelId={channelId} />
+          <TypingIndicator channelId={channelId} />
+          <MessageInput channelId={channelId} />
+        </>
+      ) : !channel ? (
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Typography color="text.secondary">Loading...</Typography>
+        </Box>
+      ) : (
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Typography color="text.secondary">
+            Voice channels are not yet supported.
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 }

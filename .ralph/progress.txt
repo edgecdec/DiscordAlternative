@@ -363,3 +363,10 @@
 - Shows "X is typing…" for one user, "N users are typing…" for multiple
 - Cleans up all timers and state on unmount/channel change
 - Lesson: Keep socket event handlers simple — filter by channelId in the handler, not via separate rooms on the client side.
+
+## TASK-040: Assemble text channel page (2026-03-25)
+- Replaced placeholder channel page with full text channel assembly: MessageList, TypingIndicator, MessageInput.
+- Added joinChannel on mount and leaveChannel on unmount/channel change via useSocket hook.
+- Channel type is fetched from server API; non-TEXT channels show a placeholder message for future voice support.
+- Deploy took ~40s to return 200 (500s during rebuild are expected during webhook deploy).
+- Lesson: Keep the channel info fetch and socket lifecycle in separate useEffects to avoid coupling data loading with room join/leave.
