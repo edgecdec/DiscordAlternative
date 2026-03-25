@@ -6,7 +6,7 @@
       "title": "Initialize Next.js project with TypeScript",
       "spec": "specs/deployment.md",
       "priority": 1,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "DO NOT use create-next-app (it hangs in non-interactive mode). Instead, manually create: package.json with next/react/react-dom deps and scripts (dev, build, start), tsconfig.json with strict mode and @/ path alias pointing to src/, next.config.js (empty config), .gitignore (node_modules, .next, .env, data/, uploads/, .ralph/.server-env), and the directory structure: src/app/, src/components/, src/lib/, src/hooks/, src/types/, data/, uploads/. Then run npm install."
     },
