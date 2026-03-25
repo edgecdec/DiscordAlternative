@@ -125,3 +125,9 @@
   - `prisma migrate deploy` does NOT run `prisma generate` — must run generate explicitly before build
   - `npm install --production` skips devDependencies (TypeScript, types) which are needed for `next build` — use `npm install` instead
   - Always check if files were already committed before trying to create them (previous attempt may have done partial work)
+
+## TASK-013: Implement create server API route (2026-03-24)
+- Created POST /api/servers with auth, validation, nested Prisma create (server + default general channel + OWNER member).
+- Used Prisma nested create to atomically create server, channel, and member in one operation.
+- Pattern: getAuthUser() for auth, NextResponse.json for responses, constants for magic values.
+- No existing responses.ts/validators.ts helpers yet — followed inline pattern from register route.

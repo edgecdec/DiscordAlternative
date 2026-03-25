@@ -170,7 +170,7 @@
       "title": "Implement create server API route",
       "spec": "specs/servers.md",
       "priority": 16,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-005"
       ],
