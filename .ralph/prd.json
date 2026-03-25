@@ -629,7 +629,7 @@
       "title": "Wire voice channel into channel page",
       "spec": "specs/webrtc.md",
       "priority": 57,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-047",
         "TASK-040"

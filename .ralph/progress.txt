@@ -430,3 +430,11 @@
 - Token fetched from /api/livekit/token on join
 - Lesson: LiveKit components-react provides good hooks but no MUI-compatible styled components — need to build custom UI on top of the hooks
 - Lesson: Keep LiveKitRoom as the wrapper and use hooks inside child components (hooks need LiveKit context)
+
+## TASK-048: Wire voice channel into channel page (2026-03-25)
+- Updated channel page to render VoiceChannel component for VOICE/VIDEO channels instead of placeholder text
+- Added VolumeUp icon for voice/video channel headers, Tag icon for text channels
+- Socket join/leave only runs for text channels (voice channels don't need text chat rooms)
+- Moved isText/isVoice declarations above the useEffect that depends on them to avoid reference-before-declaration
+- Nova Act test confirmed: voice channel shows join prompt, no text input; text channel still works normally
+- Lesson: MUI icons don't have data-testid by default — use text content or other selectors for testing

@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Box, Typography } from "@mui/material";
-import { Tag } from "@mui/icons-material";
+import { Tag, VolumeUp } from "@mui/icons-material";
 import { useSocket } from "@/hooks/useSocket";
 import MessageList from "@/components/chat/MessageList";
 import MessageInput from "@/components/chat/MessageInput";
 import TypingIndicator from "@/components/chat/TypingIndicator";
+import VoiceChannel from "@/components/voice/VoiceChannel";
 
 interface ChannelInfo {
   name: string;
@@ -34,15 +35,17 @@ export default function ChannelPage() {
       });
   }, [serverId, channelId]);
 
+  const isText = !channel || channel.type === "TEXT";
+  const isVoice = channel?.type === "VOICE" || channel?.type === "VIDEO";
+  const ChannelIcon = isVoice ? VolumeUp : Tag;
+
   useEffect(() => {
-    if (!channelId || !connected) return;
+    if (!channelId || !connected || !isText) return;
     joinChannel(channelId);
     return () => {
       leaveChannel(channelId);
     };
-  }, [channelId, connected, joinChannel, leaveChannel]);
-
-  const isText = !channel || channel.type === "TEXT";
+  }, [channelId, connected, joinChannel, leaveChannel, isText]);
 
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
@@ -57,7 +60,7 @@ export default function ChannelPage() {
           gap: 1,
         }}
       >
-        <Tag sx={{ color: "text.secondary", fontSize: 20 }} />
+        <ChannelIcon sx={{ color: "text.secondary", fontSize: 20 }} />
         <Typography variant="subtitle1" fontWeight={700}>
           {channel?.name ?? "Loading..."}
         </Typography>
@@ -73,11 +76,7 @@ export default function ChannelPage() {
           <Typography color="text.secondary">Loading...</Typography>
         </Box>
       ) : (
-        <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <Typography color="text.secondary">
-            Voice channels are not yet supported.
-          </Typography>
-        </Box>
+        <VoiceChannel channelId={channelId} />
       )}
     </Box>
   );
