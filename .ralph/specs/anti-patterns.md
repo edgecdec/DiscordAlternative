@@ -64,3 +64,8 @@ These are mistakes Ralph has made on previous projects. Do not repeat them.
 - ALWAYS read prd.json before editing it — parse the JSON, modify the specific task, write it back. Do NOT rewrite the entire file from memory.
 - When appending to progress.txt, APPEND only — do not rewrite existing content.
 - Do NOT modify spec files unless explicitly told to by the human.
+
+## Project Initialization
+- NEVER use `create-next-app` or `npx create-*` — these commands hang in non-interactive mode when the directory isn't empty.
+- Instead, manually create package.json, tsconfig.json, next.config.js, then run `npm install`.
+- Same applies to any interactive scaffolding tool — always create files manually.
