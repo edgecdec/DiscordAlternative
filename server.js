@@ -149,6 +149,58 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("message:update", async ({ messageId, content }) => {
+      try {
+        if (!content || typeof content !== "string" || content.trim().length === 0 || content.length > 2000) return;
+        const message = await prisma.message.findUnique({
+          where: { id: messageId },
+          select: { authorId: true, channelId: true, deleted: true },
+        });
+        if (!message || message.deleted || message.authorId !== socket.data.userId) return;
+        const updated = await prisma.message.update({
+          where: { id: messageId },
+          data: { content: content.trim() },
+          include: { author: { select: { id: true, username: true, avatarUrl: true } } },
+        });
+        io.to(`channel:${updated.channelId}`).emit("message:updated", {
+          id: updated.id,
+          content: updated.content,
+          fileUrl: updated.fileUrl,
+          deleted: updated.deleted,
+          createdAt: updated.createdAt.toISOString(),
+          updatedAt: updated.updatedAt.toISOString(),
+          channelId: updated.channelId,
+          author: updated.author,
+        });
+      } catch (err) {
+        console.error("message:update error:", err);
+      }
+    });
+
+    socket.on("message:delete", async ({ messageId }) => {
+      try {
+        const message = await prisma.message.findUnique({
+          where: { id: messageId },
+          select: { authorId: true, channelId: true, deleted: true, channel: { select: { serverId: true } } },
+        });
+        if (!message || message.deleted) return;
+        const isAuthor = message.authorId === socket.data.userId;
+        if (!isAuthor) {
+          const member = await prisma.serverMember.findUnique({
+            where: { userId_serverId: { userId: socket.data.userId, serverId: message.channel.serverId } },
+          });
+          if (!member || (member.role !== "OWNER" && member.role !== "ADMIN" && member.role !== "MODERATOR")) return;
+        }
+        await prisma.message.update({
+          where: { id: messageId },
+          data: { deleted: true },
+        });
+        io.to(`channel:${message.channelId}`).emit("message:deleted", { messageId });
+      } catch (err) {
+        console.error("message:delete error:", err);
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.data.username} (${socket.data.userId})`);
     });

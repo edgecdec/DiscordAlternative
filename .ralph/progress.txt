@@ -287,3 +287,10 @@
 - Creates message via Prisma with authorId from socket.data, includes author info in response
 - Broadcasts message:new to channel room with full message object (ISO date strings)
 - Lessons: server.js uses CommonJS require() — constants from src/lib/constants.ts can't be imported directly, so the 2000 limit is hardcoded in server.js. If MESSAGE_MAX changes, server.js must be updated too. Consider extracting shared constants to a .js file in the future.
+
+## TASK-030: Implement Socket.io message:update and message:delete handlers
+- Date: 2026-03-25
+- Status: done
+- Added message:update handler: validates author owns message, message not deleted, content valid (1-2000 chars), updates DB, broadcasts message:updated to channel room.
+- Added message:delete handler: validates author or server admin/owner/moderator, soft-deletes in DB, broadcasts message:deleted with { messageId } to channel room.
+- Lessons: For delete authorization, included MODERATOR role alongside OWNER/ADMIN since moderators should be able to delete messages. Used channel→serverId join to check membership role without extra queries.

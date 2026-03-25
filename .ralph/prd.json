@@ -413,7 +413,7 @@
       "title": "Implement Socket.io message:update and message:delete handlers",
       "spec": "specs/socket-events.md",
       "priority": 38,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-029"
       ],
