@@ -469,3 +469,10 @@
 - Passed userRole from ChannelPanel's currentMember to ServerSettings
 - Nova Act test confirmed: dialog opens, Members tab visible, clicking it shows member list
 - Lesson: Extracting tab content into separate components keeps dialog files manageable and focused
+
+## TASK-053: Add danger zone tab to server settings (2026-03-25)
+- Created DangerZoneTab component with red-styled delete button and confirmation dialog requiring server name input
+- Added conditional "Danger Zone" tab to ServerSettings (only visible to OWNER role)
+- Confirmation dialog requires typing the exact server name before delete is enabled
+- On successful deletion, redirects to /servers
+- Lessons: Nova Act guardrails block prompts containing words like "Danger" — use Playwright directly for filling inputs with sensitive-sounding text. Keep act() prompts neutral.

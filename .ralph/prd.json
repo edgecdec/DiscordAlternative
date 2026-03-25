@@ -687,7 +687,7 @@
       "title": "Add danger zone tab to server settings",
       "spec": "specs/servers.md",
       "priority": 62,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-051",
         "TASK-050"
