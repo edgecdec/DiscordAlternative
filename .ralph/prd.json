@@ -549,7 +549,7 @@
       "title": "Build invite page",
       "spec": "specs/servers.md",
       "priority": 50,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-041",
         "TASK-011"

@@ -377,3 +377,9 @@
 - Both routes follow existing patterns: auth check, membership validation, proper HTTP status codes (201 for join, 409 for already member, 404 for invalid code)
 - Deploy took ~40s to return 200 (500 during rebuild, normal)
 - Lessons: Keep routes minimal — no need for extra validation when Prisma unique constraints handle duplicates naturally, but explicit check gives better error messages
+
+## TASK-042: Build invite page (2026-03-25)
+- Added GET handler to `/api/servers/invite/[code]` to return server info (name, imageUrl, member count) by invite code — needed for the page to display server details before joining.
+- Created `/invite/[code]` page with server avatar, name, member count, and join button.
+- If user is not logged in, redirects to login page. If already a member (409), redirects to the server directly.
+- Lessons: Keep the GET handler unauthenticated so invite links work for anyone (they still need to log in to actually join). The 409 "already a member" case from POST is a valid redirect path, not just an error.

@@ -8,6 +8,21 @@ interface RouteParams {
   params: Promise<{ code: string }>;
 }
 
+export async function GET(_req: NextRequest, { params }: RouteParams) {
+  const { code } = await params;
+
+  const server = await prisma.server.findUnique({
+    where: { inviteCode: code },
+    select: { id: true, name: true, imageUrl: true, _count: { select: { members: true } } },
+  });
+
+  if (!server) {
+    return NextResponse.json({ error: "Invalid invite code" }, { status: 404 });
+  }
+
+  return NextResponse.json({ server });
+}
+
 export async function POST(_req: NextRequest, { params }: RouteParams) {
   const user = await getAuthUser();
   if (!user) {
