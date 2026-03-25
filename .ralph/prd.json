@@ -470,7 +470,7 @@
       "title": "Add real-time message listeners to MessageList",
       "spec": "specs/socket-events.md",
       "priority": 43,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-034"
       ],

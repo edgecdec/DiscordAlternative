@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar, Box, Typography } from "@mui/material";
-import type { SocketMessage } from "@/types/socket";
+import type { SocketMessage, MessageDeletedPayload } from "@/types/socket";
+import { useSocket } from "@/hooks/useSocket";
 
 interface MessageListProps {
   channelId: string;
@@ -22,6 +23,7 @@ export default function MessageList({ channelId }: MessageListProps) {
   const [messages, setMessages] = useState<SocketMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { socket } = useSocket();
 
   useEffect(() => {
     setLoading(true);
@@ -39,6 +41,36 @@ export default function MessageList({ channelId }: MessageListProps) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
   }, [messages.length]);
+
+  const handleNew = useCallback((msg: SocketMessage) => {
+    if (msg.channelId !== channelId) return;
+    setMessages((prev) => [...prev, msg]);
+  }, [channelId]);
+
+  const handleUpdated = useCallback((msg: SocketMessage) => {
+    if (msg.channelId !== channelId) return;
+    setMessages((prev) => prev.map((m) => (m.id === msg.id ? msg : m)));
+  }, [channelId]);
+
+  const handleDeleted = useCallback((payload: MessageDeletedPayload) => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === payload.messageId ? { ...m, deleted: true } : m
+      )
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("message:new", handleNew);
+    socket.on("message:updated", handleUpdated);
+    socket.on("message:deleted", handleDeleted);
+    return () => {
+      socket.off("message:new", handleNew);
+      socket.off("message:updated", handleUpdated);
+      socket.off("message:deleted", handleDeleted);
+    };
+  }, [socket, handleNew, handleUpdated, handleDeleted]);
 
   if (loading) {
     return (

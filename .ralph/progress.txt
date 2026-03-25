@@ -323,3 +323,11 @@
 - Auto-scrolls to bottom on load via ref
 - Shows loading and empty states
 - Lessons: The API returns messages in desc order (newest first) for cursor pagination, so reverse() is needed for chronological display in the UI.
+
+## TASK-035: Add real-time message listeners to MessageList (2026-03-25)
+- Added socket listeners for message:new, message:updated, message:deleted to MessageList
+- Used useCallback with channelId dependency to filter events to the current channel
+- message:new appends and auto-scrolls, message:updated replaces in place, message:deleted sets deleted flag
+- Lesson: Keep socket event handlers stable with useCallback to avoid re-registering listeners on every render
+- Lesson: Filter incoming socket events by channelId since the socket room may broadcast to channels the component isn't viewing
+- Deploy took ~40s to return 200 (500 during rebuild is normal)
