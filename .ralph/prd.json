@@ -652,7 +652,7 @@
       "title": "Implement delete server API route",
       "spec": "specs/servers.md",
       "priority": 59,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-015"
       ],

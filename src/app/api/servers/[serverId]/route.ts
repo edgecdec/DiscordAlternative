@@ -96,3 +96,24 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
   return NextResponse.json({ server });
 }
+
+export async function DELETE(_req: NextRequest, { params }: RouteParams) {
+  const user = await getAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { serverId } = await params;
+
+  const member = await prisma.serverMember.findUnique({
+    where: { userId_serverId: { userId: user.userId, serverId } },
+  });
+
+  if (!member || member.role !== "OWNER") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  await prisma.server.delete({ where: { id: serverId } });
+
+  return new NextResponse(null, { status: 204 });
+}
