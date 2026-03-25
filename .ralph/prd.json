@@ -514,7 +514,7 @@
       "title": "Build TypingIndicator component",
       "spec": "specs/socket-events.md",
       "priority": 47,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-038"
       ],

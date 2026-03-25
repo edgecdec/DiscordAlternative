@@ -355,3 +355,11 @@
 - Named constants TYPING_EMIT_INTERVAL_MS and TYPING_STOP_DELAY_MS (no magic numbers)
 - All validations passed first try, deploy verified at 200
 - Lessons: useRef is the right tool for mutable values that don't trigger re-renders (timers, timestamps, flags)
+
+## TASK-039: Build TypingIndicator component (2026-03-25)
+- Created src/components/chat/TypingIndicator.tsx
+- Listens for typing:start/typing:stop events filtered by channelId
+- Maintains a Map<userId, username> of currently typing users with 4s auto-clear timeout per user
+- Shows "X is typing…" for one user, "N users are typing…" for multiple
+- Cleans up all timers and state on unmount/channel change
+- Lesson: Keep socket event handlers simple — filter by channelId in the handler, not via separate rooms on the client side.
