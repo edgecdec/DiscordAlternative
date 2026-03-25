@@ -229,6 +229,24 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("typing:start", ({ channelId }) => {
+      if (!channelId) return;
+      socket.to(`channel:${channelId}`).emit("typing:start", {
+        userId: socket.data.userId,
+        username: socket.data.username,
+        channelId,
+      });
+    });
+
+    socket.on("typing:stop", ({ channelId }) => {
+      if (!channelId) return;
+      socket.to(`channel:${channelId}`).emit("typing:stop", {
+        userId: socket.data.userId,
+        username: socket.data.username,
+        channelId,
+      });
+    });
+
     socket.on("disconnect", async () => {
       const { userId, username } = socket.data;
       console.log(`Socket disconnected: ${username} (${userId})`);

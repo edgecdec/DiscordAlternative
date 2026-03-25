@@ -435,7 +435,7 @@
       "title": "Implement Socket.io typing indicators",
       "spec": "specs/socket-events.md",
       "priority": 40,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-028"
       ],

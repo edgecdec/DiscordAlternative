@@ -301,3 +301,10 @@
 - On disconnect: removes socketId from set, broadcasts `presence:offline` only when last socket disconnects (user fully offline).
 - Uses `socket.to(room)` for online (excludes sender) and `io.to(room)` for offline (sender already disconnected).
 - Lesson: presence:offline uses `io.to()` because the disconnecting socket is already gone from the room — `socket.to()` wouldn't work.
+
+## TASK-032: Implement Socket.io typing indicators (2026-03-25)
+- Added `typing:start` and `typing:stop` handlers to server.js.
+- Both handlers broadcast to the channel room excluding the sender via `socket.to()`.
+- Payload includes `{ userId, username, channelId }` matching the `TypingBroadcastPayload` type.
+- Types were already defined in `src/types/socket.ts` from TASK-026 — no type changes needed.
+- Lesson: Typing indicators are fire-and-forget — no DB persistence, no membership validation needed beyond being in the room (Socket.io room membership already implies channel access from `channel:join`).
