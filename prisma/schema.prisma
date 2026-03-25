@@ -5,3 +5,67 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model User {
+  id           String         @id @default(cuid())
+  username     String         @unique
+  email        String         @unique
+  passwordHash String
+  avatarUrl    String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  messages     Message[]
+  memberships  ServerMember[]
+  ownedServers Server[]
+}
+
+model Server {
+  id         String         @id @default(cuid())
+  name       String
+  imageUrl   String?
+  inviteCode String         @unique @default(uuid())
+  ownerId    String
+  owner      User           @relation(fields: [ownerId], references: [id])
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  channels   Channel[]
+  members    ServerMember[]
+}
+
+model Channel {
+  id        String    @id @default(cuid())
+  name      String
+  type      String    @default("TEXT")
+  serverId  String
+  server    Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  fileUrl   String?
+  deleted   Boolean  @default(false)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  channelId String
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([channelId])
+}
+
+model ServerMember {
+  id       String   @id @default(cuid())
+  role     String   @default("GUEST")
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  serverId String
+  server   Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, serverId])
+}
