@@ -1,4 +1,347 @@
 {
   "project": "DiscordAlternative",
-  "tasks": []
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Initialize Next.js project with TypeScript and dependencies",
+      "spec": "specs/deployment.md",
+      "priority": 1,
+      "status": "open",
+      "dependencies": [],
+      "description": "Run next create, configure tsconfig.json, install all dependencies (next, react, @mui/material, @emotion/react, @emotion/styled, @mui/icons-material, socket.io, socket.io-client, prisma, @prisma/client, jsonwebtoken, bcryptjs, cookie, uuid, livekit-server-sdk, @livekit/components-react). Create .env.example, .gitignore, and the base directory structure (src/app, src/components, src/lib, src/hooks, src/types, data/, uploads/)."
+    },
+    {
+      "id": "TASK-002",
+      "title": "Create Prisma schema and run initial migration",
+      "spec": "specs/database.md",
+      "priority": 2,
+      "status": "open",
+      "dependencies": ["TASK-001"],
+      "description": "Create prisma/schema.prisma with SQLite datasource pointing to ../data/discord.db. Define all models: User, Server, Channel, Message, ServerMember with all fields, relations, indexes, and cascade rules per the database spec. Run prisma migrate dev to generate the initial migration. Create src/lib/db.ts exporting a singleton PrismaClient instance."
+    },
+    {
+      "id": "TASK-003",
+      "title": "Implement auth helper and JWT middleware",
+      "spec": "specs/auth.md",
+      "priority": 3,
+      "status": "open",
+      "dependencies": ["TASK-002"],
+      "description": "Create src/lib/auth.ts with functions: signToken(userId, username), verifyToken(token), getAuthUser(req) that reads the token cookie and returns the user payload or null. Uses jsonwebtoken with JWT_SECRET env var, 7-day expiry, httpOnly cookie."
+    },
+    {
+      "id": "TASK-004",
+      "title": "Implement registration API route",
+      "spec": "specs/auth.md",
+      "priority": 4,
+      "status": "open",
+      "dependencies": ["TASK-003"],
+      "description": "Create POST /api/auth/register route handler. Validate username (3-20 chars alphanumeric), email format, password (min 6 chars). Hash password with bcryptjs (10 rounds). Create User in DB via Prisma. Sign JWT, set httpOnly cookie, return user object."
+    },
+    {
+      "id": "TASK-005",
+      "title": "Implement login and logout API routes",
+      "spec": "specs/auth.md",
+      "priority": 5,
+      "status": "open",
+      "dependencies": ["TASK-003"],
+      "description": "Create POST /api/auth/login — look up user by email, compare password hash, sign JWT, set cookie, return user. Create POST /api/auth/logout — clear the token cookie. Create GET /api/auth/me — verify JWT from cookie, return user object or 401."
+    },
+    {
+      "id": "TASK-006",
+      "title": "Create ThemeRegistry and useThemeMode hook",
+      "spec": "specs/ui-layout.md",
+      "priority": 6,
+      "status": "open",
+      "dependencies": ["TASK-001"],
+      "description": "Create src/hooks/useThemeMode.tsx with ThemeModeProvider context, dark/light toggle, localStorage persistence. Primary color #5865F2, dark bg #121212/paper #1e1e1e, light bg #f5f5f5/paper #ffffff. Create src/components/common/ThemeRegistry.tsx wrapping ThemeProvider + CssBaseline. Same pattern as MarchMadness."
+    },
+    {
+      "id": "TASK-007",
+      "title": "Create useAuth hook and AuthProvider",
+      "spec": "specs/auth.md",
+      "priority": 7,
+      "status": "open",
+      "dependencies": ["TASK-005"],
+      "description": "Create src/hooks/useAuth.tsx with AuthProvider context. On mount calls /api/auth/me. Exposes { user, login, register, logout, loading }. login() calls /api/auth/login, register() calls /api/auth/register, logout() calls /api/auth/logout. Same pattern as MarchMadness useAuth."
+    },
+    {
+      "id": "TASK-008",
+      "title": "Create root layout with ThemeRegistry and AuthProvider",
+      "spec": "specs/ui-layout.md",
+      "priority": 8,
+      "status": "open",
+      "dependencies": ["TASK-006", "TASK-007"],
+      "description": "Create src/app/layout.tsx wrapping children in ThemeRegistry > AuthProvider. Create src/app/globals.css with minimal base styles. Create src/app/page.tsx as a landing/login page — if authenticated redirect to first server, otherwise show login/register form."
+    },
+    {
+      "id": "TASK-009",
+      "title": "Build login and registration UI",
+      "spec": "specs/auth.md",
+      "priority": 9,
+      "status": "open",
+      "dependencies": ["TASK-008"],
+      "description": "Create src/components/auth/AuthForm.tsx — MUI Card with tabs or toggle between Login and Register modes. Email, password fields (and username for register). Uses useAuth hook for submit. Shows validation errors. Renders on the landing page when not authenticated."
+    },
+    {
+      "id": "TASK-010",
+      "title": "Implement create server API route",
+      "spec": "specs/servers.md",
+      "priority": 10,
+      "status": "open",
+      "dependencies": ["TASK-003"],
+      "description": "Create POST /api/servers — accepts { name, imageUrl? }. Requires auth. Creates Server with auto-generated inviteCode (uuid). Creates default 'general' TEXT channel. Creates ServerMember with role OWNER. Returns full server object with channels and members."
+    },
+    {
+      "id": "TASK-011",
+      "title": "Implement list user servers and server detail API routes",
+      "spec": "specs/servers.md",
+      "priority": 11,
+      "status": "open",
+      "dependencies": ["TASK-010"],
+      "description": "Create GET /api/servers — returns all servers the authenticated user is a member of, including channels and member count. Create GET /api/servers/[serverId] — returns full server detail with channels and members. Validates user is a member."
+    },
+    {
+      "id": "TASK-012",
+      "title": "Build server sidebar component",
+      "spec": "specs/ui-layout.md",
+      "priority": 12,
+      "status": "open",
+      "dependencies": ["TASK-011", "TASK-008"],
+      "description": "Create src/components/layout/ServerSidebar.tsx — narrow vertical strip (~72px) showing server icons as MUI Avatar. Active server highlighted. 'Create Server' button (Add icon) at bottom. Fetches user's servers from /api/servers. Clicking a server navigates to /servers/[serverId]."
+    },
+    {
+      "id": "TASK-013",
+      "title": "Build create server dialog",
+      "spec": "specs/servers.md",
+      "priority": 13,
+      "status": "open",
+      "dependencies": ["TASK-012"],
+      "description": "Create src/components/layout/CreateServerDialog.tsx — MUI Dialog with TextField for server name. On submit calls POST /api/servers. On success navigates to the new server. Triggered by the Add button in ServerSidebar."
+    },
+    {
+      "id": "TASK-014",
+      "title": "Implement channel management API routes",
+      "spec": "specs/servers.md",
+      "priority": 14,
+      "status": "open",
+      "dependencies": ["TASK-010"],
+      "description": "Create POST /api/servers/[serverId]/channels — accepts { name, type }. OWNER/ADMIN only. Create PATCH /api/channels/[channelId] — rename channel. OWNER/ADMIN only. Create DELETE /api/channels/[channelId] — delete channel. Cannot delete last TEXT channel. OWNER/ADMIN only."
+    },
+    {
+      "id": "TASK-015",
+      "title": "Build channel list panel component",
+      "spec": "specs/ui-layout.md",
+      "priority": 15,
+      "status": "open",
+      "dependencies": ["TASK-014", "TASK-012"],
+      "description": "Create src/components/layout/ChannelPanel.tsx — ~240px wide panel. Server name header at top. Channel list grouped by type: text channels with # prefix, voice channels with speaker icon. Uses MUI List/ListItemButton. Active channel highlighted. 'Add Channel' button for OWNER/ADMIN. User info panel at bottom (avatar, username, theme toggle, settings icon)."
+    },
+    {
+      "id": "TASK-016",
+      "title": "Create the three-column app layout shell",
+      "spec": "specs/ui-layout.md",
+      "priority": 16,
+      "status": "open",
+      "dependencies": ["TASK-015"],
+      "description": "Create src/app/servers/[serverId]/layout.tsx — three-column layout with ServerSidebar (left), ChannelPanel (middle), and children (right, flex). Create src/app/servers/[serverId]/page.tsx — redirects to first text channel. Create src/app/servers/[serverId]/channels/[channelId]/page.tsx — placeholder for channel content."
+    },
+    {
+      "id": "TASK-017",
+      "title": "Implement message CRUD API routes",
+      "spec": "specs/servers.md",
+      "priority": 17,
+      "status": "open",
+      "dependencies": ["TASK-003", "TASK-002"],
+      "description": "Create GET /api/channels/[channelId]/messages — cursor-based pagination (take 50, cursor param). Returns messages with author info. Create POST /api/channels/[channelId]/messages — create message. Create PATCH /api/messages/[messageId] — edit message (author only). Create DELETE /api/messages/[messageId] — soft delete (author or admin)."
+    },
+    {
+      "id": "TASK-018",
+      "title": "Create Socket.io type definitions",
+      "spec": "specs/socket-events.md",
+      "priority": 18,
+      "status": "open",
+      "dependencies": ["TASK-001"],
+      "description": "Create src/types/socket.ts with TypeScript interfaces: ServerToClientEvents (message:new, message:updated, message:deleted, presence:online, presence:offline, typing:start, typing:stop) and ClientToServerEvents (channel:join, channel:leave, message:create, message:update, message:delete, typing:start, typing:stop). Define payload types for each event."
+    },
+    {
+      "id": "TASK-019",
+      "title": "Create server.js with Next.js and Socket.io",
+      "spec": "specs/socket-events.md",
+      "priority": 19,
+      "status": "open",
+      "dependencies": ["TASK-018", "TASK-003"],
+      "description": "Create server.js at project root. Wrap Next.js app with custom HTTP server. Attach Socket.io Server. Implement connection handler: parse JWT from cookie header, verify, attach userId/username to socket. Reject invalid auth. Include webhook handler for deploy (same pattern as MarchMadness). Implement channel:join and channel:leave handlers."
+    },
+    {
+      "id": "TASK-020",
+      "title": "Implement Socket.io message event handlers",
+      "spec": "specs/socket-events.md",
+      "priority": 20,
+      "status": "open",
+      "dependencies": ["TASK-019", "TASK-017"],
+      "description": "In server.js, implement message:create handler — validate membership, persist to DB via Prisma, broadcast message:new to channel room. Implement message:update — validate author, update DB, broadcast message:updated. Implement message:delete — validate author/admin, soft-delete, broadcast message:deleted."
+    },
+    {
+      "id": "TASK-021",
+      "title": "Implement Socket.io presence and typing handlers",
+      "spec": "specs/socket-events.md",
+      "priority": 21,
+      "status": "open",
+      "dependencies": ["TASK-019"],
+      "description": "In server.js, maintain in-memory Map<userId, Set<socketId>> for online tracking. On connection, broadcast presence:online to all server rooms the user belongs to. On disconnect, broadcast presence:offline. Implement typing:start and typing:stop — broadcast to channel room excluding sender."
+    },
+    {
+      "id": "TASK-022",
+      "title": "Create useSocket hook",
+      "spec": "specs/socket-events.md",
+      "priority": 22,
+      "status": "open",
+      "dependencies": ["TASK-018", "TASK-007"],
+      "description": "Create src/hooks/useSocket.ts — connects to Socket.io server when user is authenticated. Manages connection lifecycle. Exposes the typed socket instance. Auto-reconnects on disconnect. Provides joinChannel(channelId) and leaveChannel(channelId) helpers."
+    },
+    {
+      "id": "TASK-023",
+      "title": "Build MessageList component",
+      "spec": "specs/ui-layout.md",
+      "priority": 23,
+      "status": "open",
+      "dependencies": ["TASK-022", "TASK-017"],
+      "description": "Create src/components/chat/MessageList.tsx — scrollable MUI Box with overflow-y. Fetches initial messages from /api/channels/[channelId]/messages. Listens for message:new, message:updated, message:deleted via useSocket. Each message shows Avatar, username, timestamp, content. Scroll-to-top loads older messages (cursor pagination)."
+    },
+    {
+      "id": "TASK-024",
+      "title": "Build MessageInput component",
+      "spec": "specs/ui-layout.md",
+      "priority": 24,
+      "status": "open",
+      "dependencies": ["TASK-022"],
+      "description": "Create src/components/chat/MessageInput.tsx — MUI TextField with Send IconButton. On submit emits message:create via socket. Implements typing:start/typing:stop emission with debounce. Enter key sends, Shift+Enter for newline."
+    },
+    {
+      "id": "TASK-025",
+      "title": "Build typing indicator component",
+      "spec": "specs/socket-events.md",
+      "priority": 25,
+      "status": "open",
+      "dependencies": ["TASK-024"],
+      "description": "Create src/components/chat/TypingIndicator.tsx — listens for typing:start/typing:stop events. Shows 'User is typing...' text below the message input. Handles multiple concurrent typers. Auto-clears after timeout."
+    },
+    {
+      "id": "TASK-026",
+      "title": "Assemble the text channel page",
+      "spec": "specs/ui-layout.md",
+      "priority": 26,
+      "status": "open",
+      "dependencies": ["TASK-023", "TASK-024", "TASK-025", "TASK-016"],
+      "description": "Update src/app/servers/[serverId]/channels/[channelId]/page.tsx — for TEXT channels, render channel name header, MessageList, TypingIndicator, and MessageInput. Join the socket channel room on mount, leave on unmount. Full working text chat flow."
+    },
+    {
+      "id": "TASK-027",
+      "title": "Implement invite system API routes",
+      "spec": "specs/servers.md",
+      "priority": 27,
+      "status": "open",
+      "dependencies": ["TASK-010"],
+      "description": "Create GET /api/servers/[serverId]/invite — returns invite code (members only). Create POST /api/servers/invite/[code] — join server via invite code, creates ServerMember with GUEST role, rejects if already a member."
+    },
+    {
+      "id": "TASK-028",
+      "title": "Build invite page",
+      "spec": "specs/servers.md",
+      "priority": 28,
+      "status": "open",
+      "dependencies": ["TASK-027", "TASK-008"],
+      "description": "Create src/app/invite/[code]/page.tsx — fetches server info by invite code, shows server name and 'Join' button. On join calls POST /api/servers/invite/[code], then redirects to the server. If already a member, redirects directly."
+    },
+    {
+      "id": "TASK-029",
+      "title": "Implement member management API routes",
+      "spec": "specs/servers.md",
+      "priority": 29,
+      "status": "open",
+      "dependencies": ["TASK-010"],
+      "description": "Create GET /api/servers/[serverId]/members — list members with roles. Create PATCH /api/servers/[serverId]/members/[memberId] — change role (OWNER only). Create DELETE /api/servers/[serverId]/members/[memberId] — kick member (OWNER/ADMIN only, cannot kick OWNER)."
+    },
+    {
+      "id": "TASK-030",
+      "title": "Build online members sidebar",
+      "spec": "specs/ui-layout.md",
+      "priority": 30,
+      "status": "open",
+      "dependencies": ["TASK-029", "TASK-021", "TASK-022"],
+      "description": "Create src/components/layout/MemberList.tsx — optional right sidebar showing server members grouped by role, with online/offline status indicators. Listens for presence:online/presence:offline events. Collapsible on smaller screens."
+    },
+    {
+      "id": "TASK-031",
+      "title": "Implement LiveKit token generation API route",
+      "spec": "specs/webrtc.md",
+      "priority": 31,
+      "status": "open",
+      "dependencies": ["TASK-003", "TASK-002"],
+      "description": "Create POST /api/livekit/token — requires auth. Accepts { channelId }. Validates user is a member of the server owning the channel and channel type is VOICE or VIDEO. Generates LiveKit access token using livekit-server-sdk with room name channel:<channelId>, identity user:<userId>, grants roomJoin/canPublish/canSubscribe, 1h expiry. Returns { token }."
+    },
+    {
+      "id": "TASK-032",
+      "title": "Build VoiceChannel component with LiveKit",
+      "spec": "specs/webrtc.md",
+      "priority": 32,
+      "status": "open",
+      "dependencies": ["TASK-031", "TASK-016"],
+      "description": "Create src/components/voice/VoiceChannel.tsx — fetches token from /api/livekit/token on join. Wraps content in LiveKitRoom provider connecting to NEXT_PUBLIC_LIVEKIT_URL. Renders participant list with audio/video tracks using @livekit/components-react. Mute/unmute and disconnect buttons with MUI IconButton."
+    },
+    {
+      "id": "TASK-033",
+      "title": "Wire voice channel into the channel page",
+      "spec": "specs/webrtc.md",
+      "priority": 33,
+      "status": "open",
+      "dependencies": ["TASK-032", "TASK-026"],
+      "description": "Update src/app/servers/[serverId]/channels/[channelId]/page.tsx — check channel type. If VOICE or VIDEO, render VoiceChannel component instead of MessageList/MessageInput. Show channel name and participant count."
+    },
+    {
+      "id": "TASK-034",
+      "title": "Implement update and delete server API routes",
+      "spec": "specs/servers.md",
+      "priority": 34,
+      "status": "open",
+      "dependencies": ["TASK-010"],
+      "description": "Create PATCH /api/servers/[serverId] — accepts { name?, imageUrl? }. OWNER/ADMIN only. Create DELETE /api/servers/[serverId] — OWNER only, cascades to all channels/messages/members."
+    },
+    {
+      "id": "TASK-035",
+      "title": "Build server settings UI",
+      "spec": "specs/servers.md",
+      "priority": 35,
+      "status": "open",
+      "dependencies": ["TASK-034", "TASK-029", "TASK-016"],
+      "description": "Create src/components/layout/ServerSettings.tsx — MUI Dialog accessible from settings icon in ChannelPanel. Tabs for: General (rename server, view invite code, copy invite link), Members (list, change roles, kick), Danger Zone (delete server). Only shows options the user's role permits."
+    },
+    {
+      "id": "TASK-036",
+      "title": "Add mobile responsive layout with Drawer",
+      "spec": "specs/ui-layout.md",
+      "priority": 36,
+      "status": "open",
+      "dependencies": ["TASK-026"],
+      "description": "Update the three-column layout to collapse ServerSidebar and ChannelPanel into a MUI Drawer on screens <768px. Add hamburger Menu IconButton in the channel header. Same pattern as MarchMadness mobile nav."
+    },
+    {
+      "id": "TASK-037",
+      "title": "Create deploy_webhook.sh and server.js webhook handler",
+      "spec": "specs/deployment.md",
+      "priority": 37,
+      "status": "open",
+      "dependencies": ["TASK-019"],
+      "description": "Create deploy_webhook.sh matching MarchMadness pattern: git fetch/reset, conditional npm install, prisma migrate deploy, next build, pm2 restart discord-alt. Add /api/webhook POST handler in server.js with HMAC signature verification using WEBHOOK_SECRET."
+    },
+    {
+      "id": "TASK-038",
+      "title": "Create .env.example and README",
+      "spec": "specs/deployment.md",
+      "priority": 38,
+      "status": "open",
+      "dependencies": ["TASK-001"],
+      "description": "Create .env.example with all required env vars (PORT, JWT_SECRET, WEBHOOK_SECRET, LIVEKIT_API_KEY, LIVEKIT_API_SECRET, NEXT_PUBLIC_LIVEKIT_URL). Create README.md with project description, setup instructions, and deployment guide."
+    }
+  ]
 }
