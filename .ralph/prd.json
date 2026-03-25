@@ -596,7 +596,7 @@
       "title": "Bug fix: messages require page refresh to appear",
       "spec": "specs/socket-events.md",
       "priority": 54,
-      "status": "open",
+      "status": "in_progress",
       "dependencies": [],
       "description": "BUG: New messages sent by other users do not appear in real-time \u2014 the page must be refreshed to see them. Diagnose the full Socket.io chain: 1) Check server.js message:create handler actually broadcasts message:new to the channel room. 2) Check MessageList subscribes to message:new via useSocket. 3) Check the socket actually joins the channel room on mount (channel:join event). 4) Check useSocket connects successfully (verify JWT cookie is sent in handshake). 5) Test with two browser tabs \u2014 send a message in one, verify it appears in the other without refresh. Use pm2 logs on the server to see if socket events are firing. Fix whatever is broken."
     },

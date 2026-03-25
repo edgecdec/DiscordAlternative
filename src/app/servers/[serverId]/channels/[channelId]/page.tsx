@@ -19,7 +19,7 @@ export default function ChannelPage() {
   const channelId = params?.channelId as string;
   const serverId = params?.serverId as string;
   const [channel, setChannel] = useState<ChannelInfo | null>(null);
-  const { joinChannel, leaveChannel } = useSocket();
+  const { joinChannel, leaveChannel, connected } = useSocket();
 
   useEffect(() => {
     if (!serverId) return;
@@ -35,12 +35,12 @@ export default function ChannelPage() {
   }, [serverId, channelId]);
 
   useEffect(() => {
-    if (!channelId) return;
+    if (!channelId || !connected) return;
     joinChannel(channelId);
     return () => {
       leaveChannel(channelId);
     };
-  }, [channelId, joinChannel, leaveChannel]);
+  }, [channelId, connected, joinChannel, leaveChannel]);
 
   const isText = !channel || channel.type === "TEXT";
 
