@@ -410,3 +410,12 @@
 - Root cause: channel page's `joinChannel(channelId)` useEffect fired before the socket was connected, so the `channel:join` emit was silently lost (optional chaining on null socket).
 - Fix: added `connected` from `useSocket()` as a dependency to the join/leave useEffect in the channel page. Now the effect only fires when `connected` is true, and re-fires if the socket reconnects.
 - Lesson: When using Socket.io with React, any emit that must happen on mount needs to be gated on the socket's connected state. Refs don't trigger re-renders, so emits via refs can silently fail if the socket isn't ready yet.
+
+## TASK-046: Implement LiveKit token generation API route (2026-03-25)
+- Created `src/app/api/livekit/token/route.ts` — POST endpoint that generates LiveKit access tokens.
+- Validates auth, channelId presence, channel existence, channel type (VOICE/VIDEO), and server membership.
+- Uses `livekit-server-sdk` AccessToken class with `LIVEKIT_API_KEY`/`LIVEKIT_API_SECRET` env vars.
+- Room name format: `channel:<channelId>`, identity: `user:<userId>`, grants: roomJoin, canPublish, canSubscribe, TTL 1h.
+- All validation passed first try (prisma validate, tsc --noEmit, npm test).
+- Deploy verified immediately (200 on first poll).
+- Lessons: `AccessToken.toJwt()` is async (returns Promise) — must await it. The SDK reads env vars automatically if constructor args are omitted, but explicit is better.

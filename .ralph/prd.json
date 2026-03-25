@@ -605,7 +605,7 @@
       "title": "Implement LiveKit token generation API route",
       "spec": "specs/webrtc.md",
       "priority": 55,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-005",
         "TASK-004"
