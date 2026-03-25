@@ -60,6 +60,9 @@ These are mistakes Ralph has made on previous projects. Do not repeat them.
 - NEVER run `node server.js` locally as a background process — it gets stuck and blocks the iteration.
 - This app deploys to a REMOTE server. After pushing, the webhook auto-deploys.
 - A curl returning 200 does NOT mean the site works — always verify more than just status code.
+- After every `git push`, wait 60 seconds then verify deployment: `source .ralph/.server-env && ssh -i $SSH_KEY $SSH_USER@$SSH_HOST "curl -s -o /dev/null -w '%{http_code}' http://localhost:3003"` — must return 200.
+- If deploy fails (non-200 or pm2 shows errored), check logs: `ssh -i $SSH_KEY $SSH_USER@$SSH_HOST "pm2 logs discord-alt --lines 30 --nostream"`
+- Do NOT proceed to the next task if the site is down after your push. Fix it first.
 
 ## Security — Secrets and Sensitive Data
 - NEVER hardcode IP addresses, API keys, secrets, tokens, or passwords in any committed file.

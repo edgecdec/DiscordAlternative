@@ -192,7 +192,7 @@
       "title": "Implement server detail API route",
       "spec": "specs/servers.md",
       "priority": 18,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-013"
       ],

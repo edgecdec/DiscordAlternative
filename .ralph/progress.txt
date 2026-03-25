@@ -137,3 +137,9 @@
 - Returns servers where user is a member, with channels included and member count via _count
 - Ordered by createdAt asc for consistent sidebar ordering
 - Lesson: Adding a second handler to an existing route file is straightforward — just export another named function (GET alongside POST)
+
+## TASK-015: Implement server detail API route (2026-03-24)
+- Created GET /api/servers/[serverId] — validates membership, returns server with channels and members (including user info).
+- Next.js 15 App Router uses `params: Promise<{ serverId: string }>` — must await params before accessing.
+- Followed existing pattern from /api/servers/route.ts for auth checks and response shape.
+- Membership check via `findUnique` on the `@@unique([userId, serverId])` composite key is clean and efficient.
