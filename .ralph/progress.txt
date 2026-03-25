@@ -56,3 +56,10 @@
 - On failure: returns 401 with generic "Invalid email or password" (no info leakage about which field is wrong).
 - Followed exact same patterns as register route (imports, response shape, cookie handling).
 - All validation passed: prisma validate ✓, tsc --noEmit ✓, npm test ✓.
+
+## TASK-008: Implement logout and current user API routes (2026-03-24)
+- Created `src/app/api/auth/logout/route.ts` — POST handler clears the token cookie using `buildClearTokenCookie()`.
+- Created `src/app/api/auth/me/route.ts` — GET handler calls `getAuthUser()`, looks up user in DB via Prisma with select (id, username, email, avatarUrl), returns user or 401.
+- Both routes follow the same patterns as login/register (NextResponse, auth helpers from lib/auth).
+- All validation passed: prisma validate, tsc --noEmit, npm test.
+- Lessons: The auth.ts already had `buildClearTokenCookie()` ready to use — always check existing utilities before writing new ones.
