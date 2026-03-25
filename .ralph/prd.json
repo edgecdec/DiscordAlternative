@@ -6,7 +6,7 @@
       "title": "Initialize Next.js project with TypeScript",
       "spec": "specs/deployment.md",
       "priority": 1,
-      "status": "open",
+      "status": "in_progress",
       "dependencies": [],
       "description": "Create a new Next.js 15 project with TypeScript and App Router. Configure tsconfig.json with path alias @/ pointing to src/. Create .gitignore (node_modules, .next, .env, data/, uploads/, .ralph/.server-env). Create the base directory structure: src/app, src/components, src/lib, src/hooks, src/types, data/, uploads/."
     },
