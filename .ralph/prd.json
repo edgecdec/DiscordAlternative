@@ -81,7 +81,7 @@
       "title": "Implement logout and current user API routes",
       "spec": "specs/auth.md",
       "priority": 8,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [
         "TASK-005"
       ],
