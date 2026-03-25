@@ -70,7 +70,7 @@
       "title": "Implement login API route",
       "spec": "specs/auth.md",
       "priority": 7,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [
         "TASK-005"
       ],
