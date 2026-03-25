@@ -333,7 +333,7 @@
       "title": "Implement get messages API route",
       "spec": "specs/servers.md",
       "priority": 31,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-005",
         "TASK-004"

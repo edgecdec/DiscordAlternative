@@ -238,3 +238,12 @@
 - The layout reuses existing ServerSidebar, ChannelPanel, and CreateServerDialog components — no duplication.
 - ChannelPanel already fetches server data using the serverId from useParams, so no prop drilling needed.
 - Lesson: The channel page fetches server data to get the channel name. Future tasks (TASK-040) will replace the placeholder content with MessageList/MessageInput.
+
+## TASK-023: Implement get messages API route (2026-03-25)
+- Created GET /api/channels/[channelId]/messages with cursor-based pagination
+- Validates auth and server membership before returning messages
+- Returns messages ordered by createdAt desc, with author info (id, username, avatarUrl)
+- Uses MESSAGES_PER_PAGE constant (50) for page size
+- Cursor-based pagination: pass `cursor` query param with last message ID to get next page
+- Returns `nextCursor` (null when no more pages)
+- Lessons: Next.js 15 route params are async (Promise<{channelId}>), must await them. Prisma cursor pagination uses skip:1 + cursor:{id} pattern to avoid returning the cursor item itself.
