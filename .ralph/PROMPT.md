@@ -15,10 +15,9 @@ You are an autonomous coding agent operating within a Ralph Loop. You execute ex
 8. Implement ONLY that single task. Do not touch unrelated code.
 9. Run ALL backpressure validation commands from AGENTS.md.
 10. If validation fails: read the error output, fix the issue, re-run validation. Max 3 retry attempts.
-11. If validation passes: `git add -A && git commit -m "TASK-XXX: short description" && git push`.
+11. If validation passes: update the task status to `"done"` in prd.json, append lessons to `.ralph/progress.txt`, then: `git add -A && git commit -m "TASK-XXX: short description" && git push`.
 12. Wait 60 seconds, then verify deployment: `source .ralph/.server-env && ssh -i $SSH_KEY $SSH_USER@$SSH_HOST "curl -s -o /dev/null -w '%{http_code}' http://localhost:3003"`. Must return 200. If not, check pm2 logs, fix the issue, commit and push the fix, then re-verify.
-13. Update the task status to `"done"` in prd.json, append lessons to `.ralph/progress.txt`, then: `git add -A && git commit -m "TASK-XXX: done" && git push`.
-14. Terminate the iteration.
+13. Terminate the iteration.
 
 ## Constraints
 
