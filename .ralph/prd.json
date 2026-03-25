@@ -15,7 +15,7 @@
       "title": "Install all project dependencies",
       "spec": "specs/deployment.md",
       "priority": 2,
-      "status": "open",
+      "status": "in_progress",
       "dependencies": [
         "TASK-001"
       ],
