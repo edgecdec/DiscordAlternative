@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be Right Back — Discord Alternative</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #121212;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    user-select: none;
+  }
+  h1 { color: #5865F2; font-size: 2rem; margin-bottom: 0.5rem; }
+  p { color: #b9bbbe; margin-bottom: 1.5rem; font-size: 1.1rem; }
+  canvas {
+    border: 2px solid #5865F2;
+    border-radius: 4px;
+    display: block;
+    background: #1e1e1e;
+  }
+  .score {
+    color: #b9bbbe;
+    margin-top: 0.75rem;
+    font-size: 1rem;
+  }
+  .hint {
+    color: #72767d;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+<h1>We'll be right back</h1>
+<p>Deploying an update — play some Snake while you wait!</p>
+<canvas id="game" width="300" height="300"></canvas>
+<div class="score">Score: <span id="score">0</span></div>
+<div class="hint">Arrow keys or WASD to move · Any key to restart</div>
+<script>
+(function() {
+  var CELL = 15, COLS = 20, ROWS = 20, TICK = 120;
+  var canvas = document.getElementById('game');
+  canvas.width = COLS * CELL;
+  canvas.height = ROWS * CELL;
+  var ctx = canvas.getContext('2d');
+  var scoreEl = document.getElementById('score');
+  var snake, dir, food, score, running, timer;
+
+  function init() {
+    clearInterval(timer);
+    snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+    dir = {x:1,y:0};
+    score = 0;
+    scoreEl.textContent = '0';
+    placeFood();
+    running = true;
+    timer = setInterval(tick, TICK);
+  }
+
+  function placeFood() {
+    do { food = {x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)}; }
+    while (snake.some(function(s){return s.x===food.x&&s.y===food.y;}));
+  }
+
+  function tick() {
+    if (!running) return;
+    var head = {x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+    if (head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS||snake.some(function(s){return s.x===head.x&&s.y===head.y;})) {
+      running = false;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#5865F2';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Game Over', canvas.width/2, canvas.height/2);
+      return;
+    }
+    snake.unshift(head);
+    if (head.x===food.x&&head.y===food.y) { score++; scoreEl.textContent=score; placeFood(); }
+    else { snake.pop(); }
+    draw();
+  }
+
+  function draw() {
+    ctx.fillStyle = '#1e1e1e';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#5865F2';
+    for (var i=0;i<snake.length;i++) {
+      ctx.fillRect(snake[i].x*CELL+1, snake[i].y*CELL+1, CELL-2, CELL-2);
+    }
+    ctx.fillStyle = '#ed4245';
+    ctx.fillRect(food.x*CELL+1, food.y*CELL+1, CELL-2, CELL-2);
+  }
+
+  var KEY_MAP = {ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},
+    w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0}};
+
+  document.addEventListener('keydown', function(e) {
+    if (!running) { init(); return; }
+    var nd = KEY_MAP[e.key];
+    if (nd && (nd.x+dir.x!==0||nd.y+dir.y!==0)) dir = nd;
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>

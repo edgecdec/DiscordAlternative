@@ -143,3 +143,9 @@
 - Next.js 15 App Router uses `params: Promise<{ serverId: string }>` — must await params before accessing.
 - Followed existing pattern from /api/servers/route.ts for auth checks and response shape.
 - Membership check via `findUnique` on the `@@unique([userId, serverId])` composite key is clean and efficient.
+
+## TASK-058: Create maintenance.html with Snake minigame (2026-03-24)
+- Created self-contained maintenance.html with no external dependencies.
+- Snake game uses canvas, arrow keys + WASD, matches app theme (#121212 bg, #5865F2 primary, #1e1e1e game bg).
+- nginx serves this via error_page directive on 502/503/504 during deploys.
+- Pure HTML/CSS/JS task — no TypeScript or build impact, all validations pass trivially.

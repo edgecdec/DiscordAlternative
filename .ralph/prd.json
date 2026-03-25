@@ -203,7 +203,7 @@
       "title": "Create maintenance.html page with minigame",
       "spec": "specs/deployment.md",
       "priority": 19,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-055"
       ],
