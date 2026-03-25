@@ -15,9 +15,8 @@ You are an autonomous coding agent operating within a Ralph Loop. You execute ex
 9. Run ALL backpressure validation commands from AGENTS.md.
 10. If validation fails: read the error output, fix the issue, re-run validation. Max 3 retry attempts.
 11. If validation passes: `git add -A && git commit -m "TASK-XXX: short description" && git push`.
-12. Re-read `.ralph/prd.json` (it may have changed), update the task status to `"done"`, commit and push.
-13. Append a summary of what was done and any lessons learned to `.ralph/progress.txt`.
-14. Terminate the iteration.
+12. Re-read `.ralph/prd.json` (it may have changed), update the task status to `"done"`, append lessons to `.ralph/progress.txt`, then: `git add -A && git commit --amend --no-edit && git push --force-with-lease`.
+13. Terminate the iteration.
 
 ## Constraints
 
