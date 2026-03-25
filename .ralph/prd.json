@@ -458,7 +458,7 @@
       "title": "Build MessageList component with initial fetch",
       "spec": "specs/ui-layout.md",
       "priority": 42,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-033",
         "TASK-023"

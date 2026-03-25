@@ -314,3 +314,12 @@
 - The actual work was adding SocketProvider to layout.tsx inside AuthProvider so the socket context is available app-wide.
 - Lesson: Always check if a file already exists before creating it — search the git log to avoid redundant work.
 - The hook connects to Socket.io when user is authenticated, auto-reconnects, and exposes typed joinChannel/leaveChannel helpers.
+
+## TASK-034: Build MessageList component with initial fetch (2026-03-25)
+- Created src/components/chat/MessageList.tsx with channelId prop
+- Fetches messages from /api/channels/[channelId]/messages on mount, reverses the desc-ordered response for chronological display
+- Renders each message with Avatar, username, timestamp, and content
+- Handles deleted messages with italic disabled text
+- Auto-scrolls to bottom on load via ref
+- Shows loading and empty states
+- Lessons: The API returns messages in desc order (newest first) for cursor pagination, so reverse() is needed for chronological display in the UI.
