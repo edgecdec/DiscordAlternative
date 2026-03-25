@@ -34,3 +34,9 @@
 - Lesson: Prisma 7 requires `adapter` or `accelerateUrl` in PrismaClient constructor — `datasourceUrl` is no longer valid
 - Lesson: The adapter class is `PrismaBetterSqlite3` (lowercase "qlite"), not `PrismaBetterSQLite3`
 - Lesson: Adapter constructor takes `{ url: "file:/path/to/db" }` object, not a plain string path
+
+## TASK-005: Implement auth helper and JWT utilities (2026-03-24)
+- Created `src/lib/auth.ts` with: signToken, verifyToken, getAuthUser (reads cookie via next/headers), buildTokenCookie, buildClearTokenCookie.
+- Used Next.js `cookies()` API (async) in getAuthUser instead of raw request header parsing — cleaner for App Router route handlers.
+- Exported cookie builder helpers so route handlers can set/clear cookies consistently.
+- All 3 validation commands pass (prisma validate, tsc --noEmit, npm test).
