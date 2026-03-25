@@ -175,3 +175,14 @@
 - Ran on production server via SSH — both users created and verified via login API.
 - Created `~/.config/discord-alt-creds.env` on local machine with TESTBOT_USER/TESTBOT_PASS and ADMIN_USER/ADMIN_PASS.
 - Lessons: Seed script uses CommonJS (require) since it runs directly with `node` outside the Next.js build. Same adapter pattern as src/lib/db.ts but in plain JS.
+
+## TASK-061: Set up Nova Act browser testing for UI verification (2026-03-25)
+- Added "Nova Act Testing" section to `.ralph/specs/anti-patterns.md` with the full cookie-based auth bypass pattern.
+- Verified the pattern works: curl login → parse `#HttpOnly_` cookie jar → inject via `nova.page.context.add_cookies()` → navigate → auth redirect to `/servers` confirmed.
+- Key findings:
+  - `ActResult` has only `metadata` — no `.response` attribute. Use `act_get()` with a schema for structured data, or use `nova.page` (Playwright) for assertions.
+  - Cookie jar lines prefixed with `#HttpOnly_` must be stripped before parsing — standard `#` comment skip logic will miss them.
+  - Use `headless=True` and `max_steps=5` to keep tests fast.
+  - Run with `/opt/homebrew/bin/python3.13`.
+  - Delete temp scripts after verification.
+- Deployment verified: 200 OK (this task only changed a spec file, no runtime impact).

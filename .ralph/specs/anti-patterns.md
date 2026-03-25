@@ -89,3 +89,53 @@ These are mistakes Ralph has made on previous projects. Do not repeat them.
 - The ONLY allowed amend is: deploy verified → update prd.json/progress.txt → `git commit --amend --no-edit && git push --force-with-lease`. This keeps one clean commit per task.
 - Never amend a commit that hasn't been deployed and verified yet.
 - Always `git pull` before committing if you suspect the human or another process pushed changes.
+
+## Nova Act Testing
+After deploying any UI task, write a temporary Nova Act test script to verify the feature works in a real browser against the LIVE site (https://discord.edgecdec.com). Follow this exact pattern:
+
+### Cookie-Based Auth Bypass
+1. Source creds: `source ~/.config/discord-alt-creds.env`
+2. Get auth cookie via curl:
+   ```bash
+   curl -s -c /tmp/discord-cookie.txt -X POST https://discord.edgecdec.com/api/auth/login \
+     -H 'Content-Type: application/json' \
+     -d '{"username":"'$TESTBOT_USER'","password":"'$TESTBOT_PASS'"}'
+   ```
+3. Parse the token from the cookie jar (handles `#HttpOnly_` prefix):
+   ```python
+   token = None
+   with open("/tmp/discord-cookie.txt") as f:
+       for line in f:
+           clean = line.strip()
+           if clean.startswith("#HttpOnly_"):
+               clean = clean[len("#HttpOnly_"):]
+           elif clean.startswith("#") or not clean:
+               continue
+           parts = clean.split("\t")
+           if len(parts) >= 7 and parts[5] == "token":
+               token = parts[6]
+   ```
+4. Inject cookie into Nova Act's Playwright context:
+   ```python
+   nova.page.context.add_cookies([{
+       "name": "token",
+       "value": token,
+       "domain": "discord.edgecdec.com",
+       "path": "/",
+       "httpOnly": True,
+       "secure": True,
+   }])
+   nova.page.goto("https://discord.edgecdec.com", wait_until="networkidle")
+   ```
+
+### Script Pattern
+- Save as `/tmp/test_<feature>.py`
+- Run with: `/opt/homebrew/bin/python3.13 /tmp/test_<feature>.py`
+- Use `headless=True` in NovaAct constructor
+- ONE NovaAct session — do NOT create multiple sessions
+- Use `nova.act("short one-sentence instruction")` for browser actions
+- Use `nova.page` (Playwright) for assertions (URL checks, element visibility, text content)
+- `act()` returns `ActResult` with only `metadata` — NO `.response` attribute. Use `act_get()` with a schema for structured data extraction.
+- Print PASS/FAIL for each check
+- Delete the temp script after verification passes
+- Max 5 steps per `act()` call to avoid timeouts: `nova.act("...", max_steps=5)`
