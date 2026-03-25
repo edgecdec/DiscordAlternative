@@ -230,3 +230,11 @@
 - Placed at bottom of ChannelPanel with `borderTop` divider and `background.default` bgcolor to visually separate from channel list.
 - Removed unused `Divider` import from ChannelPanel after cleanup.
 - Lesson: Keep new UI additions as separate components to stay under the 150-line file limit.
+
+## TASK-022: Create three-column layout shell and server pages (2026-03-25)
+- Created `src/app/servers/[serverId]/layout.tsx` with three-column flexbox: ServerSidebar (72px) | ChannelPanel (240px) | children (flex:1).
+- Created `src/app/servers/[serverId]/page.tsx` that fetches server data and redirects to the first TEXT channel.
+- Created `src/app/servers/[serverId]/channels/[channelId]/page.tsx` as a placeholder showing channel name with # icon.
+- The layout reuses existing ServerSidebar, ChannelPanel, and CreateServerDialog components — no duplication.
+- ChannelPanel already fetches server data using the serverId from useParams, so no prop drilling needed.
+- Lesson: The channel page fetches server data to get the channel name. Future tasks (TASK-040) will replace the placeholder content with MessageList/MessageInput.

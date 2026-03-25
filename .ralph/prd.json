@@ -322,7 +322,7 @@
       "title": "Create the three-column layout shell and server pages",
       "spec": "specs/ui-layout.md",
       "priority": 30,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-021"
       ],
