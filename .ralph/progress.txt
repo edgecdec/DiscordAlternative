@@ -294,3 +294,10 @@
 - Added message:update handler: validates author owns message, message not deleted, content valid (1-2000 chars), updates DB, broadcasts message:updated to channel room.
 - Added message:delete handler: validates author or server admin/owner/moderator, soft-deletes in DB, broadcasts message:deleted with { messageId } to channel room.
 - Lessons: For delete authorization, included MODERATOR role alongside OWNER/ADMIN since moderators should be able to delete messages. Used channel→serverId join to check membership role without extra queries.
+
+## TASK-031: Implement Socket.io presence tracking (2026-03-25)
+- Added `onlineUsers` Map<userId, Set<socketId>> to server.js for multi-tab/device tracking.
+- On connection: socket joins `server:<serverId>` rooms for all user's memberships, broadcasts `presence:online` only on first socket (user just came online).
+- On disconnect: removes socketId from set, broadcasts `presence:offline` only when last socket disconnects (user fully offline).
+- Uses `socket.to(room)` for online (excludes sender) and `io.to(room)` for offline (sender already disconnected).
+- Lesson: presence:offline uses `io.to()` because the disconnecting socket is already gone from the room — `socket.to()` wouldn't work.

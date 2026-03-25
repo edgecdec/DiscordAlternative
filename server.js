@@ -79,6 +79,7 @@ app.prepare().then(() => {
   });
 
   const io = new SocketServer(server);
+  const onlineUsers = new Map(); // Map<userId, Set<socketId>>
 
   io.use((socket, next) => {
     const cookieHeader = socket.handshake.headers.cookie;
@@ -89,8 +90,35 @@ app.prepare().then(() => {
     next();
   });
 
-  io.on("connection", (socket) => {
-    console.log(`Socket connected: ${socket.data.username} (${socket.data.userId})`);
+  io.on("connection", async (socket) => {
+    const { userId, username } = socket.data;
+    console.log(`Socket connected: ${username} (${userId})`);
+
+    // Track online presence
+    if (!onlineUsers.has(userId)) {
+      onlineUsers.set(userId, new Set());
+    }
+    onlineUsers.get(userId).add(socket.id);
+
+    // Join server rooms and broadcast presence:online
+    try {
+      const memberships = await prisma.serverMember.findMany({
+        where: { userId },
+        select: { serverId: true },
+      });
+      const serverRooms = memberships.map((m) => `server:${m.serverId}`);
+      for (const room of serverRooms) {
+        socket.join(room);
+      }
+      // Only broadcast if this is the user's first socket (just came online)
+      if (onlineUsers.get(userId).size === 1) {
+        for (const room of serverRooms) {
+          socket.to(room).emit("presence:online", { userId, username });
+        }
+      }
+    } catch (err) {
+      console.error("presence:online error:", err);
+    }
 
     socket.on("channel:join", async ({ channelId }) => {
       try {
@@ -201,8 +229,29 @@ app.prepare().then(() => {
       }
     });
 
-    socket.on("disconnect", () => {
-      console.log(`Socket disconnected: ${socket.data.username} (${socket.data.userId})`);
+    socket.on("disconnect", async () => {
+      const { userId, username } = socket.data;
+      console.log(`Socket disconnected: ${username} (${userId})`);
+
+      const sockets = onlineUsers.get(userId);
+      if (sockets) {
+        sockets.delete(socket.id);
+        if (sockets.size === 0) {
+          onlineUsers.delete(userId);
+          // Broadcast offline to all user's server rooms
+          try {
+            const memberships = await prisma.serverMember.findMany({
+              where: { userId },
+              select: { serverId: true },
+            });
+            for (const m of memberships) {
+              io.to(`server:${m.serverId}`).emit("presence:offline", { userId });
+            }
+          } catch (err) {
+            console.error("presence:offline error:", err);
+          }
+        }
+      }
     });
   });
 

@@ -424,7 +424,7 @@
       "title": "Implement Socket.io presence tracking",
       "spec": "specs/socket-events.md",
       "priority": 39,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-028"
       ],
