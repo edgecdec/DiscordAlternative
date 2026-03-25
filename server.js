@@ -4,6 +4,9 @@ const { createHmac } = require("crypto");
 const { execFile } = require("child_process");
 const path = require("path");
 const next = require("next");
+const { Server: SocketServer } = require("socket.io");
+const jwt = require("jsonwebtoken");
+const cookie = require("cookie");
 
 const PORT = parseInt(process.env.PORT || "3003", 10);
 const dev = process.env.NODE_ENV !== "production";
@@ -25,6 +28,21 @@ function collectBody(req) {
     req.on("end", () => resolve(Buffer.concat(chunks)));
     req.on("error", reject);
   });
+}
+
+function parseAuthFromCookie(cookieHeader) {
+  if (!cookieHeader) return null;
+  const parsed = cookie.parse(cookieHeader);
+  const token = parsed.token;
+  if (!token) return null;
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return null;
+  try {
+    const decoded = jwt.verify(token, secret);
+    return { userId: decoded.userId, username: decoded.username };
+  } catch {
+    return null;
+  }
 }
 
 app.prepare().then(() => {
@@ -52,6 +70,25 @@ app.prepare().then(() => {
     }
 
     handle(req, res, parsed);
+  });
+
+  const io = new SocketServer(server);
+
+  io.use((socket, next) => {
+    const cookieHeader = socket.handshake.headers.cookie;
+    const user = parseAuthFromCookie(cookieHeader);
+    if (!user) return next(new Error("Authentication required"));
+    socket.data.userId = user.userId;
+    socket.data.username = user.username;
+    next();
+  });
+
+  io.on("connection", (socket) => {
+    console.log(`Socket connected: ${socket.data.username} (${socket.data.userId})`);
+
+    socket.on("disconnect", () => {
+      console.log(`Socket disconnected: ${socket.data.username} (${socket.data.userId})`);
+    });
   });
 
   server.listen(PORT, () => {

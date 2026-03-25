@@ -378,7 +378,7 @@
       "title": "Add Socket.io to server.js with auth",
       "spec": "specs/socket-events.md",
       "priority": 35,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-055",
         "TASK-026",

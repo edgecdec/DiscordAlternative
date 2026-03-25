@@ -267,3 +267,9 @@
 - Created src/types/socket.ts with all payload interfaces and typed ServerToClientEvents/ClientToServerEvents
 - Payload types: ChannelJoinPayload, ChannelLeavePayload, MessageCreatePayload, MessageUpdatePayload, MessageDeletePayload, TypingPayload, PresenceOnlinePayload, PresenceOfflinePayload, TypingBroadcastPayload, MessageDeletedPayload, SocketMessage, MessageAuthor
 - Lessons: Types-only tasks are straightforward — no runtime impact, just ensure tsc passes. The SocketMessage type includes author info since that's what gets broadcast to clients.
+
+## TASK-027: Add Socket.io to server.js with JWT cookie auth
+- Date: 2026-03-25
+- Status: DONE
+- Changes: Updated server.js to attach Socket.io Server to the HTTP server. Added JWT auth middleware that parses the token cookie from handshake headers, verifies it with jsonwebtoken, and attaches userId/username to socket.data. Rejects unauthenticated connections.
+- Lessons: server.js is CommonJS so can't import from src/lib/auth.ts directly — duplicated the JWT verify logic using require('jsonwebtoken') and require('cookie'). The parseAuthFromCookie helper is self-contained and mirrors verifyToken from auth.ts. Future socket event handlers (TASK-028+) will build on the io.on("connection") block added here.
