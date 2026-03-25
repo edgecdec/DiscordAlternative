@@ -59,7 +59,7 @@
       "title": "Implement registration API route",
       "spec": "specs/auth.md",
       "priority": 6,
-      "status": "open",
+      "status": "in_progress",
       "dependencies": [
         "TASK-005"
       ],
