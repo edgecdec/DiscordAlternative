@@ -592,10 +592,19 @@
       "description": "Create src/components/layout/MemberList.tsx \u2014 right sidebar showing server members grouped by role (OWNER, ADMIN, MODERATOR, GUEST). Green/gray dot for online/offline status via presence events from useSocket. Fetches members from /api/servers/[serverId]/members."
     },
     {
+      "id": "TASK-063",
+      "title": "Bug fix: messages require page refresh to appear",
+      "spec": "specs/socket-events.md",
+      "priority": 54,
+      "status": "open",
+      "dependencies": [],
+      "description": "BUG: New messages sent by other users do not appear in real-time \u2014 the page must be refreshed to see them. Diagnose the full Socket.io chain: 1) Check server.js message:create handler actually broadcasts message:new to the channel room. 2) Check MessageList subscribes to message:new via useSocket. 3) Check the socket actually joins the channel room on mount (channel:join event). 4) Check useSocket connects successfully (verify JWT cookie is sent in handshake). 5) Test with two browser tabs \u2014 send a message in one, verify it appears in the other without refresh. Use pm2 logs on the server to see if socket events are firing. Fix whatever is broken."
+    },
+    {
       "id": "TASK-046",
       "title": "Implement LiveKit token generation API route",
       "spec": "specs/webrtc.md",
-      "priority": 54,
+      "priority": 55,
       "status": "open",
       "dependencies": [
         "TASK-005",
@@ -607,7 +616,7 @@
       "id": "TASK-047",
       "title": "Build VoiceChannel component",
       "spec": "specs/webrtc.md",
-      "priority": 55,
+      "priority": 56,
       "status": "open",
       "dependencies": [
         "TASK-046",
@@ -619,7 +628,7 @@
       "id": "TASK-048",
       "title": "Wire voice channel into channel page",
       "spec": "specs/webrtc.md",
-      "priority": 56,
+      "priority": 57,
       "status": "open",
       "dependencies": [
         "TASK-047",
@@ -631,7 +640,7 @@
       "id": "TASK-049",
       "title": "Implement update server API route",
       "spec": "specs/servers.md",
-      "priority": 57,
+      "priority": 58,
       "status": "open",
       "dependencies": [
         "TASK-015"
@@ -642,7 +651,7 @@
       "id": "TASK-050",
       "title": "Implement delete server API route",
       "spec": "specs/servers.md",
-      "priority": 58,
+      "priority": 59,
       "status": "open",
       "dependencies": [
         "TASK-015"
@@ -653,7 +662,7 @@
       "id": "TASK-051",
       "title": "Build server settings dialog \u2014 general tab",
       "spec": "specs/servers.md",
-      "priority": 59,
+      "priority": 60,
       "status": "open",
       "dependencies": [
         "TASK-049",
@@ -665,7 +674,7 @@
       "id": "TASK-052",
       "title": "Add members tab to server settings",
       "spec": "specs/servers.md",
-      "priority": 60,
+      "priority": 61,
       "status": "open",
       "dependencies": [
         "TASK-051",
@@ -677,7 +686,7 @@
       "id": "TASK-053",
       "title": "Add danger zone tab to server settings",
       "spec": "specs/servers.md",
-      "priority": 61,
+      "priority": 62,
       "status": "open",
       "dependencies": [
         "TASK-051",
@@ -689,7 +698,7 @@
       "id": "TASK-054",
       "title": "Add mobile responsive layout with Drawer",
       "spec": "specs/ui-layout.md",
-      "priority": 62,
+      "priority": 63,
       "status": "open",
       "dependencies": [
         "TASK-040"
