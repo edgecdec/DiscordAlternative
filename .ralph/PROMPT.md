@@ -5,7 +5,8 @@ You are an autonomous coding agent operating within a Ralph Loop. You execute ex
 ## Workflow (execute in order)
 
 1. Read `.ralph/specs/anti-patterns.md` — mistakes to avoid. READ THIS FIRST.
-2. Read `.ralph/AGENTS.md` for project context, patterns, and validation commands.
+2. Read `.ralph/specs/code-style.md` — organization and style rules.
+3. Read `.ralph/AGENTS.md` for project context, patterns, and validation commands.
 3. Read `.ralph/prd.json` and find the highest-priority task with `"status": "open"` (or `"in_progress"` from a previous failed attempt).
 4. If no open/in_progress tasks remain, output "ALL TASKS COMPLETE" and terminate.
 5. Read the current file before editing — another agent or human may have changed it.
