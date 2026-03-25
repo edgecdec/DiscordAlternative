@@ -107,3 +107,21 @@
 - Logs to /var/log/webhook_deploy_discord.log.
 - Uses md5sum to detect package.json changes — avoids unnecessary npm install on every deploy.
 - Trap ensures lock file cleanup even on script failure.
+
+## TASK-057: Create .env.example, set up nginx, and do first deploy
+- Date: 2026-03-25
+- Status: done
+- What was done:
+  - .env.example and .gitignore fix were already committed from a previous attempt
+  - Created nginx config for discord.edgecdec.com proxying to localhost:3003
+  - Obtained SSL cert via certbot (auto-configured nginx for HTTPS)
+  - Cloned repo to /var/www/DiscordAlternative on server
+  - Generated JWT_SECRET, added to server .env alongside existing WEBHOOK_SECRET
+  - Ran npm install, prisma generate, prisma migrate deploy, npm run build
+  - Started with pm2 as discord-alt
+  - Verified 200 from both localhost:3003 and https://discord.edgecdec.com
+  - Fixed deploy_webhook.sh: added `npx prisma generate` before build, changed `npm install --production` to `npm install` (devDeps needed for build)
+- Lessons learned:
+  - `prisma migrate deploy` does NOT run `prisma generate` — must run generate explicitly before build
+  - `npm install --production` skips devDependencies (TypeScript, types) which are needed for `next build` — use `npm install` instead
+  - Always check if files were already committed before trying to create them (previous attempt may have done partial work)

@@ -30,9 +30,10 @@ NEW_PKG_HASH=$(md5sum package.json | cut -d' ' -f1)
 
 if [ "$OLD_PKG_HASH" != "$NEW_PKG_HASH" ]; then
   echo "package.json changed, running npm install..."
-  npm install --production
+  npm install
 fi
 
+npx prisma generate
 npx prisma migrate deploy
 
 rm -rf .next
