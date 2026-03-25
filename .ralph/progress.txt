@@ -72,3 +72,11 @@
 - Split ThemeRegistry into ThemeModeProvider (context) + ThemeApplier (consumes context, applies ThemeProvider) to avoid circular dependency.
 - All validation passed: prisma validate, tsc --noEmit, npm test.
 - Lessons: MUI 7 createTheme API is unchanged from v6 — no migration issues.
+
+## TASK-010: Create useAuth hook and AuthProvider (2026-03-24)
+- Status: DONE
+- Created src/hooks/useAuth.tsx with AuthProvider context and useAuth hook.
+- Exposes { user, login, register, logout, loading }.
+- On mount calls /api/auth/me to restore session from httpOnly cookie.
+- Used useCallback for stable function references, cleanup flag in useEffect to avoid state updates after unmount.
+- Lessons: API routes return { user: { id, username, email } } shape — matched the hook's User interface to that. authFetch helper avoids duplicating POST+JSON logic across login/register.

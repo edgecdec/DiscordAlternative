@@ -103,7 +103,7 @@
       "title": "Create useAuth hook and AuthProvider",
       "spec": "specs/auth.md",
       "priority": 10,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-008"
       ],
