@@ -389,3 +389,10 @@
 - Followed existing pattern from server detail route (auth check, membership check, Prisma query with user select).
 - Deploy returned 500 for first 30s during rebuild, then 200 at 40s — normal webhook deploy cycle.
 - Lessons: Simple CRUD routes following established patterns are quick wins. The existing server detail route already includes members, but a dedicated members endpoint is needed for the MemberList component (TASK-045).
+
+## TASK-044: Implement change role and kick member API routes (2026-03-25)
+- Created `src/app/api/servers/[serverId]/members/[memberId]/route.ts`
+- PATCH: Changes member role (OWNER only). Validates role is one of ADMIN/MODERATOR/GUEST. Cannot change OWNER's role.
+- DELETE: Kicks member (OWNER/ADMIN only). Cannot kick the OWNER.
+- Followed existing patterns from channels route for auth/validation style.
+- All validation passed first try. Deploy verified after ~30s (initial 500s during rebuild, then 200).

@@ -572,7 +572,7 @@
       "title": "Implement change role and kick member API routes",
       "spec": "specs/servers.md",
       "priority": 52,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-043"
       ],
