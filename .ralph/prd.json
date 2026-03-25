@@ -345,7 +345,7 @@
       "title": "Implement create message API route",
       "spec": "specs/servers.md",
       "priority": 32,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-023"
       ],

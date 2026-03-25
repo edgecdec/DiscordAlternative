@@ -247,3 +247,11 @@
 - Cursor-based pagination: pass `cursor` query param with last message ID to get next page
 - Returns `nextCursor` (null when no more pages)
 - Lessons: Next.js 15 route params are async (Promise<{channelId}>), must await them. Prisma cursor pagination uses skip:1 + cursor:{id} pattern to avoid returning the cursor item itself.
+
+## TASK-024: Implement create message API route (2026-03-25)
+- Added POST handler to existing messages route file
+- Validates: auth, content required + non-empty, content length <= MESSAGE_MAX, channel exists, user is server member
+- Supports optional fileUrl field
+- Returns 201 with message including author info
+- Reused existing RouteParams interface and channel/membership validation pattern from GET handler
+- Lessons: The GET handler already had the channel lookup + membership check pattern — kept POST consistent with same approach rather than extracting a shared helper (only 2 usages, not worth abstracting yet)
