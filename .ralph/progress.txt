@@ -255,3 +255,10 @@
 - Returns 201 with message including author info
 - Reused existing RouteParams interface and channel/membership validation pattern from GET handler
 - Lessons: The GET handler already had the channel lookup + membership check pattern — kept POST consistent with same approach rather than extracting a shared helper (only 2 usages, not worth abstracting yet)
+
+## TASK-025: Implement edit and delete message API routes (2026-03-25)
+- Created `src/app/api/messages/[messageId]/route.ts` with PATCH and DELETE handlers.
+- PATCH: validates auth, checks author ownership, validates content length against MESSAGE_MAX, returns updated message with author include.
+- DELETE: validates auth, checks author OR server admin/owner role, soft-deletes by setting `deleted=true`, returns updated message.
+- Both handlers return 404 for already-deleted messages.
+- Lessons: The existing messages route pattern (channelId-based membership check) was a good reference. For message-level routes, the delete handler needs an extra hop to look up the channel's serverId to check admin roles — keep this pattern for future message-level operations.

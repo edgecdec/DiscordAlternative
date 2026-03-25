@@ -356,7 +356,7 @@
       "title": "Implement edit and delete message API routes",
       "spec": "specs/servers.md",
       "priority": 33,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-024"
       ],
