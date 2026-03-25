@@ -226,7 +226,7 @@
       "title": "Fix: database tables missing on production server",
       "spec": "specs/deployment.md",
       "priority": 21,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [],
       "description": "URGENT: The production server at discord.edgecdec.com returns 'The table main.User does not exist' when registering. The Prisma migration was not applied to the production DB. SSH into the server, diagnose why the tables are missing (check data/discord.db, check prisma config datasource URL, check if prisma migrate deploy actually creates tables). Fix it so the migration runs correctly. Verify by curling the register endpoint. Also ensure deploy_webhook.sh runs prisma migrate deploy correctly on future deploys."
     },

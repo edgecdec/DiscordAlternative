@@ -160,3 +160,11 @@
 - All validation passed first try (prisma validate, tsc --noEmit, npm test).
 - Deployment verified: 200 OK.
 - Lessons: Keep component props minimal — pass callbacks for actions that will be handled by parent or sibling components (like dialogs).
+
+## TASK-059: Fix database tables missing on production server (2026-03-25)
+- Root cause: `prisma.config.ts` had `url: 'file:../data/discord.db'` — in Prisma 7, this resolves relative to the config file (project root), so `../data/` pointed to `/var/www/data/` instead of `/var/www/DiscordAlternative/data/`.
+- The app's PrismaClient in `src/lib/db.ts` used `path.join(process.cwd(), 'data', 'discord.db')` which correctly resolved to the project's `data/` dir. Mismatch meant migrations went to wrong file.
+- Fix was already applied by human in commit 5fedd2c: changed to `file:./data/discord.db`.
+- Verified: deploy webhook ran, migrations applied to correct DB, register endpoint returns valid user.
+- Confirmed deploy_webhook.sh will work correctly on future deploys.
+- Lessons: In Prisma 7, datasource URL in `prisma.config.ts` resolves relative to the config file location, NOT the schema file. Always verify the runtime DB path matches the migration DB path.
