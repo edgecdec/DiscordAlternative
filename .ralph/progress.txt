@@ -186,3 +186,12 @@
   - Run with `/opt/homebrew/bin/python3.13`.
   - Delete temp scripts after verification.
 - Deployment verified: 200 OK (this task only changed a spec file, no runtime impact).
+
+## TASK-062: Create constants.ts with size limits and retrofit existing routes
+- Date: 2026-03-25
+- Created src/lib/constants.ts with all size limits (USERNAME_MIN/MAX, PASSWORD_MIN/MAX, SERVER_NAME_MIN/MAX, CHANNEL_NAME_MIN/MAX, MESSAGE_MAX, FILE_UPLOAD_MAX_BYTES, AVATAR_URL_MAX, MESSAGES_PER_PAGE, BCRYPT_ROUNDS, USERNAME_PATTERN).
+- Updated register route: replaced local constants with imports, added PASSWORD_MAX validation.
+- Updated servers route: replaced local SERVER_NAME_MIN/MAX with imports. Note: the old SERVER_NAME_MAX was 100, spec says 50 — corrected to 50.
+- Updated AuthForm.tsx: imported constants, replaced hardcoded minLength/maxLength values with USERNAME_MIN/MAX and PASSWORD_MIN/PASSWORD_MAX.
+- Login route had no hardcoded limits to replace (it only checks presence, not length).
+- Lesson: Always check if existing hardcoded values match the spec — the servers route had SERVER_NAME_MAX=100 but spec says 50.

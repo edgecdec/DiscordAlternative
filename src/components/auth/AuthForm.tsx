@@ -12,6 +12,12 @@ import {
   Link as MuiLink,
 } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  USERNAME_MIN,
+  USERNAME_MAX,
+  PASSWORD_MIN,
+  PASSWORD_MAX,
+} from "@/lib/constants";
 
 type Mode = "login" | "register";
 
@@ -66,7 +72,7 @@ export default function AuthForm() {
           onChange={(e) => setUsername(e.target.value)}
           required
           autoComplete="username"
-          slotProps={{ htmlInput: { minLength: 3, maxLength: 20 } }}
+          slotProps={{ htmlInput: { minLength: USERNAME_MIN, maxLength: USERNAME_MAX } }}
         />
 
         <TextField
@@ -76,7 +82,7 @@ export default function AuthForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete={isLogin ? "current-password" : "new-password"}
-          slotProps={{ htmlInput: { minLength: 6 } }}
+          slotProps={{ htmlInput: { minLength: PASSWORD_MIN, maxLength: PASSWORD_MAX } }}
         />
 
         <Button

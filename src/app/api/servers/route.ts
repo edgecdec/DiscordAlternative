@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
+import { SERVER_NAME_MIN, SERVER_NAME_MAX } from "@/lib/constants";
 
-const SERVER_NAME_MIN = 1;
-const SERVER_NAME_MAX = 100;
 const DEFAULT_CHANNEL_NAME = "general";
 const DEFAULT_CHANNEL_TYPE = "TEXT";
 const OWNER_ROLE = "OWNER";

@@ -257,7 +257,7 @@
       "title": "Create constants.ts with size limits and retrofit existing routes",
       "spec": "specs/code-style.md",
       "priority": 24,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Create src/lib/constants.ts with all size limits: USERNAME_MIN=3, USERNAME_MAX=20, PASSWORD_MIN=6, PASSWORD_MAX=128, SERVER_NAME_MIN=1, SERVER_NAME_MAX=50, CHANNEL_NAME_MIN=1, CHANNEL_NAME_MAX=50, MESSAGE_MAX=2000, FILE_UPLOAD_MAX_BYTES=5*1024*1024, AVATAR_URL_MAX=512, MESSAGES_PER_PAGE=50. Update existing API routes (register, login, create server) to import and use these constants instead of hardcoded values. Update AuthForm.tsx to set maxLength on TextFields."
     },

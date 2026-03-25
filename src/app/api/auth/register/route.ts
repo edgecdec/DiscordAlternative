@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { signToken, buildTokenCookie } from "@/lib/auth";
-
-const USERNAME_MIN = 3;
-const USERNAME_MAX = 20;
-const USERNAME_PATTERN = /^[a-zA-Z0-9]+$/;
-const PASSWORD_MIN = 6;
-const BCRYPT_ROUNDS = 10;
+import {
+  USERNAME_MIN,
+  USERNAME_MAX,
+  USERNAME_PATTERN,
+  PASSWORD_MIN,
+  PASSWORD_MAX,
+  BCRYPT_ROUNDS,
+} from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -25,9 +27,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!password || password.length < PASSWORD_MIN) {
+  if (!password || password.length < PASSWORD_MIN || password.length > PASSWORD_MAX) {
     return NextResponse.json(
-      { error: "Password must be at least 6 characters" },
+      { error: `Password must be ${PASSWORD_MIN}-${PASSWORD_MAX} characters` },
       { status: 400 }
     );
   }
