@@ -405,3 +405,8 @@
 - Wired MemberList into `src/app/servers/[serverId]/layout.tsx` as the rightmost column.
 - Hidden on xs/sm screens via `display: { xs: "none", md: "block" }` — mobile responsive task (TASK-054) will handle drawer integration.
 - Lesson: When adding real-time features that need initial state, always add a "list" or "sync" event — relying only on incremental updates means late-joining clients miss existing state.
+
+## TASK-063: Bug fix — messages require page refresh to appear (2026-03-25)
+- Root cause: channel page's `joinChannel(channelId)` useEffect fired before the socket was connected, so the `channel:join` emit was silently lost (optional chaining on null socket).
+- Fix: added `connected` from `useSocket()` as a dependency to the join/leave useEffect in the channel page. Now the effect only fires when `connected` is true, and re-fires if the socket reconnects.
+- Lesson: When using Socket.io with React, any emit that must happen on mount needs to be gated on the socket's connected state. Refs don't trigger re-renders, so emits via refs can silently fail if the socket isn't ready yet.
