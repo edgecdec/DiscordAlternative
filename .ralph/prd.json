@@ -266,7 +266,7 @@
       "title": "Build create server dialog",
       "spec": "specs/servers.md",
       "priority": 25,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-016"
       ],

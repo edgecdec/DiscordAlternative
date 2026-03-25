@@ -195,3 +195,9 @@
 - Updated AuthForm.tsx: imported constants, replaced hardcoded minLength/maxLength values with USERNAME_MIN/MAX and PASSWORD_MIN/PASSWORD_MAX.
 - Login route had no hardcoded limits to replace (it only checks presence, not length).
 - Lesson: Always check if existing hardcoded values match the spec — the servers route had SERVER_NAME_MAX=100 but spec says 50.
+
+## TASK-017: Build create server dialog (2026-03-25)
+- Created CreateServerDialog.tsx with MUI Dialog, TextField (maxLength from constants), error handling, and navigation on success.
+- Created minimal /servers page to wire ServerSidebar + CreateServerDialog together (ServerSidebar already had onCreateClick prop).
+- All validation passed first try. Deploy returned 200.
+- Lesson: ServerSidebar was already designed with the onCreateClick prop, so integration was straightforward. Keep components composable with callback props.
