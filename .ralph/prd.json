@@ -299,7 +299,7 @@
       "title": "Build channel list panel component",
       "spec": "specs/ui-layout.md",
       "priority": 28,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-018",
         "TASK-016"

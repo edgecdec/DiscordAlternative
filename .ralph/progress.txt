@@ -216,3 +216,9 @@
 - Extracted shared `getChannelAndValidateAdmin` helper within the file to avoid duplicating channel lookup + auth + role check logic.
 - All validation passed first try (prisma validate, tsc --noEmit, npm test). Deploy returned 200.
 - Lesson: Discriminated union return type (`{ error, status } | { channel }`) with `"error" in result` check is a clean pattern for shared validation helpers.
+
+## TASK-020: Build channel list panel component (2026-03-25)
+- Created ChannelPanel.tsx (~240px sidebar) with server name header, channels grouped by type (TEXT/VOICE), active channel highlighting, and Add Channel button for OWNER/ADMIN.
+- Created CreateChannelDialog.tsx with channel type toggle (TEXT/VOICE) and name input.
+- ChannelPanel fetches server data from /api/servers/[serverId] and passes userId prop to determine if user can manage channels.
+- Lesson: Keep the "Add" button in the channel group header rather than a separate floating button — matches Discord's UX pattern and keeps the component simpler.
