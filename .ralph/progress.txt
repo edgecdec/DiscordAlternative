@@ -262,3 +262,8 @@
 - DELETE: validates auth, checks author OR server admin/owner role, soft-deletes by setting `deleted=true`, returns updated message.
 - Both handlers return 404 for already-deleted messages.
 - Lessons: The existing messages route pattern (channelId-based membership check) was a good reference. For message-level routes, the delete handler needs an extra hop to look up the channel's serverId to check admin roles — keep this pattern for future message-level operations.
+
+## TASK-026: Create Socket.io type definitions (2026-03-25)
+- Created src/types/socket.ts with all payload interfaces and typed ServerToClientEvents/ClientToServerEvents
+- Payload types: ChannelJoinPayload, ChannelLeavePayload, MessageCreatePayload, MessageUpdatePayload, MessageDeletePayload, TypingPayload, PresenceOnlinePayload, PresenceOfflinePayload, TypingBroadcastPayload, MessageDeletedPayload, SocketMessage, MessageAuthor
+- Lessons: Types-only tasks are straightforward — no runtime impact, just ensure tsc passes. The SocketMessage type includes author info since that's what gets broadcast to clients.

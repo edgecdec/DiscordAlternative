@@ -367,7 +367,7 @@
       "title": "Create Socket.io type definitions",
       "spec": "specs/socket-events.md",
       "priority": 34,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-002"
       ],
