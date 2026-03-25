@@ -699,7 +699,7 @@
       "title": "Add mobile responsive layout with Drawer",
       "spec": "specs/ui-layout.md",
       "priority": 63,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-040"
       ],

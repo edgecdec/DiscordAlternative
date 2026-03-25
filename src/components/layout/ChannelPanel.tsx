@@ -40,9 +40,10 @@ interface ServerData {
 
 interface ChannelPanelProps {
   userId: string;
+  onNavigate?: () => void;
 }
 
-export default function ChannelPanel({ userId }: ChannelPanelProps) {
+export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) {
   const [server, setServer] = useState<ServerData | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -91,7 +92,7 @@ export default function ChannelPanel({ userId }: ChannelPanelProps) {
           <ListItemButton
             key={ch.id}
             selected={ch.id === channelId}
-            onClick={() => router.push(`/servers/${server.id}/channels/${ch.id}`)}
+            onClick={() => { router.push(`/servers/${server.id}/channels/${ch.id}`); onNavigate?.(); }}
             sx={{ borderRadius: 1, mx: 0.5, px: 1 }}
           >
             <ListItemIcon sx={{ minWidth: 28, color: "text.secondary" }}>

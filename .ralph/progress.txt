@@ -476,3 +476,11 @@
 - Confirmation dialog requires typing the exact server name before delete is enabled
 - On successful deletion, redirects to /servers
 - Lessons: Nova Act guardrails block prompts containing words like "Danger" — use Playwright directly for filling inputs with sensitive-sounding text. Keep act() prompts neutral.
+
+## TASK-054: Add mobile responsive layout with Drawer (2026-03-25)
+- Used `useMediaQuery("(max-width:767px)")` raw query since MUI's `md` breakpoint is 900px, not 768px.
+- Added `onNavigate` optional callback to both ServerSidebar and ChannelPanel so the drawer closes when user navigates.
+- Hamburger button positioned absolutely in the content area; channel page header gets extra left padding on mobile to avoid overlap.
+- MemberList hidden on mobile entirely (not in drawer) to save space.
+- Nova Act doesn't support mobile viewports (<1280px width) — can only verify desktop regression, not mobile behavior directly.
+- Drawer uses `PaperProps` with `flexDirection: "row"` to lay out ServerSidebar and ChannelPanel side by side inside the drawer.

@@ -15,9 +15,10 @@ interface ServerItem {
 
 interface ServerSidebarProps {
   onCreateClick: () => void;
+  onNavigate?: () => void;
 }
 
-export default function ServerSidebar({ onCreateClick }: ServerSidebarProps) {
+export default function ServerSidebar({ onCreateClick, onNavigate }: ServerSidebarProps) {
   const [servers, setServers] = useState<ServerItem[]>([]);
   const router = useRouter();
   const params = useParams();
@@ -74,7 +75,7 @@ export default function ServerSidebar({ onCreateClick }: ServerSidebarProps) {
                     }
                   : undefined,
               }}
-              onClick={() => router.push(`/servers/${server.id}`)}
+              onClick={() => { router.push(`/servers/${server.id}`); onNavigate?.(); }}
             >
               <Avatar
                 src={server.imageUrl ?? undefined}

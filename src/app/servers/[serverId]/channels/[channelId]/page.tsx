@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { Tag, VolumeUp } from "@mui/icons-material";
 import { useSocket } from "@/hooks/useSocket";
 import MessageList from "@/components/chat/MessageList";
@@ -21,6 +21,7 @@ export default function ChannelPage() {
   const serverId = params?.serverId as string;
   const [channel, setChannel] = useState<ChannelInfo | null>(null);
   const { joinChannel, leaveChannel, connected } = useSocket();
+  const isMobile = useMediaQuery("(max-width:767px)");
 
   useEffect(() => {
     if (!serverId) return;
@@ -51,7 +52,8 @@ export default function ChannelPage() {
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
       <Box
         sx={{
-          px: 2,
+          pl: isMobile ? 6 : 2,
+          pr: 2,
           py: 1,
           borderBottom: 1,
           borderColor: "divider",
