@@ -48,7 +48,7 @@
       "title": "Implement auth helper and JWT utilities",
       "spec": "specs/auth.md",
       "priority": 5,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [
         "TASK-004"
       ],
