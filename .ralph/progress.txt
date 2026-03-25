@@ -1,2 +1,12 @@
 # Ralph Loop Progress Log
 # Append-only. Each iteration records what was done and lessons learned.
+
+## TASK-001: Initialize Next.js project with TypeScript (2026-03-24)
+- Created Next.js 15 project with React 19, TypeScript, App Router, src/ directory
+- Configured tsconfig.json with @/ path alias → ./src/*
+- Created directory structure: src/app, src/components, src/lib, src/hooks, src/types, data/, uploads/
+- Updated .gitignore with node_modules, .next, .env, data/, uploads/, .ralph/.server-env
+- Minimal layout.tsx, page.tsx, globals.css — stripped all boilerplate
+- Added "test" script placeholder to package.json
+- Lesson: create-next-app rejects capital letters in directory names — used temp dir + rsync workaround
+- Lesson: Another process may reset prd.json status — always re-read before updating
