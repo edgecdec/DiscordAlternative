@@ -126,7 +126,7 @@
       "title": "Build login and registration UI",
       "spec": "specs/auth.md",
       "priority": 12,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [
         "TASK-011"
       ],
