@@ -13,19 +13,24 @@ import {
   IconButton,
   Tooltip,
   Alert,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { ContentCopy, Close } from "@mui/icons-material";
 import { SERVER_NAME_MAX } from "@/lib/constants";
+import MembersTab from "@/components/layout/MembersTab";
 
 interface ServerSettingsProps {
   open: boolean;
   onClose: () => void;
   serverId: string;
   serverName: string;
+  userRole: string;
   onUpdated: () => void;
 }
 
-export default function ServerSettings({ open, onClose, serverId, serverName, onUpdated }: ServerSettingsProps) {
+export default function ServerSettings({ open, onClose, serverId, serverName, userRole, onUpdated }: ServerSettingsProps) {
+  const [tab, setTab] = useState(0);
   const [name, setName] = useState(serverName);
   const [inviteCode, setInviteCode] = useState("");
   const [copied, setCopied] = useState(false);
@@ -49,6 +54,7 @@ export default function ServerSettings({ open, onClose, serverId, serverName, on
       fetchInviteCode();
       setCopied(false);
       setError("");
+      setTab(0);
     }
   }, [open, fetchInviteCode]);
 
@@ -91,41 +97,52 @@ export default function ServerSettings({ open, onClose, serverId, serverName, on
           <Close />
         </IconButton>
       </DialogTitle>
+      <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ px: 3 }}>
+        <Tab label="General" />
+        <Tab label="Members" />
+      </Tabs>
       <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        <TextField
-          label="Server Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          fullWidth
-          sx={{ mt: 1 }}
-          slotProps={{ htmlInput: { maxLength: SERVER_NAME_MAX } }}
-        />
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle2" sx={{ color: "text.secondary", mb: 1 }}>
-            Invite Link
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {tab === 0 && (
+          <>
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
             <TextField
-              value={inviteUrl}
+              label="Server Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               fullWidth
-              size="small"
-              slotProps={{ input: { readOnly: true } }}
+              sx={{ mt: 1 }}
+              slotProps={{ htmlInput: { maxLength: SERVER_NAME_MAX } }}
             />
-            <Tooltip title={copied ? "Copied!" : "Copy"}>
-              <IconButton onClick={handleCopy} disabled={!inviteCode}>
-                <ContentCopy />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="subtitle2" sx={{ color: "text.secondary", mb: 1 }}>
+                Invite Link
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <TextField
+                  value={inviteUrl}
+                  fullWidth
+                  size="small"
+                  slotProps={{ input: { readOnly: true } }}
+                />
+                <Tooltip title={copied ? "Copied!" : "Copy"}>
+                  <IconButton onClick={handleCopy} disabled={!inviteCode}>
+                    <ContentCopy />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+          </>
+        )}
+        {tab === 1 && <MembersTab serverId={serverId} userRole={userRole} />}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSave} variant="contained" disabled={saving}>
-          Save
-        </Button>
-      </DialogActions>
+      {tab === 0 && (
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={handleSave} variant="contained" disabled={saving}>
+            Save
+          </Button>
+        </DialogActions>
+      )}
     </Dialog>
   );
 }

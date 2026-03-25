@@ -461,3 +461,11 @@
 - Wired dialog open/close and onUpdated callback to refetch server data
 - Lesson: testbot lands on /servers (list page) not directly on a server channel — Nova Act tests need to handle clicking into a server first before testing channel panel features
 - Lesson: After git push, the maintenance page may show briefly during rebuild — wait extra time before curling for auth cookies against the live site
+
+## TASK-052: Add members tab to server settings (2026-03-25)
+- Created MembersTab.tsx as a separate component to keep ServerSettings under 150 lines
+- Added Tabs (General/Members) to ServerSettings dialog
+- OWNER sees role change dropdown (ADMIN/MODERATOR/GUEST) and kick button per member; non-owners see role chips
+- Passed userRole from ChannelPanel's currentMember to ServerSettings
+- Nova Act test confirmed: dialog opens, Members tab visible, clicking it shows member list
+- Lesson: Extracting tab content into separate components keeps dialog files manageable and focused

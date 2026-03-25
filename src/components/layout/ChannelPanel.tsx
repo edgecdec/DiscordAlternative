@@ -150,6 +150,7 @@ export default function ChannelPanel({ userId }: ChannelPanelProps) {
         onClose={() => setSettingsOpen(false)}
         serverId={server.id}
         serverName={server.name}
+        userRole={currentMember?.role || "GUEST"}
         onUpdated={fetchServer}
       />
 

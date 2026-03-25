@@ -675,7 +675,7 @@
       "title": "Add members tab to server settings",
       "spec": "specs/servers.md",
       "priority": 61,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-051",
         "TASK-044"
