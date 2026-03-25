@@ -92,7 +92,7 @@
       "title": "Create ThemeRegistry and useThemeMode hook",
       "spec": "specs/ui-layout.md",
       "priority": 9,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-001"
       ],
