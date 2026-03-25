@@ -438,3 +438,11 @@
 - Moved isText/isVoice declarations above the useEffect that depends on them to avoid reference-before-declaration
 - Nova Act test confirmed: voice channel shows join prompt, no text input; text channel still works normally
 - Lesson: MUI icons don't have data-testid by default — use text content or other selectors for testing
+
+## TASK-049: Implement update server API route (2026-03-25)
+- Added PATCH handler to /api/servers/[serverId]/route.ts
+- Validates OWNER or ADMIN role before allowing updates
+- Accepts optional name and imageUrl fields with validation against constants
+- Returns 400 if no fields provided, 403 if not authorized
+- Reused existing pattern from channels route for ADMIN_ROLES check
+- Lessons: Straightforward addition to existing route file. Pattern is well-established from prior tasks.

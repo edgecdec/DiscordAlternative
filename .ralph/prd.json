@@ -641,7 +641,7 @@
       "title": "Implement update server API route",
       "spec": "specs/servers.md",
       "priority": 58,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-015"
       ],
