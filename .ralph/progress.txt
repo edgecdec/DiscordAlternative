@@ -331,3 +331,10 @@
 - Lesson: Keep socket event handlers stable with useCallback to avoid re-registering listeners on every render
 - Lesson: Filter incoming socket events by channelId since the socket room may broadcast to channels the component isn't viewing
 - Deploy took ~40s to return 200 (500 during rebuild is normal)
+
+## TASK-036: Add cursor-based pagination to MessageList (2026-03-25)
+- Used `cursorRef` instead of state for cursor to avoid stale closures in scroll handler.
+- `requestAnimationFrame` after prepending older messages to restore scroll position (scrollHeight delta).
+- Moved auto-scroll-to-bottom for new messages into `handleNew` callback with `requestAnimationFrame` instead of reacting to `messages.length` change — avoids scrolling to bottom when loading older messages.
+- Initial scroll-to-bottom now triggers on `loading` state change (when initial fetch completes) rather than on every `messages.length` change.
+- CircularProgress spinner shown at top of list while fetching older messages.

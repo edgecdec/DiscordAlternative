@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Avatar, Box, Typography } from "@mui/material";
+import { Avatar, Box, CircularProgress, Typography } from "@mui/material";
 import type { SocketMessage, MessageDeletedPayload } from "@/types/socket";
 import { useSocket } from "@/hooks/useSocket";
 
@@ -22,17 +22,25 @@ function formatTimestamp(iso: string): string {
 export default function MessageList({ channelId }: MessageListProps) {
   const [messages, setMessages] = useState<SocketMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<string | null>(null);
   const { socket } = useSocket();
 
   useEffect(() => {
     setLoading(true);
     setMessages([]);
+    cursorRef.current = null;
+    setHasMore(false);
     fetch(`/api/channels/${channelId}/messages`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.messages) {
           setMessages(data.messages.reverse());
+          cursorRef.current = data.nextCursor ?? null;
+          setHasMore(!!data.nextCursor);
         }
       })
       .finally(() => setLoading(false));
@@ -40,11 +48,52 @@ export default function MessageList({ channelId }: MessageListProps) {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
-  }, [messages.length]);
+  }, [loading]);
+
+  const loadOlder = useCallback(async () => {
+    if (loadingMore || !cursorRef.current) return;
+    setLoadingMore(true);
+    const container = containerRef.current;
+    const prevHeight = container?.scrollHeight ?? 0;
+    try {
+      const res = await fetch(
+        `/api/channels/${channelId}/messages?cursor=${cursorRef.current}`
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.messages?.length) {
+        const older: SocketMessage[] = data.messages.reverse();
+        setMessages((prev) => [...older, ...prev]);
+        cursorRef.current = data.nextCursor ?? null;
+        setHasMore(!!data.nextCursor);
+        requestAnimationFrame(() => {
+          if (container) {
+            container.scrollTop = container.scrollHeight - prevHeight;
+          }
+        });
+      } else {
+        setHasMore(false);
+        cursorRef.current = null;
+      }
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [channelId, loadingMore]);
+
+  const handleScroll = useCallback(() => {
+    const container = containerRef.current;
+    if (!container || !hasMore || loadingMore) return;
+    if (container.scrollTop === 0) {
+      loadOlder();
+    }
+  }, [hasMore, loadingMore, loadOlder]);
 
   const handleNew = useCallback((msg: SocketMessage) => {
     if (msg.channelId !== channelId) return;
     setMessages((prev) => [...prev, msg]);
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    });
   }, [channelId]);
 
   const handleUpdated = useCallback((msg: SocketMessage) => {
@@ -89,7 +138,16 @@ export default function MessageList({ channelId }: MessageListProps) {
   }
 
   return (
-    <Box sx={{ flex: 1, overflowY: "auto", px: 2, py: 1 }}>
+    <Box
+      ref={containerRef}
+      onScroll={handleScroll}
+      sx={{ flex: 1, overflowY: "auto", px: 2, py: 1 }}
+    >
+      {loadingMore && (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
+          <CircularProgress size={24} />
+        </Box>
+      )}
       {messages.map((msg) => (
         <Box key={msg.id} sx={{ display: "flex", gap: 1.5, py: 0.75 }}>
           <Avatar

@@ -481,7 +481,7 @@
       "title": "Add cursor-based pagination to MessageList",
       "spec": "specs/ui-layout.md",
       "priority": 44,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-035"
       ],
