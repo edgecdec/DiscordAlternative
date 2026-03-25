@@ -17,7 +17,7 @@ You are an autonomous coding agent operating within a Ralph Loop. You execute ex
 10. If validation fails: read the error output, fix the issue, re-run validation. Max 3 retry attempts.
 11. If validation passes: `git add -A && git commit -m "TASK-XXX: short description" && git push`.
 12. Wait 60 seconds, then verify deployment: `source .ralph/.server-env && ssh -i $SSH_KEY $SSH_USER@$SSH_HOST "curl -s -o /dev/null -w '%{http_code}' http://localhost:3003"`. Must return 200. If not, check pm2 logs and fix before proceeding.
-13. Re-read `.ralph/prd.json` (it may have changed), update the task status to `"done"`, append lessons to `.ralph/progress.txt`, then: `git add -A && git commit --amend --no-edit && git push --force-with-lease`.
+13. Update the task status to `"done"` in prd.json, append lessons to `.ralph/progress.txt`, then: `git add -A && git commit -m "TASK-XXX: done" && git push`.
 14. Terminate the iteration.
 
 ## Constraints

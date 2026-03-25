@@ -85,7 +85,7 @@ These are mistakes Ralph has made on previous projects. Do not repeat them.
 - Same applies to any interactive scaffolding tool — always create files manually.
 
 ## Git Hygiene
-- ONE commit per task. Not two, not three. One.
-- Do NOT make a separate commit for "start" or for updating prd.json status. Everything goes in one commit.
-- Use `git commit --amend --no-edit` to fold status updates into the task commit.
-- Use `git push --force-with-lease` after amending.
+- NEVER use `git push --force` or `git push --force-with-lease`. The webhook deploy triggers on push — force pushing causes the server to deploy stale code or miss deploys entirely.
+- NEVER use `git commit --amend`. Each commit is a separate push that triggers a deploy.
+- Two commits per task is fine (one for code, one for status update). Both trigger deploys which is OK.
+- Always `git push` after every commit. Never batch multiple commits before pushing.
