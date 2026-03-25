@@ -60,6 +60,16 @@ These are mistakes Ralph has made on previous projects. Do not repeat them.
 - This app deploys to a REMOTE server. After pushing, the webhook auto-deploys.
 - A curl returning 200 does NOT mean the site works — always verify more than just status code.
 
+## Security — Secrets and Sensitive Data
+- NEVER hardcode IP addresses, API keys, secrets, tokens, or passwords in any committed file.
+- ALL secrets go in `.env` (gitignored). Reference them via `process.env.VARIABLE_NAME`.
+- Server connection details live in `.ralph/.server-env` (gitignored). Never copy them into other files.
+- When creating example configs, use placeholders: `<random-secret>`, `<your-api-key>`, etc.
+- NEVER log secrets to console, progress.txt, or commit messages.
+- Before committing, mentally verify: does this diff contain any IPs, keys, passwords, or tokens? If yes, move them to .env.
+- The `.env.example` file should ONLY contain placeholder values, never real secrets.
+- NEVER commit `.env` files. Verify `.gitignore` includes `.env` before every commit that touches env vars.
+
 ## File Handling
 - ALWAYS read prd.json before editing it — parse the JSON, modify the specific task, write it back. Do NOT rewrite the entire file from memory.
 - When appending to progress.txt, APPEND only — do not rewrite existing content.
