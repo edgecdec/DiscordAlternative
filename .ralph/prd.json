@@ -446,7 +446,7 @@
       "title": "Create useSocket hook",
       "spec": "specs/socket-events.md",
       "priority": 41,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [
         "TASK-026",
         "TASK-010"

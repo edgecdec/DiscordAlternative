@@ -308,3 +308,9 @@
 - Payload includes `{ userId, username, channelId }` matching the `TypingBroadcastPayload` type.
 - Types were already defined in `src/types/socket.ts` from TASK-026 — no type changes needed.
 - Lesson: Typing indicators are fire-and-forget — no DB persistence, no membership validation needed beyond being in the room (Socket.io room membership already implies channel access from `channel:join`).
+
+## TASK-033: Create useSocket hook (2026-03-25)
+- The useSocket.ts file already existed from a previous iteration (committed in f6f065b) but was never wired into the app.
+- The actual work was adding SocketProvider to layout.tsx inside AuthProvider so the socket context is available app-wide.
+- Lesson: Always check if a file already exists before creating it — search the git log to avoid redundant work.
+- The hook connects to Socket.io when user is authenticated, auto-reconnects, and exposes typed joinChannel/leaveChannel helpers.
