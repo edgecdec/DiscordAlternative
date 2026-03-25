@@ -91,3 +91,13 @@
 - Updated src/app/page.tsx — redirects to /servers if authenticated, otherwise renders AuthForm centered on screen.
 - Uses useAuth hook for submit (login/register) and session check.
 - Lessons: Always re-read files before editing — useAuth had already been updated to username-only auth (no email) by a previous commit. The auth spec is the source of truth for field names, not the prd.json task description which mentioned email.
+
+## TASK-055: Create server.js with Next.js wrapper and webhook handler
+- Date: 2026-03-25
+- Status: done
+- Created server.js at project root with custom HTTP server wrapping Next.js request handler.
+- Webhook handler at /api/webhook verifies HMAC SHA-256 signature from x-hub-signature-256 header using WEBHOOK_SECRET env var.
+- On valid webhook, responds 200 immediately then spawns deploy_webhook.sh asynchronously via execFile.
+- Listens on PORT env var (default 3003).
+- server.js is plain CommonJS (not TypeScript) since it runs directly with `node server.js`.
+- Lessons: server.js is the foundation — Socket.io will be added on top in TASK-027. Keep it minimal for now.

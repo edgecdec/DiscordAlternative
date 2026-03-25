@@ -137,7 +137,7 @@
       "title": "Create server.js with Next.js wrapper and webhook handler",
       "spec": "specs/deployment.md",
       "priority": 13,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [
         "TASK-002"
       ],

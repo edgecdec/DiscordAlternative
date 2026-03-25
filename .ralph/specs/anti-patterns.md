@@ -12,6 +12,7 @@ These are mistakes Ralph has made on previous projects. Do not repeat them.
 - A human developer may be editing files at the same time as you. ALWAYS re-read a file before modifying it — never assume it hasn't changed since you last read it.
 - Before editing prd.json or progress.txt, read the current version first. Another process may have updated it.
 - Use `git pull` or check `git status` before committing if you suspect concurrent changes.
+- The human overseer may make direct code changes outside the ralph loop. If you notice files have changed unexpectedly, re-read them and adapt — do not revert or overwrite human changes.
 
 ## Context Management
 - Do NOT read every file in the project — only read files relevant to the current task.
