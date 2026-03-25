@@ -47,6 +47,7 @@ for t in tasks:
 
   # One task per loop, fresh context
   kiro-cli chat \
+    --agent discord \
     --no-interactive \
     --trust-all-tools \
     "$(cat .ralph/PROMPT.md)" \
