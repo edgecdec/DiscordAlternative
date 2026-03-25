@@ -148,7 +148,7 @@
       "title": "Create deploy_webhook.sh",
       "spec": "specs/deployment.md",
       "priority": 14,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-055"
       ],

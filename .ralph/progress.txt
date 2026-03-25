@@ -101,3 +101,9 @@
 - Listens on PORT env var (default 3003).
 - server.js is plain CommonJS (not TypeScript) since it runs directly with `node server.js`.
 - Lessons: server.js is the foundation — Socket.io will be added on top in TASK-027. Keep it minimal for now.
+
+## TASK-056: Create deploy_webhook.sh (2026-03-24)
+- Created deploy_webhook.sh with lock file, git fetch/reset, conditional npm install, prisma migrate deploy, next build, pm2 restart.
+- Logs to /var/log/webhook_deploy_discord.log.
+- Uses md5sum to detect package.json changes — avoids unnecessary npm install on every deploy.
+- Trap ensures lock file cleanup even on script failure.
