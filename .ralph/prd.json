@@ -503,7 +503,7 @@
       "title": "Add typing indicator emission to MessageInput",
       "spec": "specs/socket-events.md",
       "priority": 46,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-037"
       ],

@@ -346,3 +346,12 @@
 - Emits message:create via socket with channelId and content
 - All validations passed first try, deploy verified at 200
 - Lessons: Straightforward component — useCallback for send/keydown keeps it clean
+
+## TASK-038: Add typing indicator emission to MessageInput (2026-03-25)
+- Added debounced typing:start emission (max once per 2s via timestamp check)
+- Added typing:stop emission after 3s idle timeout or on message send
+- Cleanup on unmount/channel change via useEffect return
+- Reset lastTypingEmit timestamp on send so next keystroke re-emits immediately
+- Named constants TYPING_EMIT_INTERVAL_MS and TYPING_STOP_DELAY_MS (no magic numbers)
+- All validations passed first try, deploy verified at 200
+- Lessons: useRef is the right tool for mutable values that don't trigger re-renders (timers, timestamps, flags)
