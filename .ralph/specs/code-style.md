@@ -13,7 +13,28 @@
   - `src/lib/validators.ts` — input validation helpers (e.g. validateUsername, validatePassword)
   - `src/lib/permissions.ts` — role checking helpers (e.g. isOwnerOrAdmin, isMember)
   - `src/lib/responses.ts` — standard error response helpers (e.g. unauthorized(), badRequest(), notFound())
+  - `src/lib/constants.ts` — all size limits and validation constants (see below)
 - If you write the same pattern in two places, extract it immediately. Don't wait.
+
+## Size Limits and Validation Constants
+All limits must be defined in `src/lib/constants.ts` and referenced everywhere. Never hardcode limits inline.
+
+```
+USERNAME_MIN = 3
+USERNAME_MAX = 20
+PASSWORD_MIN = 6
+PASSWORD_MAX = 128
+SERVER_NAME_MIN = 1
+SERVER_NAME_MAX = 50
+CHANNEL_NAME_MIN = 1
+CHANNEL_NAME_MAX = 50
+MESSAGE_MAX = 2000
+FILE_UPLOAD_MAX_BYTES = 5 * 1024 * 1024  (5MB)
+AVATAR_URL_MAX = 512
+MESSAGES_PER_PAGE = 50
+```
+
+Every API route that accepts user input MUST validate against these limits and return 400 with a clear error if exceeded. Every TextField in the UI MUST set maxLength via slotProps to match.
 
 ## API Route Pattern
 Every API route should follow this structure:
