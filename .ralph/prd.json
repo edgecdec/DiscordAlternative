@@ -663,7 +663,7 @@
       "title": "Build server settings dialog \u2014 general tab",
       "spec": "specs/servers.md",
       "priority": 60,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-049",
         "TASK-041"

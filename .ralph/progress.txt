@@ -454,3 +454,10 @@
 - Returns 204 No Content on success
 - Verified on production: 401 without auth, 403 for non-owner, route works correctly
 - Lesson: During deploy transition, endpoints may briefly return unexpected status codes (405) — always retest after build completes
+
+## TASK-051: Build server settings dialog — general tab (2026-03-25)
+- Created ServerSettings.tsx with rename field and invite code copy-to-clipboard
+- Added Settings gear icon to ChannelPanel header (visible to OWNER/ADMIN only)
+- Wired dialog open/close and onUpdated callback to refetch server data
+- Lesson: testbot lands on /servers (list page) not directly on a server channel — Nova Act tests need to handle clicking into a server first before testing channel panel features
+- Lesson: After git push, the maintenance page may show briefly during rebuild — wait extra time before curling for auth cookies against the live site

@@ -12,8 +12,9 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Tag, VolumeUp, Add } from "@mui/icons-material";
+import { Tag, VolumeUp, Add, Settings } from "@mui/icons-material";
 import CreateChannelDialog from "@/components/layout/CreateChannelDialog";
+import ServerSettings from "@/components/layout/ServerSettings";
 import UserInfoPanel from "@/components/layout/UserInfoPanel";
 
 const PANEL_WIDTH = 240;
@@ -44,6 +45,7 @@ interface ChannelPanelProps {
 export default function ChannelPanel({ userId }: ChannelPanelProps) {
   const [server, setServer] = useState<ServerData | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const router = useRouter();
   const params = useParams();
   const serverId = params?.serverId as string | undefined;
@@ -118,10 +120,17 @@ export default function ChannelPanel({ userId }: ChannelPanelProps) {
         borderColor: "divider",
       }}
     >
-      <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: "divider" }}>
-        <Typography variant="subtitle1" fontWeight={700} noWrap>
+      <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: "divider", display: "flex", alignItems: "center" }}>
+        <Typography variant="subtitle1" fontWeight={700} noWrap sx={{ flex: 1 }}>
           {server.name}
         </Typography>
+        {canManage && (
+          <Tooltip title="Server Settings">
+            <IconButton size="small" onClick={() => setSettingsOpen(true)} sx={{ color: "text.secondary" }}>
+              <Settings sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
 
       <Box sx={{ flex: 1, overflowY: "auto", py: 0.5 }}>
@@ -134,6 +143,14 @@ export default function ChannelPanel({ userId }: ChannelPanelProps) {
         onClose={() => setDialogOpen(false)}
         serverId={server.id}
         onCreated={fetchServer}
+      />
+
+      <ServerSettings
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        serverId={server.id}
+        serverName={server.name}
+        onUpdated={fetchServer}
       />
 
       <UserInfoPanel />
