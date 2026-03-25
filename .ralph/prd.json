@@ -37,7 +37,7 @@
       "title": "Run initial Prisma migration and create DB client",
       "spec": "specs/database.md",
       "priority": 4,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [
         "TASK-003"
       ],
