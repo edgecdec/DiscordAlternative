@@ -561,7 +561,7 @@
       "title": "Implement list members API route",
       "spec": "specs/servers.md",
       "priority": 51,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-013"
       ],

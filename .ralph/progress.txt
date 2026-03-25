@@ -383,3 +383,9 @@
 - Created `/invite/[code]` page with server avatar, name, member count, and join button.
 - If user is not logged in, redirects to login page. If already a member (409), redirects to the server directly.
 - Lessons: Keep the GET handler unauthenticated so invite links work for anyone (they still need to log in to actually join). The 409 "already a member" case from POST is a valid redirect path, not just an error.
+
+## TASK-043: Implement list members API route (2026-03-25)
+- Created GET /api/servers/[serverId]/members returning members with user info and roles.
+- Followed existing pattern from server detail route (auth check, membership check, Prisma query with user select).
+- Deploy returned 500 for first 30s during rebuild, then 200 at 40s — normal webhook deploy cycle.
+- Lessons: Simple CRUD routes following established patterns are quick wins. The existing server detail route already includes members, but a dedicated members endpoint is needed for the MemberList component (TASK-045).
