@@ -222,3 +222,11 @@
 - Created CreateChannelDialog.tsx with channel type toggle (TEXT/VOICE) and name input.
 - ChannelPanel fetches server data from /api/servers/[serverId] and passes userId prop to determine if user can manage channels.
 - Lesson: Keep the "Add" button in the channel group header rather than a separate floating button — matches Discord's UX pattern and keeps the component simpler.
+
+## TASK-021: Build user info panel in channel panel (2026-03-25)
+- Created `UserInfoPanel` as a separate component in `src/components/layout/UserInfoPanel.tsx` per one-component-per-file rule.
+- Shows Avatar with first letter fallback, username, theme toggle (DarkMode/LightMode), and Settings icon button.
+- Uses `useAuth` for user data and `useThemeMode` for toggle.
+- Placed at bottom of ChannelPanel with `borderTop` divider and `background.default` bgcolor to visually separate from channel list.
+- Removed unused `Divider` import from ChannelPanel after cleanup.
+- Lesson: Keep new UI additions as separate components to stay under the 150-line file limit.

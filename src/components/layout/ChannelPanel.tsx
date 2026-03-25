@@ -10,11 +10,11 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
-  Divider,
   Tooltip,
 } from "@mui/material";
 import { Tag, VolumeUp, Add } from "@mui/icons-material";
 import CreateChannelDialog from "@/components/layout/CreateChannelDialog";
+import UserInfoPanel from "@/components/layout/UserInfoPanel";
 
 const PANEL_WIDTH = 240;
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
@@ -135,6 +135,8 @@ export default function ChannelPanel({ userId }: ChannelPanelProps) {
         serverId={server.id}
         onCreated={fetchServer}
       />
+
+      <UserInfoPanel />
     </Box>
   );
 }

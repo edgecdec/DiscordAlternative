@@ -311,7 +311,7 @@
       "title": "Build user info panel in channel panel",
       "spec": "specs/ui-layout.md",
       "priority": 29,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-020"
       ],
