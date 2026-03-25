@@ -617,7 +617,7 @@
       "title": "Build VoiceChannel component",
       "spec": "specs/webrtc.md",
       "priority": 56,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-046",
         "TASK-022"

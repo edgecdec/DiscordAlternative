@@ -419,3 +419,14 @@
 - All validation passed first try (prisma validate, tsc --noEmit, npm test).
 - Deploy verified immediately (200 on first poll).
 - Lessons: `AccessToken.toJwt()` is async (returns Promise) — must await it. The SDK reads env vars automatically if constructor args are omitted, but explicit is better.
+
+## TASK-047: Build VoiceChannel component (2026-03-25)
+- Created src/components/voice/VoiceChannel.tsx with LiveKit integration
+- Component has 3 states: not joined (join button), connecting (spinner), connected (participant list + controls)
+- Uses @livekit/components-react hooks: useParticipants, useLocalParticipant, useConnectionState, useIsSpeaking
+- ParticipantTile sub-component shows avatar with green border when speaking, mute icon when muted
+- RoomContent sub-component handles mic toggle and disconnect
+- RoomAudioRenderer handles remote audio playback
+- Token fetched from /api/livekit/token on join
+- Lesson: LiveKit components-react provides good hooks but no MUI-compatible styled components — need to build custom UI on top of the hooks
+- Lesson: Keep LiveKitRoom as the wrapper and use hooks inside child components (hooks need LiveKit context)
