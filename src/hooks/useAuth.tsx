@@ -12,15 +12,14 @@ import {
 interface User {
   id: string;
   username: string;
-  email: string;
   avatarUrl?: string | null;
 }
 
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
+  register: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -57,13 +56,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const data = await authFetch<{ user: User }>("/api/auth/login", { email, password });
+  const login = useCallback(async (username: string, password: string) => {
+    const data = await authFetch<{ user: User }>("/api/auth/login", { username, password });
     setUser(data.user);
   }, []);
 
-  const register = useCallback(async (username: string, email: string, password: string) => {
-    const data = await authFetch<{ user: User }>("/api/auth/register", { username, email, password });
+  const register = useCallback(async (username: string, password: string) => {
+    const data = await authFetch<{ user: User }>("/api/auth/register", { username, password });
     setUser(data.user);
   }, []);
 

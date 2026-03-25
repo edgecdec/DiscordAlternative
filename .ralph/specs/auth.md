@@ -42,3 +42,5 @@ JWT-based auth using httpOnly cookies. Same pattern as MarchMadness.
 - React context provider wrapping the app (same pattern as MarchMadness).
 - On mount, calls `/api/auth/me` to check session.
 - Exposes `{ user, login, register, logout, loading }`.
+- login() accepts `{ username, password }`.
+- register() accepts `{ username, password }`.

@@ -20,7 +20,6 @@ generator client {
 ### User
 - id: String @id @default(cuid())
 - username: String @unique
-- email: String @unique
 - passwordHash: String
 - avatarUrl: String? (optional)
 - createdAt: DateTime @default(now())

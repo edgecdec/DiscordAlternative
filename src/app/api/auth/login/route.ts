@@ -5,40 +5,29 @@ import { signToken, buildTokenCookie } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { email, password } = body as {
-    email?: string;
-    password?: string;
-  };
+  const { username, password } = body as { username?: string; password?: string };
 
-  if (!email || !password) {
+  if (!username || !password) {
     return NextResponse.json(
-      { error: "Email and password are required" },
+      { error: "Username and password are required" },
       { status: 400 }
     );
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-
+  const user = await prisma.user.findUnique({ where: { username } });
   if (!user) {
-    return NextResponse.json(
-      { error: "Invalid email or password" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
-
   if (!valid) {
-    return NextResponse.json(
-      { error: "Invalid email or password" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
   }
 
   const token = signToken(user.id, user.username);
 
   return NextResponse.json(
-    { user: { id: user.id, username: user.username, email: user.email } },
+    { user: { id: user.id, username: user.username } },
     { headers: { "Set-Cookie": buildTokenCookie(token) } }
   );
 }
