@@ -8,23 +8,23 @@ JWT-based auth using httpOnly cookies. Same pattern as MarchMadness.
 - `cookie` for cookie parsing
 
 ## Registration
-- POST `/api/auth/register` — accepts `{ username, email, password }`.
-- Validate: username 3-20 chars alphanumeric, email valid format, password min 6 chars.
+- POST `/api/auth/register` — accepts `{ username, password }`.
+- Validate: username 3-20 chars alphanumeric, password min 6 chars.
 - Hash password with bcryptjs (10 rounds).
 - Create User in database.
 - Sign JWT with `{ userId, username }`, 7-day expiry.
-- Set `token` as httpOnly cookie, return `{ user: { id, username, email } }`.
+- Set `token` as httpOnly cookie, return `{ user: { id, username } }`.
 
 ## Login
-- POST `/api/auth/login` — accepts `{ email, password }`.
-- Look up user by email, compare password hash.
+- POST `/api/auth/login` — accepts `{ username, password }`.
+- Look up user by username, compare password hash.
 - Sign JWT, set cookie, return user object.
 
 ## Logout
 - POST `/api/auth/logout` — clear the `token` cookie.
 
 ## Current User
-- GET `/api/auth/me` — read JWT from cookie, return user object or 401.
+- GET `/api/auth/me` — read JWT from cookie, return user object (id, username, avatarUrl) or 401.
 
 ## Middleware Pattern
 - API routes call a shared `getAuthUser(req)` helper from `src/lib/auth.ts`.

@@ -114,7 +114,7 @@
       "title": "Create root layout with providers",
       "spec": "specs/ui-layout.md",
       "priority": 11,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-009",
         "TASK-010"
