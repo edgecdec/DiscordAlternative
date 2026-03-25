@@ -131,3 +131,9 @@
 - Used Prisma nested create to atomically create server, channel, and member in one operation.
 - Pattern: getAuthUser() for auth, NextResponse.json for responses, constants for magic values.
 - No existing responses.ts/validators.ts helpers yet — followed inline pattern from register route.
+
+## TASK-014: Implement list user servers API route (2026-03-24)
+- Added GET handler to src/app/api/servers/route.ts
+- Returns servers where user is a member, with channels included and member count via _count
+- Ordered by createdAt asc for consistent sidebar ordering
+- Lesson: Adding a second handler to an existing route file is straightforward — just export another named function (GET alongside POST)

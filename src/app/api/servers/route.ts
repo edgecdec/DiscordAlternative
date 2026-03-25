@@ -8,6 +8,24 @@ const DEFAULT_CHANNEL_NAME = "general";
 const DEFAULT_CHANNEL_TYPE = "TEXT";
 const OWNER_ROLE = "OWNER";
 
+export async function GET() {
+  const user = await getAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const servers = await prisma.server.findMany({
+    where: { members: { some: { userId: user.userId } } },
+    include: {
+      channels: true,
+      _count: { select: { members: true } },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return NextResponse.json({ servers });
+}
+
 export async function POST(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) {

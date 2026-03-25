@@ -181,7 +181,7 @@
       "title": "Implement list user servers API route",
       "spec": "specs/servers.md",
       "priority": 17,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-013"
       ],
