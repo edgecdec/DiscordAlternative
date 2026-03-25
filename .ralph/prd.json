@@ -583,7 +583,7 @@
       "title": "Build online members sidebar",
       "spec": "specs/ui-layout.md",
       "priority": 53,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-043",
         "TASK-031",

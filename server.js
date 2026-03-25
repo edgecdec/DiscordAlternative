@@ -141,6 +141,25 @@ app.prepare().then(() => {
       socket.leave(`channel:${channelId}`);
     });
 
+    socket.on("presence:list", async ({ serverId }) => {
+      try {
+        const member = await prisma.serverMember.findUnique({
+          where: { userId_serverId: { userId: socket.data.userId, serverId } },
+        });
+        if (!member) return;
+        const members = await prisma.serverMember.findMany({
+          where: { serverId },
+          select: { userId: true },
+        });
+        const onlineUserIds = members
+          .map((m) => m.userId)
+          .filter((id) => onlineUsers.has(id));
+        socket.emit("presence:list", { onlineUserIds });
+      } catch (err) {
+        console.error("presence:list error:", err);
+      }
+    });
+
     socket.on("message:create", async ({ channelId, content, fileUrl }) => {
       try {
         if (!content || typeof content !== "string" || content.trim().length === 0 || content.length > 2000) return;

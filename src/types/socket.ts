@@ -45,6 +45,14 @@ export interface TypingPayload {
   channelId: string;
 }
 
+export interface PresenceListPayload {
+  serverId: string;
+}
+
+export interface PresenceListResponse {
+  onlineUserIds: string[];
+}
+
 // Server → Client payloads
 export interface PresenceOnlinePayload {
   userId: string;
@@ -72,6 +80,7 @@ export interface ServerToClientEvents {
   "message:deleted": (payload: MessageDeletedPayload) => void;
   "presence:online": (payload: PresenceOnlinePayload) => void;
   "presence:offline": (payload: PresenceOfflinePayload) => void;
+  "presence:list": (payload: PresenceListResponse) => void;
   "typing:start": (payload: TypingBroadcastPayload) => void;
   "typing:stop": (payload: TypingBroadcastPayload) => void;
 }
@@ -82,6 +91,7 @@ export interface ClientToServerEvents {
   "message:create": (payload: MessageCreatePayload) => void;
   "message:update": (payload: MessageUpdatePayload) => void;
   "message:delete": (payload: MessageDeletePayload) => void;
+  "presence:list": (payload: PresenceListPayload) => void;
   "typing:start": (payload: TypingPayload) => void;
   "typing:stop": (payload: TypingPayload) => void;
 }

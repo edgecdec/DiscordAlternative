@@ -396,3 +396,12 @@
 - DELETE: Kicks member (OWNER/ADMIN only). Cannot kick the OWNER.
 - Followed existing patterns from channels route for auth/validation style.
 - All validation passed first try. Deploy verified after ~30s (initial 500s during rebuild, then 200).
+
+## TASK-045: Build online members sidebar (2026-03-25)
+- Created `src/components/layout/MemberList.tsx` — right sidebar (240px) showing server members grouped by role (OWNER, ADMIN, MODERATOR, GUEST) with green/gray Circle dot for online/offline status.
+- Added `presence:list` socket event (client→server request, server→client response) to get initial online user IDs when the component mounts. Without this, the component wouldn't know who's already online.
+- Updated `src/types/socket.ts` with `PresenceListPayload` and `PresenceListResponse` types, added `presence:list` to both event interfaces.
+- Added `presence:list` handler in `server.js` — validates membership, queries server members, filters by `onlineUsers` map, emits back to requesting socket.
+- Wired MemberList into `src/app/servers/[serverId]/layout.tsx` as the rightmost column.
+- Hidden on xs/sm screens via `display: { xs: "none", md: "block" }` — mobile responsive task (TASK-054) will handle drawer integration.
+- Lesson: When adding real-time features that need initial state, always add a "list" or "sync" event — relying only on incremental updates means late-joining clients miss existing state.
