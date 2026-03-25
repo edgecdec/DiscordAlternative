@@ -36,7 +36,7 @@ JWT_SECRET=<random-secret>
 WEBHOOK_SECRET=<webhook-secret>
 LIVEKIT_API_KEY=<from-livekit.yaml>
 LIVEKIT_API_SECRET=<from-livekit.yaml>
-NEXT_PUBLIC_LIVEKIT_URL=ws://<your-domain>:7880
+NEXT_PUBLIC_LIVEKIT_URL=ws://discord.edgecdec.com:7880
 ```
 
 ## .gitignore additions

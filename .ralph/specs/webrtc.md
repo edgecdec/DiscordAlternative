@@ -32,4 +32,4 @@ Voice and video channels use a self-hosted LiveKit server as the SFU. Backend on
 ## Environment Variables
 - `LIVEKIT_API_KEY` — server-side only, matches key in `/etc/livekit.yaml`
 - `LIVEKIT_API_SECRET` — server-side only, matches secret in `/etc/livekit.yaml`
-- `NEXT_PUBLIC_LIVEKIT_URL` — public, e.g. `ws://yourdomain.com:7880`
+- `NEXT_PUBLIC_LIVEKIT_URL` — public, e.g. `ws://discord.edgecdec.com:7880`

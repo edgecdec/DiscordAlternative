@@ -72,6 +72,7 @@ ssh -i $SSH_KEY $SSH_USER@$SSH_HOST "pm2 logs discord-alt --lines 30 --nostream"
 Connection details are stored locally in `.ralph/.server-env` (gitignored). Read that file to get `SSH_KEY`, `SSH_USER`, and `SSH_HOST`.
 
 - Production path: `/var/www/DiscordAlternative`
+- Live URL: https://discord.edgecdec.com
 - OS: Ubuntu 24.04, x86_64
 - Process manager: pm2
 - Other apps on same server: jeopardy (:3000), superconnections (:3001), marchmadness (:3002)
