@@ -99,6 +99,15 @@ ssh -i $SSH_KEY $SSH_USER@$SSH_HOST "free -h && df -h /"
 ssh -i $SSH_KEY $SSH_USER@$SSH_HOST "curl -s -o /dev/null -w '%{http_code}' http://localhost:3003"
 ```
 
+## Pre-Configured Infrastructure (already done, do not redo)
+
+- DNS: `discord.edgecdec.com` → server IP (Cloudflare, DNS only, no proxy)
+- Server directory created: `/var/www/DiscordAlternative`
+- `.env` on server has `WEBHOOK_SECRET` already set
+- GitHub webhook configured: `http://discord.edgecdec.com/api/webhook` (will 404 until app is deployed)
+- nginx config still needed — must proxy `discord.edgecdec.com` → `localhost:3003` (match pattern of other apps on server)
+- GitHub repo: `https://github.com/edgecdec/DiscordAlternative` (remote origin set)
+
 ## Operational Notes
 
 - Socket.io event payloads must have TypeScript interfaces in `src/types/socket.ts`.
