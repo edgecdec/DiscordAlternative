@@ -149,3 +149,14 @@
 - Snake game uses canvas, arrow keys + WASD, matches app theme (#121212 bg, #5865F2 primary, #1e1e1e game bg).
 - nginx serves this via error_page directive on 502/503/504 during deploys.
 - Pure HTML/CSS/JS task — no TypeScript or build impact, all validations pass trivially.
+
+## TASK-016: Build server sidebar component
+- Date: 2025-03-25
+- Status: done
+- Created `src/components/layout/ServerSidebar.tsx` — narrow 72px vertical sidebar with server avatars, active state indicator (colored left border + square avatar), and create server button.
+- Component accepts `onCreateClick` prop for the create server dialog (TASK-017).
+- Fetches servers from `/api/servers` on mount.
+- Uses `useParams` to detect active server and highlight it.
+- All validation passed first try (prisma validate, tsc --noEmit, npm test).
+- Deployment verified: 200 OK.
+- Lessons: Keep component props minimal — pass callbacks for actions that will be handled by parent or sibling components (like dialogs).
