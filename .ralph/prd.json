@@ -492,7 +492,7 @@
       "title": "Build MessageInput component",
       "spec": "specs/ui-layout.md",
       "priority": 45,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-033"
       ],

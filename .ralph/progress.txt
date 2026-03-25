@@ -338,3 +338,11 @@
 - Moved auto-scroll-to-bottom for new messages into `handleNew` callback with `requestAnimationFrame` instead of reacting to `messages.length` change — avoids scrolling to bottom when loading older messages.
 - Initial scroll-to-bottom now triggers on `loading` state change (when initial fetch completes) rather than on every `messages.length` change.
 - CircularProgress spinner shown at top of list while fetching older messages.
+
+## TASK-037: Build MessageInput component (2026-03-25)
+- Created src/components/chat/MessageInput.tsx with MUI TextField + Send IconButton
+- Enter sends, Shift+Enter inserts newline, input clears on send
+- Uses MESSAGE_MAX from constants.ts for maxLength on input
+- Emits message:create via socket with channelId and content
+- All validations passed first try, deploy verified at 200
+- Lessons: Straightforward component — useCallback for send/keydown keeps it clean
