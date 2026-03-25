@@ -704,6 +704,267 @@
         "TASK-040"
       ],
       "description": "Update the three-column layout \u2014 on screens <768px, hide ServerSidebar and ChannelPanel, show hamburger Menu IconButton in channel header. Clicking opens MUI Drawer containing both panels. Same pattern as MarchMadness mobile nav."
+    },
+    {
+      "id": "TASK-064",
+      "title": "Create user profile API routes",
+      "spec": "specs/auth.md",
+      "priority": 64,
+      "status": "open",
+      "dependencies": [],
+      "description": "Create GET /api/users/[username] \u2014 public profile (id, username, avatarUrl, createdAt). Create PATCH /api/auth/profile \u2014 authenticated, accepts { username?, avatarUrl? }. Validate username against constants. Create PATCH /api/auth/password \u2014 accepts { currentPassword, newPassword }, verify current, hash new."
+    },
+    {
+      "id": "TASK-065",
+      "title": "Build user profile page",
+      "spec": "specs/ui-layout.md",
+      "priority": 65,
+      "status": "open",
+      "dependencies": [],
+      "description": "Create src/app/profile/[username]/page.tsx \u2014 shows user avatar, username, join date. If viewing own profile, show edit button. Create src/components/common/ProfileDialog.tsx \u2014 MUI Dialog to edit username, avatar, and change password. Accessible from user info panel in ChannelPanel."
+    },
+    {
+      "id": "TASK-066",
+      "title": "Track last-read message per channel per user",
+      "spec": "specs/database.md",
+      "priority": 66,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a ChannelRead model to Prisma: id, userId, channelId, lastReadMessageId, updatedAt. @@unique([userId, channelId]). Create API route PATCH /api/channels/[channelId]/read \u2014 updates lastReadMessageId to the latest message. Call this when user views a channel."
+    },
+    {
+      "id": "TASK-067",
+      "title": "Add unread indicators to channel list and server sidebar",
+      "spec": "specs/ui-layout.md",
+      "priority": 67,
+      "status": "open",
+      "dependencies": [],
+      "description": "Update ChannelPanel to show bold channel name and dot indicator when channel has messages newer than lastReadMessageId. Update ServerSidebar to show notification dot on server icon if any channel in that server has unreads. Fetch unread status from a new GET /api/servers/[serverId]/unreads endpoint."
+    },
+    {
+      "id": "TASK-068",
+      "title": "Implement file upload API route",
+      "spec": "specs/deployment.md",
+      "priority": 68,
+      "status": "open",
+      "dependencies": [],
+      "description": "Create POST /api/upload \u2014 accepts multipart form data, saves file to uploads/ directory with a unique filename (uuid + original extension). Validate file size against FILE_UPLOAD_MAX_BYTES from constants. Return { url: '/uploads/filename' }. Serve uploads/ directory as static files from server.js."
+    },
+    {
+      "id": "TASK-069",
+      "title": "Add file attachment button to MessageInput",
+      "spec": "specs/ui-layout.md",
+      "priority": 69,
+      "status": "open",
+      "dependencies": [],
+      "description": "Update MessageInput to include an AttachFile IconButton. On click, open file picker. Upload file to /api/upload, then send message with fileUrl. Show upload progress indicator."
+    },
+    {
+      "id": "TASK-070",
+      "title": "Display image attachments inline in messages",
+      "spec": "specs/ui-layout.md",
+      "priority": 70,
+      "status": "open",
+      "dependencies": [],
+      "description": "Update MessageList message rendering \u2014 if message has fileUrl, detect if it's an image (jpg/png/gif/webp) and render inline with max-width 400px. For non-image files, show a download link with filename and file size."
+    },
+    {
+      "id": "TASK-071",
+      "title": "Create message reactions database model and API",
+      "spec": "specs/database.md",
+      "priority": 71,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add Reaction model to Prisma: id, emoji (String), userId, messageId, createdAt. @@unique([userId, messageId, emoji]). Create POST /api/messages/[messageId]/reactions \u2014 accepts { emoji }, toggles reaction (add if not exists, remove if exists). Create GET /api/messages/[messageId]/reactions \u2014 returns reactions grouped by emoji with count and whether current user reacted."
+    },
+    {
+      "id": "TASK-072",
+      "title": "Add reaction UI to messages",
+      "spec": "specs/ui-layout.md",
+      "priority": 72,
+      "status": "open",
+      "dependencies": [],
+      "description": "Update message rendering in MessageList \u2014 show reaction chips below message content (emoji + count, highlighted if current user reacted). Add a small emoji picker on hover/click (smiley face icon). Clicking a reaction chip toggles it. Broadcast reaction changes via Socket.io events reaction:add and reaction:remove."
+    },
+    {
+      "id": "TASK-073",
+      "title": "Add reply support to messages database and API",
+      "spec": "specs/database.md",
+      "priority": 73,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add replyToId field (optional String) to Message model, self-relation to Message. Update POST /api/channels/[channelId]/messages to accept optional replyToId. Update GET messages to include replyTo message (id, content snippet, author username) when present."
+    },
+    {
+      "id": "TASK-074",
+      "title": "Build reply UI in chat",
+      "spec": "specs/ui-layout.md",
+      "priority": 74,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add reply button to messages (on hover). Clicking sets a reply-to bar above MessageInput showing the quoted message snippet with an X to cancel. Sending includes replyToId. In MessageList, render replied-to messages with a small quote block above the message content."
+    },
+    {
+      "id": "TASK-075",
+      "title": "Implement @mention parsing and highlighting",
+      "spec": "specs/socket-events.md",
+      "priority": 75,
+      "status": "open",
+      "dependencies": [],
+      "description": "When a message contains @username, the server should check if that user is a member of the server. In MessageList, parse @username patterns and render them as highlighted styled spans (primary color, clickable). Add a Socket.io event mention:notify that alerts the mentioned user."
+    },
+    {
+      "id": "TASK-076",
+      "title": "Add @mention autocomplete to MessageInput",
+      "spec": "specs/ui-layout.md",
+      "priority": 76,
+      "status": "open",
+      "dependencies": [],
+      "description": "When user types @ in MessageInput, show a dropdown of server members filtered by what they've typed so far. Selecting a member inserts @username into the message. Use MUI Popper or Autocomplete positioned above the input."
+    },
+    {
+      "id": "TASK-077",
+      "title": "Add link preview rendering to messages",
+      "spec": "specs/ui-layout.md",
+      "priority": 77,
+      "status": "open",
+      "dependencies": [],
+      "description": "In MessageList, detect URLs in message content using regex. Render them as clickable links. For the first URL in a message, show a simple preview card below the message with the URL domain and a link icon. Keep it lightweight \u2014 no server-side fetching of metadata for now."
+    },
+    {
+      "id": "TASK-078",
+      "title": "Add emoji picker to MessageInput",
+      "spec": "specs/ui-layout.md",
+      "priority": 78,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a smiley face IconButton next to the send button in MessageInput. On click, show a popover with a grid of common emoji (use a static list of ~100 popular emoji, no external library). Clicking an emoji inserts it at cursor position in the input."
+    },
+    {
+      "id": "TASK-079",
+      "title": "Add channel categories to database and API",
+      "spec": "specs/database.md",
+      "priority": 79,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add ChannelCategory model to Prisma: id, name, serverId, position (Int). Add optional categoryId to Channel model. Create POST /api/servers/[serverId]/categories \u2014 create category. Create PATCH/DELETE for categories. Update channel creation to accept optional categoryId."
+    },
+    {
+      "id": "TASK-080",
+      "title": "Render channel categories in ChannelPanel",
+      "spec": "specs/ui-layout.md",
+      "priority": 80,
+      "status": "open",
+      "dependencies": [],
+      "description": "Update ChannelPanel to group channels under collapsible category headers. Uncategorized channels appear at top. Categories are collapsible (click header to toggle). Show channel count per category."
+    },
+    {
+      "id": "TASK-081",
+      "title": "Build first-time user onboarding flow",
+      "spec": "specs/ui-layout.md",
+      "priority": 81,
+      "status": "open",
+      "dependencies": [],
+      "description": "When user has no servers (GET /api/servers returns empty), show a welcome page instead of redirecting. Two options: 'Create a Server' and 'Join a Server' (enter invite code). Friendly copy and icons. After creating/joining, redirect to the server."
+    },
+    {
+      "id": "TASK-082",
+      "title": "Implement message search API",
+      "spec": "specs/database.md",
+      "priority": 82,
+      "status": "open",
+      "dependencies": [],
+      "description": "Create GET /api/servers/[serverId]/search?q=query \u2014 full-text search across all messages in the server the user has access to. Return matching messages with channel name, author, timestamp. Paginated. Use Prisma contains filter on content field."
+    },
+    {
+      "id": "TASK-083",
+      "title": "Build message search UI",
+      "spec": "specs/ui-layout.md",
+      "priority": 83,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a search IconButton in the channel header. Opens a search panel/dialog with a TextField. Results show message snippets with channel name and author. Clicking a result navigates to that channel and scrolls to the message."
+    },
+    {
+      "id": "TASK-084",
+      "title": "Add keyboard shortcuts",
+      "spec": "specs/ui-layout.md",
+      "priority": 84,
+      "status": "open",
+      "dependencies": [],
+      "description": "Escape closes any open dialog/drawer. Ctrl+K (or Cmd+K on Mac) opens a quick-switch dialog to search and jump to channels. Focus message input when typing in a channel view (if no dialog is open). Add a small keyboard shortcut hint in the UI."
+    },
+    {
+      "id": "TASK-085",
+      "title": "Add user status to database and API",
+      "spec": "specs/database.md",
+      "priority": 85,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add status field to User model: String, default 'online'. Valid values: online, away, dnd, offline. Create PATCH /api/auth/status \u2014 accepts { status }. Broadcast status changes via Socket.io presence:status event. Show status as colored dot on user avatars (green=online, yellow=away, red=dnd, gray=offline)."
+    },
+    {
+      "id": "TASK-086",
+      "title": "Build user status selector UI",
+      "spec": "specs/ui-layout.md",
+      "priority": 86,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a status dot next to the user avatar in the user info panel at bottom of ChannelPanel. Clicking opens a small menu to select status (Online, Away, Do Not Disturb, Invisible). Update MemberList to show status dots on all members."
+    },
+    {
+      "id": "TASK-087",
+      "title": "Create direct message database model and API",
+      "spec": "specs/database.md",
+      "priority": 87,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add DirectMessage model to Prisma: id, content, fileUrl, senderId, receiverId, createdAt, updatedAt. Create GET /api/dm/[userId] \u2014 get DM history with a user (paginated). Create POST /api/dm/[userId] \u2014 send a DM. Add Socket.io events dm:new for real-time delivery."
+    },
+    {
+      "id": "TASK-088",
+      "title": "Build direct messages UI",
+      "spec": "specs/ui-layout.md",
+      "priority": 88,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a DM section to ServerSidebar (above server list) with a chat bubble icon. Clicking shows a list of recent DM conversations. Clicking a conversation opens a DM view (reuse MessageList and MessageInput components). Show unread DM indicator on the icon."
+    },
+    {
+      "id": "TASK-089",
+      "title": "Create audit log database model and API",
+      "spec": "specs/database.md",
+      "priority": 89,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add AuditLog model to Prisma: id, serverId, userId, action (String: member_kick, member_role_change, channel_create, channel_delete, message_delete, server_update), targetId, details (String, JSON), createdAt. Log actions automatically in the relevant API routes. Create GET /api/servers/[serverId]/audit-log \u2014 OWNER/ADMIN only, paginated."
+    },
+    {
+      "id": "TASK-090",
+      "title": "Build audit log UI in server settings",
+      "spec": "specs/ui-layout.md",
+      "priority": 90,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add an Audit Log tab to ServerSettings dialog (OWNER/ADMIN only). Shows a chronological list of actions: who did what, when. Each entry shows user avatar, action description, and timestamp. Paginated with load more."
+    },
+    {
+      "id": "TASK-091",
+      "title": "Implement slow mode for channels",
+      "spec": "specs/database.md",
+      "priority": 91,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add slowModeSeconds field to Channel model (Int, default 0, 0 means disabled). Create PATCH /api/channels/[channelId] to accept slowModeSeconds. In the Socket.io message:create handler, check if user's last message in the channel was within the slow mode window \u2014 reject if too soon. Return error with seconds remaining."
+    },
+    {
+      "id": "TASK-092",
+      "title": "Build slow mode UI",
+      "spec": "specs/ui-layout.md",
+      "priority": 92,
+      "status": "open",
+      "dependencies": [],
+      "description": "In MessageInput, if the channel has slow mode enabled and user recently sent a message, disable the input and show a countdown timer. In channel settings (accessible from channel header), OWNER/ADMIN can set slow mode duration (off, 5s, 10s, 30s, 1m, 5m). Show a clock icon in the channel header when slow mode is active."
     }
   ]
 }
