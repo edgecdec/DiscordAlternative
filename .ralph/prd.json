@@ -250,7 +250,7 @@
       "dependencies": [
         "TASK-060"
       ],
-      "description": "For all future UI tasks, write a temporary Nova Act test script to verify the feature works in a real browser. Pattern: 1) Get auth cookie via curl using creds from ~/.config/discord-alt-creds.env (source it first). 2) Start NovaAct at https://discord.edgecdec.com with the cookie \u2014 no login steps needed. 3) Use short one-sentence prompts per act() call. 4) Print PASS/FAIL for each check. 5) Run with /opt/homebrew/bin/python3.13. 6) Delete temp script after verification. Add this pattern to .ralph/specs/anti-patterns.md under a new 'Nova Act Testing' section so all future iterations follow it. Reference TestApplication's PROMPT.md for the full pattern."
+      "description": "For all future UI tasks, after deploying to the remote server, write a temporary Nova Act test script to verify the feature works in a real browser against the LIVE site (https://discord.edgecdec.com). Pattern: 1) source ~/.config/discord-alt-creds.env. 2) Get auth cookie via curl against the live site: curl -s -c /tmp/discord-cookie.txt -X POST https://discord.edgecdec.com/api/auth/login -H 'Content-Type: application/json' -d '{\"username\":\"$TESTBOT_USER\",\"password\":\"$TESTBOT_PASS\"}'. 3) Start NovaAct at https://discord.edgecdec.com with the cookie file \u2014 no login steps needed. 4) Use short one-sentence prompts per act() call. 5) Print PASS/FAIL. 6) Run with /opt/homebrew/bin/python3.13. 7) Delete temp script after verification. Add this pattern to .ralph/specs/anti-patterns.md under a 'Nova Act Testing' section so all future iterations follow it. Reference ~/TestProjects/TestApplication/PROMPT.md for the full cookie-based auth bypass pattern."
     },
     {
       "id": "TASK-017",

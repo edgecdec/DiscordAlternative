@@ -4,6 +4,6 @@ import { defineConfig } from 'prisma/config';
 export default defineConfig({
   schema: path.join(__dirname, 'prisma', 'schema.prisma'),
   datasource: {
-    url: 'file:../data/discord.db',
+    url: 'file:./data/discord.db',
   },
 });
