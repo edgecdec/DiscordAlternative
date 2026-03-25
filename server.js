@@ -7,6 +7,12 @@ const next = require("next");
 const { Server: SocketServer } = require("socket.io");
 const jwt = require("jsonwebtoken");
 const cookie = require("cookie");
+const { PrismaClient } = require("@prisma/client");
+const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
+
+const DB_PATH = path.join(process.cwd(), "data", "discord.db");
+const adapter = new PrismaBetterSqlite3({ url: `file:${DB_PATH}` });
+const prisma = new PrismaClient({ adapter });
 
 const PORT = parseInt(process.env.PORT || "3003", 10);
 const dev = process.env.NODE_ENV !== "production";
@@ -85,6 +91,27 @@ app.prepare().then(() => {
 
   io.on("connection", (socket) => {
     console.log(`Socket connected: ${socket.data.username} (${socket.data.userId})`);
+
+    socket.on("channel:join", async ({ channelId }) => {
+      try {
+        const channel = await prisma.channel.findUnique({
+          where: { id: channelId },
+          select: { serverId: true },
+        });
+        if (!channel) return;
+        const member = await prisma.serverMember.findUnique({
+          where: { userId_serverId: { userId: socket.data.userId, serverId: channel.serverId } },
+        });
+        if (!member) return;
+        socket.join(`channel:${channelId}`);
+      } catch (err) {
+        console.error("channel:join error:", err);
+      }
+    });
+
+    socket.on("channel:leave", ({ channelId }) => {
+      socket.leave(`channel:${channelId}`);
+    });
 
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.data.username} (${socket.data.userId})`);

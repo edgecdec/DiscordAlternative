@@ -391,7 +391,7 @@
       "title": "Implement Socket.io channel join/leave handlers",
       "spec": "specs/socket-events.md",
       "priority": 36,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-027"
       ],

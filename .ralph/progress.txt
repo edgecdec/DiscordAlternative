@@ -273,3 +273,10 @@
 - Status: DONE
 - Changes: Updated server.js to attach Socket.io Server to the HTTP server. Added JWT auth middleware that parses the token cookie from handshake headers, verifies it with jsonwebtoken, and attaches userId/username to socket.data. Rejects unauthenticated connections.
 - Lessons: server.js is CommonJS so can't import from src/lib/auth.ts directly — duplicated the JWT verify logic using require('jsonwebtoken') and require('cookie'). The parseAuthFromCookie helper is self-contained and mirrors verifyToken from auth.ts. Future socket event handlers (TASK-028+) will build on the io.on("connection") block added here.
+
+## TASK-028: Implement Socket.io channel join/leave handlers (2026-03-25)
+- Added Prisma client initialization to server.js using CommonJS require (PrismaClient + PrismaBetterSqlite3 adapter)
+- channel:join validates membership by looking up channel's serverId then checking ServerMember exists for the user
+- channel:leave simply calls socket.leave() — no validation needed
+- Lesson: server.js is CommonJS so must use require() for Prisma, not the ES module db.ts singleton
+- Lesson: The @@unique([userId, serverId]) constraint on ServerMember enables efficient findUnique for membership checks
