@@ -168,3 +168,10 @@
 - Verified: deploy webhook ran, migrations applied to correct DB, register endpoint returns valid user.
 - Confirmed deploy_webhook.sh will work correctly on future deploys.
 - Lessons: In Prisma 7, datasource URL in `prisma.config.ts` resolves relative to the config file location, NOT the schema file. Always verify the runtime DB path matches the migration DB path.
+
+## TASK-060: Create seed script with test user and test credentials file (2026-03-25)
+- Created `scripts/seed.js` — standalone Node.js script using Prisma + bcryptjs to seed test users.
+- Creates `testbot` (password: testpass123) and `ralphbot` (password: ralphpass123) if they don't exist.
+- Ran on production server via SSH — both users created and verified via login API.
+- Created `~/.config/discord-alt-creds.env` on local machine with TESTBOT_USER/TESTBOT_PASS and ADMIN_USER/ADMIN_PASS.
+- Lessons: Seed script uses CommonJS (require) since it runs directly with `node` outside the Next.js build. Same adapter pattern as src/lib/db.ts but in plain JS.
