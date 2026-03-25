@@ -113,6 +113,42 @@ app.prepare().then(() => {
       socket.leave(`channel:${channelId}`);
     });
 
+    socket.on("message:create", async ({ channelId, content, fileUrl }) => {
+      try {
+        if (!content || typeof content !== "string" || content.trim().length === 0 || content.length > 2000) return;
+        const channel = await prisma.channel.findUnique({
+          where: { id: channelId },
+          select: { serverId: true },
+        });
+        if (!channel) return;
+        const member = await prisma.serverMember.findUnique({
+          where: { userId_serverId: { userId: socket.data.userId, serverId: channel.serverId } },
+        });
+        if (!member) return;
+        const message = await prisma.message.create({
+          data: {
+            content: content.trim(),
+            fileUrl: fileUrl || null,
+            channelId,
+            authorId: socket.data.userId,
+          },
+          include: { author: { select: { id: true, username: true, avatarUrl: true } } },
+        });
+        io.to(`channel:${channelId}`).emit("message:new", {
+          id: message.id,
+          content: message.content,
+          fileUrl: message.fileUrl,
+          deleted: message.deleted,
+          createdAt: message.createdAt.toISOString(),
+          updatedAt: message.updatedAt.toISOString(),
+          channelId: message.channelId,
+          author: message.author,
+        });
+      } catch (err) {
+        console.error("message:create error:", err);
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.data.username} (${socket.data.userId})`);
     });

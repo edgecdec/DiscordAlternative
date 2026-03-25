@@ -280,3 +280,10 @@
 - channel:leave simply calls socket.leave() — no validation needed
 - Lesson: server.js is CommonJS so must use require() for Prisma, not the ES module db.ts singleton
 - Lesson: The @@unique([userId, serverId]) constraint on ServerMember enables efficient findUnique for membership checks
+
+## TASK-029: Implement Socket.io message:create handler (2026-03-25)
+- Added message:create socket handler in server.js
+- Validates content (non-empty, max 2000 chars), channel existence, and server membership before persisting
+- Creates message via Prisma with authorId from socket.data, includes author info in response
+- Broadcasts message:new to channel room with full message object (ISO date strings)
+- Lessons: server.js uses CommonJS require() — constants from src/lib/constants.ts can't be imported directly, so the 2000 limit is hardcoded in server.js. If MESSAGE_MAX changes, server.js must be updated too. Consider extracting shared constants to a .js file in the future.

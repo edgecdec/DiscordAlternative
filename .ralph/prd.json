@@ -402,7 +402,7 @@
       "title": "Implement Socket.io message:create handler",
       "spec": "specs/socket-events.md",
       "priority": 37,
-      "status": "open",
+      "status": "done",
       "dependencies": [
         "TASK-028"
       ],
