@@ -18,3 +18,10 @@
 - Created prisma.config.ts for Prisma 7 datasource URL configuration
 - Lesson: Prisma 7 removed `url` from datasource block in schema.prisma — must use prisma.config.ts with `datasource: { url }` instead
 - Lesson: Prisma 7 defineConfig uses `datasource` property (not `migrate`) for the connection URL
+
+## TASK-003: Create Prisma schema with all models (2026-03-24)
+- Created prisma/schema.prisma with 5 models: User, Server, Channel, Message, ServerMember
+- All relations, cascade deletes (Server→Channel, Server→ServerMember, Channel→Message), indexes (Message.channelId), and @@unique([userId, serverId]) on ServerMember
+- Used String fields for role/type (SQLite has no enum support)
+- Lesson: Prisma requires reverse relation fields — had to add `ownedServers Server[]` to User for the Server.owner relation
+- Note: datasource URL is in prisma.config.ts (Prisma 7 pattern), schema only has `provider = "sqlite"`
