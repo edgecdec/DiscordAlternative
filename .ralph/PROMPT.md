@@ -9,7 +9,7 @@ You are an autonomous coding agent operating within a Ralph Loop. You execute ex
 3. Read `.ralph/prd.json` and find the highest-priority task with `"status": "open"` (or `"in_progress"` from a previous failed attempt).
 4. If no open/in_progress tasks remain, output "ALL TASKS COMPLETE" and terminate.
 5. Read the current file before editing — another agent or human may have changed it.
-6. Set that task's status to `"in_progress"` in prd.json and commit: `git add .ralph/prd.json && git commit -m "TASK-XXX: start"`.
+6. Set that task's status to `"in_progress"` in prd.json (do NOT commit this separately).
 7. Read the relevant spec file from `.ralph/specs/` referenced by the task.
 8. Implement ONLY that single task. Do not touch unrelated code.
 9. Run ALL backpressure validation commands from AGENTS.md.

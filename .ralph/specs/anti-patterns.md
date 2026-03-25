@@ -79,3 +79,9 @@ These are mistakes Ralph has made on previous projects. Do not repeat them.
 - NEVER use `create-next-app` or `npx create-*` — these commands hang in non-interactive mode when the directory isn't empty.
 - Instead, manually create package.json, tsconfig.json, next.config.js, then run `npm install`.
 - Same applies to any interactive scaffolding tool — always create files manually.
+
+## Git Hygiene
+- ONE commit per task. Not two, not three. One.
+- Do NOT make a separate commit for "start" or for updating prd.json status. Everything goes in one commit.
+- Use `git commit --amend --no-edit` to fold status updates into the task commit.
+- Use `git push --force-with-lease` after amending.
