@@ -2,6 +2,7 @@ const { createServer } = require("http");
 const { parse } = require("url");
 const { createHmac } = require("crypto");
 const { execFile } = require("child_process");
+const fs = require("fs");
 const path = require("path");
 const next = require("next");
 const { Server: SocketServer } = require("socket.io");
@@ -18,6 +19,21 @@ const PORT = parseInt(process.env.PORT || "3003", 10);
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
+
+const UPLOADS_DIR = path.join(process.cwd(), "uploads");
+
+const MIME_TYPES = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".svg": "image/svg+xml",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".pdf": "application/pdf",
+  ".txt": "text/plain",
+};
 
 function verifySignature(payload, signature) {
   const secret = process.env.WEBHOOK_SECRET;
@@ -72,6 +88,27 @@ app.prepare().then(() => {
         if (stdout) console.log("Deploy stdout:", stdout);
         if (stderr) console.error("Deploy stderr:", stderr);
       });
+      return;
+    }
+
+    // Serve static uploads
+    if (parsed.pathname && parsed.pathname.startsWith("/uploads/")) {
+      const filename = path.basename(parsed.pathname);
+      const filePath = path.join(UPLOADS_DIR, filename);
+      try {
+        const stat = fs.statSync(filePath);
+        const ext = path.extname(filename).toLowerCase();
+        const contentType = MIME_TYPES[ext] || "application/octet-stream";
+        res.writeHead(200, {
+          "Content-Type": contentType,
+          "Content-Length": stat.size,
+          "Cache-Control": "public, max-age=31536000, immutable",
+        });
+        fs.createReadStream(filePath).pipe(res);
+      } catch {
+        res.writeHead(404);
+        res.end("Not found");
+      }
       return;
     }
 

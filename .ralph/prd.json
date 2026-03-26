@@ -746,7 +746,7 @@
       "title": "Implement file upload API route",
       "spec": "specs/deployment.md",
       "priority": 68,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Create POST /api/upload \u2014 accepts multipart form data, saves file to uploads/ directory with a unique filename (uuid + original extension). Validate file size against FILE_UPLOAD_MAX_BYTES from constants. Return { url: '/uploads/filename' }. Serve uploads/ directory as static files from server.js."
     },

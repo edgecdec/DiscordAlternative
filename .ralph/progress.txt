@@ -513,3 +513,10 @@
 - Both components poll unreads every 30 seconds via setInterval
 - Lesson: The deploy webhook deletes .next before rebuilding, causing brief 500s. Always wait 60+ seconds before checking deployment status.
 - Lesson: For unread detection, comparing createdAt timestamps after looking up the lastReadMessageId is more reliable than ID-based comparison since cuid IDs aren't sequential.
+
+## TASK-068: Implement file upload API route (2026-03-26)
+- Created POST /api/upload with multipart form data handling, UUID filenames, and FILE_UPLOAD_MAX_BYTES validation
+- Added static file serving in server.js for /uploads/ path with proper MIME types and cache headers
+- Used path.basename() to prevent directory traversal in static serving
+- Lesson: server.js needs `fs` require added for static file serving — remember to add imports when extending server.js
+- Lesson: Next.js formData() API works well for file uploads, no need for external multipart libraries
