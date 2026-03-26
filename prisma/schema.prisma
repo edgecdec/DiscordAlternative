@@ -17,6 +17,7 @@ model User {
   memberships  ServerMember[]
   ownedServers Server[]
   channelReads ChannelRead[]
+  reactions    Reaction[]
 }
 
 model Server {
@@ -45,16 +46,17 @@ model Channel {
 }
 
 model Message {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   content   String
   fileUrl   String?
-  deleted   Boolean  @default(false)
+  deleted   Boolean    @default(false)
   authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
+  author    User       @relation(fields: [authorId], references: [id])
   channelId String
-  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  channel   Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  reactions Reaction[]
 
   @@index([channelId])
 }
@@ -81,4 +83,17 @@ model ChannelRead {
   updatedAt         DateTime @updatedAt
 
   @@unique([userId, channelId])
+}
+
+model Reaction {
+  id        String   @id @default(cuid())
+  emoji     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, messageId, emoji])
+  @@index([messageId])
 }

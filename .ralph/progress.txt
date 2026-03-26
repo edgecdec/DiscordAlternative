@@ -538,3 +538,11 @@
 - Used MUI theme tokens (action.hover, action.selected, primary.main) instead of hardcoded colors
 - Lesson: Nova Act has trouble with file input elements — use Playwright's `set_input_files` directly instead of trying to click file inputs through Nova Act
 - Lesson: To test attachment rendering, create a message with fileUrl via API first, then verify the UI renders it
+
+## TASK-071: Create message reactions database model and API (2026-03-26)
+- Added Reaction model to Prisma schema with @@unique([userId, messageId, emoji]) and @@index([messageId])
+- Added relations to User and Message models
+- Created POST /api/messages/[messageId]/reactions — toggles reaction (add if not exists, remove if exists)
+- Created GET /api/messages/[messageId]/reactions — returns reactions grouped by emoji with count and userReacted boolean
+- Both endpoints validate server membership before allowing access
+- Lesson: After adding a new Prisma model, must run `npx prisma generate` to regenerate the client before tsc will pass — the migration alone doesn't update the TypeScript types

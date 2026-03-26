@@ -773,7 +773,7 @@
       "title": "Create message reactions database model and API",
       "spec": "specs/database.md",
       "priority": 71,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add Reaction model to Prisma: id, emoji (String), userId, messageId, createdAt. @@unique([userId, messageId, emoji]). Create POST /api/messages/[messageId]/reactions \u2014 accepts { emoji }, toggles reaction (add if not exists, remove if exists). Create GET /api/messages/[messageId]/reactions \u2014 returns reactions grouped by emoji with count and whether current user reacted."
     },
