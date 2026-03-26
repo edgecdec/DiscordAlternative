@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar, Box, CircularProgress, Typography } from "@mui/material";
 import type { SocketMessage, MessageDeletedPayload } from "@/types/socket";
 import { useSocket } from "@/hooks/useSocket";
+import MessageAttachment from "@/components/chat/MessageAttachment";
 
 interface MessageListProps {
   channelId: string;
@@ -176,6 +177,9 @@ export default function MessageList({ channelId }: MessageListProps) {
             >
               {msg.deleted ? "This message has been deleted" : msg.content}
             </Typography>
+            {!msg.deleted && msg.fileUrl && (
+              <MessageAttachment fileUrl={msg.fileUrl} />
+            )}
           </Box>
         </Box>
       ))}

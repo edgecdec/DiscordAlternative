@@ -764,7 +764,7 @@
       "title": "Display image attachments inline in messages",
       "spec": "specs/ui-layout.md",
       "priority": 70,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Update MessageList message rendering \u2014 if message has fileUrl, detect if it's an image (jpg/png/gif/webp) and render inline with max-width 400px. For non-image files, show a download link with filename and file size."
     },

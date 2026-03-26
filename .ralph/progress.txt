@@ -529,3 +529,12 @@
 - Socket message:create already supported fileUrl in types — just needed to pass it
 - Lesson: Nova Act test needs to start on about:blank before injecting cookies, then navigate — starting directly on the target URL doesn't pick up cookies set after page load
 - Lesson: The /servers page (no server selected) doesn't show MessageInput — need to navigate into a specific channel to verify chat UI components
+
+## TASK-070: Display image attachments inline in messages (2026-03-26)
+- Created `MessageAttachment.tsx` component to handle both image and non-image file rendering
+- Images (jpg/jpeg/png/gif/webp) render inline with max-width 400px, clickable to open in new tab
+- Non-image files render as download links with a file icon
+- Extracted into separate component to keep MessageList under 150-line limit (it was already at 185 lines)
+- Used MUI theme tokens (action.hover, action.selected, primary.main) instead of hardcoded colors
+- Lesson: Nova Act has trouble with file input elements — use Playwright's `set_input_files` directly instead of trying to click file inputs through Nova Act
+- Lesson: To test attachment rendering, create a message with fileUrl via API first, then verify the UI renders it
