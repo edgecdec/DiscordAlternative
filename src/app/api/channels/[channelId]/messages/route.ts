@@ -39,12 +39,23 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
     include: {
       author: { select: { id: true, username: true, avatarUrl: true } },
+      reactions: { select: { emoji: true, userId: true } },
     },
+  });
+
+  const formatted = messages.map((m) => {
+    const reactionMap: Record<string, { count: number; userReacted: boolean }> = {};
+    for (const r of m.reactions) {
+      if (!reactionMap[r.emoji]) reactionMap[r.emoji] = { count: 0, userReacted: false };
+      reactionMap[r.emoji].count++;
+      if (r.userId === user.userId) reactionMap[r.emoji].userReacted = true;
+    }
+    return { ...m, reactions: reactionMap };
   });
 
   const nextCursor = messages.length === MESSAGES_PER_PAGE ? messages[messages.length - 1].id : null;
 
-  return NextResponse.json({ messages, nextCursor });
+  return NextResponse.json({ messages: formatted, nextCursor });
 }
 
 export async function POST(req: NextRequest, { params }: RouteParams) {

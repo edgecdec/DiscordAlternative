@@ -6,6 +6,11 @@ export interface MessageAuthor {
   avatarUrl: string | null;
 }
 
+export interface ReactionGroup {
+  count: number;
+  userReacted: boolean;
+}
+
 export interface SocketMessage {
   id: string;
   content: string;
@@ -15,6 +20,7 @@ export interface SocketMessage {
   updatedAt: string;
   channelId: string;
   author: MessageAuthor;
+  reactions?: Record<string, ReactionGroup>;
 }
 
 // Client → Server payloads
@@ -73,11 +79,25 @@ export interface MessageDeletedPayload {
   messageId: string;
 }
 
+export interface ReactionTogglePayload {
+  messageId: string;
+  emoji: string;
+}
+
+export interface ReactionBroadcastPayload {
+  messageId: string;
+  emoji: string;
+  userId: string;
+  channelId: string;
+}
+
 // Typed Socket.io event interfaces
 export interface ServerToClientEvents {
   "message:new": (message: SocketMessage) => void;
   "message:updated": (message: SocketMessage) => void;
   "message:deleted": (payload: MessageDeletedPayload) => void;
+  "reaction:add": (payload: ReactionBroadcastPayload) => void;
+  "reaction:remove": (payload: ReactionBroadcastPayload) => void;
   "presence:online": (payload: PresenceOnlinePayload) => void;
   "presence:offline": (payload: PresenceOfflinePayload) => void;
   "presence:list": (payload: PresenceListResponse) => void;
@@ -91,6 +111,7 @@ export interface ClientToServerEvents {
   "message:create": (payload: MessageCreatePayload) => void;
   "message:update": (payload: MessageUpdatePayload) => void;
   "message:delete": (payload: MessageDeletePayload) => void;
+  "reaction:toggle": (payload: ReactionTogglePayload) => void;
   "presence:list": (payload: PresenceListPayload) => void;
   "typing:start": (payload: TypingPayload) => void;
   "typing:stop": (payload: TypingPayload) => void;

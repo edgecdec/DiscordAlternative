@@ -782,7 +782,7 @@
       "title": "Add reaction UI to messages",
       "spec": "specs/ui-layout.md",
       "priority": 72,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Update message rendering in MessageList \u2014 show reaction chips below message content (emoji + count, highlighted if current user reacted). Add a small emoji picker on hover/click (smiley face icon). Clicking a reaction chip toggles it. Broadcast reaction changes via Socket.io events reaction:add and reaction:remove."
     },

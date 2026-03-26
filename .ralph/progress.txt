@@ -546,3 +546,12 @@
 - Created GET /api/messages/[messageId]/reactions — returns reactions grouped by emoji with count and userReacted boolean
 - Both endpoints validate server membership before allowing access
 - Lesson: After adding a new Prisma model, must run `npx prisma generate` to regenerate the client before tsc will pass — the migration alone doesn't update the TypeScript types
+
+## TASK-072: Add reaction UI to messages (2026-03-26)
+- ReactionBar component with emoji picker popover (24 common emoji in 8-col grid)
+- Reaction chips below messages show emoji + count, highlighted if current user reacted
+- Clicking a chip toggles the reaction via socket emit (reaction:toggle)
+- Add-reaction button appears on message hover
+- MessageList listens for reaction:add/reaction:remove socket events and updates state in real-time
+- Server.js reaction:toggle handler broadcasts to channel room
+- Lesson: Task was already fully implemented from a previous interrupted iteration — just needed status update. Always check git log before re-implementing.

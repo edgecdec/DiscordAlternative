@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar, Box, CircularProgress, Typography } from "@mui/material";
-import type { SocketMessage, MessageDeletedPayload } from "@/types/socket";
+import type { SocketMessage, MessageDeletedPayload, ReactionBroadcastPayload } from "@/types/socket";
 import { useSocket } from "@/hooks/useSocket";
+import { useAuth } from "@/hooks/useAuth";
 import MessageAttachment from "@/components/chat/MessageAttachment";
+import ReactionBar from "@/components/chat/ReactionBar";
 
 interface MessageListProps {
   channelId: string;
@@ -29,6 +31,7 @@ export default function MessageList({ channelId }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<string | null>(null);
   const { socket } = useSocket();
+  const { user } = useAuth();
 
   useEffect(() => {
     setLoading(true);
@@ -110,17 +113,64 @@ export default function MessageList({ channelId }: MessageListProps) {
     );
   }, []);
 
+  const handleReactionAdd = useCallback((payload: ReactionBroadcastPayload) => {
+    if (payload.channelId !== channelId) return;
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== payload.messageId) return m;
+        const reactions = { ...m.reactions };
+        const existing = reactions[payload.emoji] ?? { count: 0, userReacted: false };
+        reactions[payload.emoji] = {
+          count: existing.count + 1,
+          userReacted: existing.userReacted || payload.userId === user?.id,
+        };
+        return { ...m, reactions };
+      })
+    );
+  }, [channelId, user?.id]);
+
+  const handleReactionRemove = useCallback((payload: ReactionBroadcastPayload) => {
+    if (payload.channelId !== channelId) return;
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== payload.messageId) return m;
+        const reactions = { ...m.reactions };
+        const existing = reactions[payload.emoji];
+        if (!existing) return m;
+        const newCount = existing.count - 1;
+        if (newCount <= 0) {
+          delete reactions[payload.emoji];
+        } else {
+          reactions[payload.emoji] = {
+            count: newCount,
+            userReacted: payload.userId === user?.id ? false : existing.userReacted,
+          };
+        }
+        return { ...m, reactions };
+      })
+    );
+  }, [channelId, user?.id]);
+
+  const handleReactionToggle = useCallback((messageId: string, emoji: string) => {
+    if (!socket) return;
+    socket.emit("reaction:toggle", { messageId, emoji });
+  }, [socket]);
+
   useEffect(() => {
     if (!socket) return;
     socket.on("message:new", handleNew);
     socket.on("message:updated", handleUpdated);
     socket.on("message:deleted", handleDeleted);
+    socket.on("reaction:add", handleReactionAdd);
+    socket.on("reaction:remove", handleReactionRemove);
     return () => {
       socket.off("message:new", handleNew);
       socket.off("message:updated", handleUpdated);
       socket.off("message:deleted", handleDeleted);
+      socket.off("reaction:add", handleReactionAdd);
+      socket.off("reaction:remove", handleReactionRemove);
     };
-  }, [socket, handleNew, handleUpdated, handleDeleted]);
+  }, [socket, handleNew, handleUpdated, handleDeleted, handleReactionAdd, handleReactionRemove]);
 
   if (loading) {
     return (
@@ -150,7 +200,15 @@ export default function MessageList({ channelId }: MessageListProps) {
         </Box>
       )}
       {messages.map((msg) => (
-        <Box key={msg.id} sx={{ display: "flex", gap: 1.5, py: 0.75 }}>
+        <Box
+          key={msg.id}
+          sx={{
+            display: "flex",
+            gap: 1.5,
+            py: 0.75,
+            "&:hover .reaction-add-btn": { opacity: 1 },
+          }}
+        >
           <Avatar
             sx={{ width: 36, height: 36, mt: 0.5, bgcolor: "primary.main", fontSize: 14 }}
             src={msg.author.avatarUrl ?? undefined}
@@ -179,6 +237,12 @@ export default function MessageList({ channelId }: MessageListProps) {
             </Typography>
             {!msg.deleted && msg.fileUrl && (
               <MessageAttachment fileUrl={msg.fileUrl} />
+            )}
+            {!msg.deleted && (
+              <ReactionBar
+                reactions={msg.reactions ?? {}}
+                onToggle={(emoji) => handleReactionToggle(msg.id, emoji)}
+              />
             )}
           </Box>
         </Box>

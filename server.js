@@ -285,6 +285,34 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("reaction:toggle", async ({ messageId, emoji }) => {
+      try {
+        if (!messageId || !emoji || typeof emoji !== "string") return;
+        const message = await prisma.message.findUnique({
+          where: { id: messageId },
+          select: { id: true, deleted: true, channelId: true, channel: { select: { serverId: true } } },
+        });
+        if (!message || message.deleted) return;
+        const member = await prisma.serverMember.findUnique({
+          where: { userId_serverId: { userId: socket.data.userId, serverId: message.channel.serverId } },
+        });
+        if (!member) return;
+        const existing = await prisma.reaction.findUnique({
+          where: { userId_messageId_emoji: { userId: socket.data.userId, messageId, emoji } },
+        });
+        const payload = { messageId, emoji, userId: socket.data.userId, channelId: message.channelId };
+        if (existing) {
+          await prisma.reaction.delete({ where: { id: existing.id } });
+          io.to(`channel:${message.channelId}`).emit("reaction:remove", payload);
+        } else {
+          await prisma.reaction.create({ data: { emoji, userId: socket.data.userId, messageId } });
+          io.to(`channel:${message.channelId}`).emit("reaction:add", payload);
+        }
+      } catch (err) {
+        console.error("reaction:toggle error:", err);
+      }
+    });
+
     socket.on("typing:start", ({ channelId }) => {
       if (!channelId) return;
       socket.to(`channel:${channelId}`).emit("typing:start", {
