@@ -520,3 +520,12 @@
 - Used path.basename() to prevent directory traversal in static serving
 - Lesson: server.js needs `fs` require added for static file serving — remember to add imports when extending server.js
 - Lesson: Next.js formData() API works well for file uploads, no need for external multipart libraries
+
+## TASK-069: Add file attachment button to MessageInput (2026-03-26)
+- Added AttachFile IconButton to MessageInput with hidden file input
+- Upload uses XHR for progress tracking (XMLHttpRequest upload.progress event)
+- Pending file shown as a chip with close button above the input
+- File size validated client-side against FILE_UPLOAD_MAX_BYTES before upload
+- Socket message:create already supported fileUrl in types — just needed to pass it
+- Lesson: Nova Act test needs to start on about:blank before injecting cookies, then navigate — starting directly on the target URL doesn't pick up cookies set after page load
+- Lesson: The /servers page (no server selected) doesn't show MessageInput — need to navigate into a specific channel to verify chat UI components

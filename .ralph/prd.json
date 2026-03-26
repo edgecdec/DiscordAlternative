@@ -755,7 +755,7 @@
       "title": "Add file attachment button to MessageInput",
       "spec": "specs/ui-layout.md",
       "priority": 69,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Update MessageInput to include an AttachFile IconButton. On click, open file picker. Upload file to /api/upload, then send message with fileUrl. Show upload progress indicator."
     },
