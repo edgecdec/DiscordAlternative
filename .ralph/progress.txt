@@ -505,3 +505,11 @@
 - Updated channel page to mark channel as read on mount and on each new message received via socket
 - Lesson: After adding a new Prisma model, must run `npx prisma generate` before `tsc --noEmit` — the migration alone doesn't update the client types
 - Lesson: When no messages exist in a channel, the read endpoint correctly returns success without creating a ChannelRead record (no message to reference)
+
+## TASK-067: Add unread indicators to channel list and server sidebar (2026-03-26)
+- Created GET /api/servers/[serverId]/unreads endpoint that compares lastReadMessageId timestamps against newer messages per channel
+- Updated ChannelPanel: bold text + primary-colored dot for unread channels (suppressed for currently active channel)
+- Updated ServerSidebar: MUI Badge dot on server avatars when any channel has unreads (suppressed for active server)
+- Both components poll unreads every 30 seconds via setInterval
+- Lesson: The deploy webhook deletes .next before rebuilding, causing brief 500s. Always wait 60+ seconds before checking deployment status.
+- Lesson: For unread detection, comparing createdAt timestamps after looking up the lastReadMessageId is more reliable than ID-based comparison since cuid IDs aren't sequential.

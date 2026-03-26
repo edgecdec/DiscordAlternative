@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Box, Avatar, Tooltip, IconButton, Divider } from "@mui/material";
+import { Badge, Box, Avatar, Tooltip, IconButton, Divider } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
 const SIDEBAR_WIDTH = 72;
+const UNREAD_POLL_MS = 30_000;
 
 interface ServerItem {
   id: string;
@@ -20,6 +21,7 @@ interface ServerSidebarProps {
 
 export default function ServerSidebar({ onCreateClick, onNavigate }: ServerSidebarProps) {
   const [servers, setServers] = useState<ServerItem[]>([]);
+  const [serverUnreads, setServerUnreads] = useState<Record<string, boolean>>({});
   const router = useRouter();
   const params = useParams();
   const activeServerId = params?.serverId as string | undefined;
@@ -32,9 +34,30 @@ export default function ServerSidebar({ onCreateClick, onNavigate }: ServerSideb
     }
   }, []);
 
+  const fetchAllUnreads = useCallback(async () => {
+    if (servers.length === 0) return;
+    const results: Record<string, boolean> = {};
+    await Promise.all(
+      servers.map(async (s) => {
+        const res = await fetch(`/api/servers/${s.id}/unreads`);
+        if (res.ok) {
+          const data = await res.json();
+          results[s.id] = Object.values(data.unreads as Record<string, boolean>).some(Boolean);
+        }
+      })
+    );
+    setServerUnreads(results);
+  }, [servers]);
+
   useEffect(() => {
     fetchServers();
   }, [fetchServers]);
+
+  useEffect(() => {
+    fetchAllUnreads();
+    const interval = setInterval(fetchAllUnreads, UNREAD_POLL_MS);
+    return () => clearInterval(interval);
+  }, [fetchAllUnreads]);
 
   return (
     <Box
@@ -55,6 +78,7 @@ export default function ServerSidebar({ onCreateClick, onNavigate }: ServerSideb
     >
       {servers.map((server) => {
         const isActive = server.id === activeServerId;
+        const hasUnread = serverUnreads[server.id] && !isActive;
         return (
           <Tooltip key={server.id} title={server.name} placement="right">
             <Box
@@ -77,20 +101,27 @@ export default function ServerSidebar({ onCreateClick, onNavigate }: ServerSideb
               }}
               onClick={() => { router.push(`/servers/${server.id}`); onNavigate?.(); }}
             >
-              <Avatar
-                src={server.imageUrl ?? undefined}
-                sx={{
-                  width: 48,
-                  height: 48,
-                  bgcolor: isActive ? "primary.main" : "background.paper",
-                  color: "text.primary",
-                  fontSize: 18,
-                  transition: "border-radius 0.2s",
-                  borderRadius: isActive ? 2 : "50%",
-                }}
+              <Badge
+                variant="dot"
+                invisible={!hasUnread}
+                overlap="circular"
+                sx={{ "& .MuiBadge-dot": { bgcolor: "primary.main", width: 10, height: 10, borderRadius: "50%" } }}
               >
-                {server.name[0]?.toUpperCase()}
-              </Avatar>
+                <Avatar
+                  src={server.imageUrl ?? undefined}
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    bgcolor: isActive ? "primary.main" : "background.paper",
+                    color: "text.primary",
+                    fontSize: 18,
+                    transition: "border-radius 0.2s",
+                    borderRadius: isActive ? 2 : "50%",
+                  }}
+                >
+                  {server.name[0]?.toUpperCase()}
+                </Avatar>
+              </Badge>
             </Box>
           </Tooltip>
         );

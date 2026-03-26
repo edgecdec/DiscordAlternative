@@ -737,7 +737,7 @@
       "title": "Add unread indicators to channel list and server sidebar",
       "spec": "specs/ui-layout.md",
       "priority": 67,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Update ChannelPanel to show bold channel name and dot indicator when channel has messages newer than lastReadMessageId. Update ServerSidebar to show notification dot on server icon if any channel in that server has unreads. Fetch unread status from a new GET /api/servers/[serverId]/unreads endpoint."
     },

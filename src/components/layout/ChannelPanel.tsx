@@ -12,13 +12,14 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Tag, VolumeUp, Add, Settings } from "@mui/icons-material";
+import { Tag, VolumeUp, Add, Settings, FiberManualRecord } from "@mui/icons-material";
 import CreateChannelDialog from "@/components/layout/CreateChannelDialog";
 import ServerSettings from "@/components/layout/ServerSettings";
 import UserInfoPanel from "@/components/layout/UserInfoPanel";
 
 const PANEL_WIDTH = 240;
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
+const UNREAD_POLL_MS = 30_000;
 
 interface Channel {
   id: string;
@@ -45,6 +46,7 @@ interface ChannelPanelProps {
 
 export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) {
   const [server, setServer] = useState<ServerData | null>(null);
+  const [unreads, setUnreads] = useState<Record<string, boolean>>({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const router = useRouter();
@@ -61,9 +63,24 @@ export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) 
     }
   }, [serverId]);
 
+  const fetchUnreads = useCallback(async () => {
+    if (!serverId) return;
+    const res = await fetch(`/api/servers/${serverId}/unreads`);
+    if (res.ok) {
+      const data = await res.json();
+      setUnreads(data.unreads);
+    }
+  }, [serverId]);
+
   useEffect(() => {
     fetchServer();
   }, [fetchServer]);
+
+  useEffect(() => {
+    fetchUnreads();
+    const interval = setInterval(fetchUnreads, UNREAD_POLL_MS);
+    return () => clearInterval(interval);
+  }, [fetchUnreads]);
 
   if (!server) return null;
 
@@ -88,22 +105,37 @@ export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) 
         )}
       </Box>
       <List dense disablePadding>
-        {channels.map((ch) => (
-          <ListItemButton
-            key={ch.id}
-            selected={ch.id === channelId}
-            onClick={() => { router.push(`/servers/${server.id}/channels/${ch.id}`); onNavigate?.(); }}
-            sx={{ borderRadius: 1, mx: 0.5, px: 1 }}
-          >
-            <ListItemIcon sx={{ minWidth: 28, color: "text.secondary" }}>
-              {icon}
-            </ListItemIcon>
-            <ListItemText
-              primary={ch.name}
-              slotProps={{ primary: { noWrap: true, sx: { fontSize: 14 } } }}
-            />
-          </ListItemButton>
-        ))}
+        {channels.map((ch) => {
+          const isUnread = unreads[ch.id] && ch.id !== channelId;
+          return (
+            <ListItemButton
+              key={ch.id}
+              selected={ch.id === channelId}
+              onClick={() => { router.push(`/servers/${server.id}/channels/${ch.id}`); onNavigate?.(); }}
+              sx={{ borderRadius: 1, mx: 0.5, px: 1 }}
+            >
+              <ListItemIcon sx={{ minWidth: 28, color: "text.secondary" }}>
+                {icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={ch.name}
+                slotProps={{
+                  primary: {
+                    noWrap: true,
+                    sx: {
+                      fontSize: 14,
+                      fontWeight: isUnread ? 700 : 400,
+                      color: isUnread ? "text.primary" : "text.secondary",
+                    },
+                  },
+                }}
+              />
+              {isUnread && (
+                <FiberManualRecord sx={{ fontSize: 8, color: "primary.main", ml: 0.5 }} />
+              )}
+            </ListItemButton>
+          );
+        })}
       </List>
     </>
   );
