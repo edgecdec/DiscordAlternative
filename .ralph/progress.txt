@@ -498,3 +498,10 @@
 - Wired Settings button in `UserInfoPanel` to open `ProfileDialog`.
 - Lesson: Using `TransitionProps.onEnter` on MUI Dialog is a clean way to reset form state when the dialog opens, avoiding stale state from previous opens.
 - Lesson: Keep dialog components in `src/components/common/` when they're reused from multiple places (profile page + user info panel).
+
+## TASK-066: Track last-read message per channel per user (2026-03-26)
+- Added ChannelRead model to Prisma schema with @@unique([userId, channelId])
+- Created PATCH /api/channels/[channelId]/read — upserts lastReadMessageId to latest message
+- Updated channel page to mark channel as read on mount and on each new message received via socket
+- Lesson: After adding a new Prisma model, must run `npx prisma generate` before `tsc --noEmit` — the migration alone doesn't update the client types
+- Lesson: When no messages exist in a channel, the read endpoint correctly returns success without creating a ChannelRead record (no message to reference)

@@ -728,7 +728,7 @@
       "title": "Track last-read message per channel per user",
       "spec": "specs/database.md",
       "priority": 66,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add a ChannelRead model to Prisma: id, userId, channelId, lastReadMessageId, updatedAt. @@unique([userId, channelId]). Create API route PATCH /api/channels/[channelId]/read \u2014 updates lastReadMessageId to the latest message. Call this when user views a channel."
     },

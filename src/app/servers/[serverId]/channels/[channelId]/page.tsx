@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Box, Typography, useMediaQuery } from "@mui/material";
 import { Tag, VolumeUp } from "@mui/icons-material";
@@ -15,12 +15,16 @@ interface ChannelInfo {
   type: string;
 }
 
+function markChannelRead(channelId: string) {
+  fetch(`/api/channels/${channelId}/read`, { method: "PATCH" });
+}
+
 export default function ChannelPage() {
   const params = useParams();
   const channelId = params?.channelId as string;
   const serverId = params?.serverId as string;
   const [channel, setChannel] = useState<ChannelInfo | null>(null);
-  const { joinChannel, leaveChannel, connected } = useSocket();
+  const { socket, joinChannel, leaveChannel, connected } = useSocket();
   const isMobile = useMediaQuery("(max-width:767px)");
 
   useEffect(() => {
@@ -47,6 +51,20 @@ export default function ChannelPage() {
       leaveChannel(channelId);
     };
   }, [channelId, connected, joinChannel, leaveChannel, isText]);
+
+  const onNewMessage = useCallback(() => {
+    markChannelRead(channelId);
+  }, [channelId]);
+
+  useEffect(() => {
+    if (!channelId || !isText) return;
+    markChannelRead(channelId);
+    if (!socket) return;
+    socket.on("message:new", onNewMessage);
+    return () => {
+      socket.off("message:new", onNewMessage);
+    };
+  }, [channelId, isText, socket, onNewMessage]);
 
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>

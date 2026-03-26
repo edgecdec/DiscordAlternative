@@ -16,6 +16,7 @@ model User {
   messages     Message[]
   memberships  ServerMember[]
   ownedServers Server[]
+  channelReads ChannelRead[]
 }
 
 model Server {
@@ -32,14 +33,15 @@ model Server {
 }
 
 model Channel {
-  id        String    @id @default(cuid())
+  id        String        @id @default(cuid())
   name      String
-  type      String    @default("TEXT")
+  type      String        @default("TEXT")
   serverId  String
-  server    Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  server    Server        @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
   messages  Message[]
+  reads     ChannelRead[]
 }
 
 model Message {
@@ -67,4 +69,16 @@ model ServerMember {
   joinedAt DateTime @default(now())
 
   @@unique([userId, serverId])
+}
+
+model ChannelRead {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  channelId         String
+  channel           Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  lastReadMessageId String
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, channelId])
 }
