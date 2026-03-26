@@ -710,7 +710,7 @@
       "title": "Create user profile API routes",
       "spec": "specs/auth.md",
       "priority": 64,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Create GET /api/users/[username] \u2014 public profile (id, username, avatarUrl, createdAt). Create PATCH /api/auth/profile \u2014 authenticated, accepts { username?, avatarUrl? }. Validate username against constants. Create PATCH /api/auth/password \u2014 accepts { currentPassword, newPassword }, verify current, hash new."
     },

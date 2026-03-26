@@ -484,3 +484,9 @@
 - MemberList hidden on mobile entirely (not in drawer) to save space.
 - Nova Act doesn't support mobile viewports (<1280px width) — can only verify desktop regression, not mobile behavior directly.
 - Drawer uses `PaperProps` with `flexDirection: "row"` to lay out ServerSidebar and ChannelPanel side by side inside the drawer.
+
+## TASK-064: Create user profile API routes (2026-03-26)
+- Created GET /api/users/[username] for public profiles, PATCH /api/auth/profile for username/avatar updates, PATCH /api/auth/password for password changes.
+- When username changes, re-sign JWT and set new cookie so the token stays in sync.
+- All validation uses constants from src/lib/constants.ts.
+- Deploy webhook build takes ~30s on the server — need to wait for build to complete before testing API routes (initial curl may return 404 if build is still running).
