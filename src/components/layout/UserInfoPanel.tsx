@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { Box, Avatar, Typography, IconButton, Tooltip } from "@mui/material";
 import { DarkMode, LightMode, Settings } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import ProfileDialog from "@/components/common/ProfileDialog";
 
 export default function UserInfoPanel() {
   const { user } = useAuth();
   const { mode, toggleMode } = useThemeMode();
+  const [profileOpen, setProfileOpen] = useState(false);
 
   if (!user) return null;
 
@@ -38,11 +41,12 @@ export default function UserInfoPanel() {
           {mode === "dark" ? <LightMode sx={{ fontSize: 18 }} /> : <DarkMode sx={{ fontSize: 18 }} />}
         </IconButton>
       </Tooltip>
-      <Tooltip title="Settings">
-        <IconButton size="small" sx={{ color: "text.secondary" }}>
+      <Tooltip title="Edit Profile">
+        <IconButton size="small" onClick={() => setProfileOpen(true)} sx={{ color: "text.secondary" }}>
           <Settings sx={{ fontSize: 18 }} />
         </IconButton>
       </Tooltip>
+      <ProfileDialog open={profileOpen} onClose={() => setProfileOpen(false)} />
     </Box>
   );
 }

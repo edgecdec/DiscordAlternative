@@ -719,7 +719,7 @@
       "title": "Build user profile page",
       "spec": "specs/ui-layout.md",
       "priority": 65,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Create src/app/profile/[username]/page.tsx \u2014 shows user avatar, username, join date. If viewing own profile, show edit button. Create src/components/common/ProfileDialog.tsx \u2014 MUI Dialog to edit username, avatar, and change password. Accessible from user info panel in ChannelPanel."
     },

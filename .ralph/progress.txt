@@ -490,3 +490,11 @@
 - When username changes, re-sign JWT and set new cookie so the token stays in sync.
 - All validation uses constants from src/lib/constants.ts.
 - Deploy webhook build takes ~30s on the server — need to wait for build to complete before testing API routes (initial curl may return 404 if build is still running).
+
+## TASK-065: Build user profile page (2026-03-26)
+- Created `/profile/[username]` page showing avatar, username, join date, and edit button for own profile.
+- Created `ProfileDialog` component with two tabs: Profile (username + avatar URL) and Password change.
+- Added `refreshUser()` to `useAuth` hook so profile edits update the global user state.
+- Wired Settings button in `UserInfoPanel` to open `ProfileDialog`.
+- Lesson: Using `TransitionProps.onEnter` on MUI Dialog is a clean way to reset form state when the dialog opens, avoiding stale state from previous opens.
+- Lesson: Keep dialog components in `src/components/common/` when they're reused from multiple places (profile page + user info panel).
