@@ -863,7 +863,7 @@
       "title": "Build first-time user onboarding flow",
       "spec": "specs/ui-layout.md",
       "priority": 81,
-      "status": "open",
+      "status": "in_progress",
       "dependencies": [],
       "description": "When user has no servers (GET /api/servers returns empty), show a welcome page instead of redirecting. Two options: 'Create a Server' and 'Join a Server' (enter invite code). Friendly copy and icons. After creating/joining, redirect to the server."
     },
