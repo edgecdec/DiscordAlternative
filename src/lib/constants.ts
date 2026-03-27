@@ -14,3 +14,6 @@ export const FILE_UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
 export const AVATAR_URL_MAX = 512;
 export const MESSAGES_PER_PAGE = 50;
 export const BCRYPT_ROUNDS = 10;
+
+export const USER_STATUSES = ["online", "away", "dnd", "offline"] as const;
+export type UserStatus = (typeof USER_STATUSES)[number];

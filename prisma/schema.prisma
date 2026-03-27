@@ -11,6 +11,7 @@ model User {
   username     String         @unique
   passwordHash String
   avatarUrl    String?
+  status       String         @default("online")
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   messages     Message[]

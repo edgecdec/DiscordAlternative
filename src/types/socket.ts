@@ -66,6 +66,7 @@ export interface PresenceListPayload {
 
 export interface PresenceListResponse {
   onlineUserIds: string[];
+  userStatuses?: Record<string, string>;
 }
 
 // Server → Client payloads
@@ -108,6 +109,11 @@ export interface MentionNotifyPayload {
   content: string;
 }
 
+export interface PresenceStatusPayload {
+  userId: string;
+  status: string;
+}
+
 // Typed Socket.io event interfaces
 export interface ServerToClientEvents {
   "message:new": (message: SocketMessage) => void;
@@ -118,9 +124,14 @@ export interface ServerToClientEvents {
   "presence:online": (payload: PresenceOnlinePayload) => void;
   "presence:offline": (payload: PresenceOfflinePayload) => void;
   "presence:list": (payload: PresenceListResponse) => void;
+  "presence:status": (payload: PresenceStatusPayload) => void;
   "typing:start": (payload: TypingBroadcastPayload) => void;
   "typing:stop": (payload: TypingBroadcastPayload) => void;
   "mention:notify": (payload: MentionNotifyPayload) => void;
+}
+
+export interface StatusUpdatePayload {
+  status: string;
 }
 
 export interface ClientToServerEvents {
@@ -131,6 +142,7 @@ export interface ClientToServerEvents {
   "message:delete": (payload: MessageDeletePayload) => void;
   "reaction:toggle": (payload: ReactionTogglePayload) => void;
   "presence:list": (payload: PresenceListPayload) => void;
+  "presence:status": (payload: StatusUpdatePayload) => void;
   "typing:start": (payload: TypingPayload) => void;
   "typing:stop": (payload: TypingPayload) => void;
 }

@@ -186,12 +186,16 @@ app.prepare().then(() => {
         if (!member) return;
         const members = await prisma.serverMember.findMany({
           where: { serverId },
-          select: { userId: true },
+          include: { user: { select: { id: true, status: true } } },
         });
         const onlineUserIds = members
-          .map((m) => m.userId)
+          .map((m) => m.user.id)
           .filter((id) => onlineUsers.has(id));
-        socket.emit("presence:list", { onlineUserIds });
+        const userStatuses = {};
+        for (const m of members) {
+          userStatuses[m.user.id] = onlineUsers.has(m.user.id) ? m.user.status : "offline";
+        }
+        socket.emit("presence:list", { onlineUserIds, userStatuses });
       } catch (err) {
         console.error("presence:list error:", err);
       }
@@ -359,6 +363,24 @@ app.prepare().then(() => {
         }
       } catch (err) {
         console.error("reaction:toggle error:", err);
+      }
+    });
+
+    const VALID_STATUSES = ["online", "away", "dnd", "offline"];
+
+    socket.on("presence:status", async ({ status }) => {
+      if (!status || !VALID_STATUSES.includes(status)) return;
+      try {
+        await prisma.user.update({ where: { id: userId }, data: { status } });
+        const memberships = await prisma.serverMember.findMany({
+          where: { userId },
+          select: { serverId: true },
+        });
+        for (const m of memberships) {
+          io.to(`server:${m.serverId}`).emit("presence:status", { userId, status });
+        }
+      } catch (err) {
+        console.error("presence:status error:", err);
       }
     });
 

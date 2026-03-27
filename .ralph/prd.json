@@ -899,7 +899,7 @@
       "title": "Add user status to database and API",
       "spec": "specs/database.md",
       "priority": 85,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add status field to User model: String, default 'online'. Valid values: online, away, dnd, offline. Create PATCH /api/auth/status \u2014 accepts { status }. Broadcast status changes via Socket.io presence:status event. Show status as colored dot on user avatars (green=online, yellow=away, red=dnd, gray=offline)."
     },

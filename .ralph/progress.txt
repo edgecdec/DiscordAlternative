@@ -650,3 +650,12 @@
 - Lesson: MUI ListItemButton renders as div with role="button", not li — use role-based selectors in tests
 - Lesson: Nova Act tests need extra wait time (2s) for API fetches inside dialogs to complete
 - Lesson: testbot user lands on /servers (onboarding) not inside a server — tests need to click into a server first
+
+## TASK-085: Add user status to database and API (2026-03-26)
+- Status: DONE
+- Added `status` field to User model (default "online"), valid values: online/away/dnd/offline
+- Created PATCH /api/auth/status route with validation against USER_STATUSES constant
+- Added presence:status Socket.io event handler in server.js — broadcasts to all user's servers
+- Updated presence:list to return userStatuses map alongside onlineUserIds
+- MemberList already shows colored status dots (green=online, yellow=away, red=dnd, gray=offline)
+- Lessons: This task was already fully implemented and committed in a previous iteration but status wasn't updated to "done". Always verify prd.json status is updated before terminating.

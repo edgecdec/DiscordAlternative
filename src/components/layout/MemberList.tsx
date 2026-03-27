@@ -20,12 +20,20 @@ const ROLE_LABELS: Record<string, string> = {
   GUEST: "Members",
 };
 
+const STATUS_COLORS: Record<string, string> = {
+  online: "success.main",
+  away: "warning.main",
+  dnd: "error.main",
+  offline: "text.disabled",
+};
+
 export default function MemberList() {
   const params = useParams();
   const serverId = params?.serverId as string;
   const { socket } = useSocket();
   const [members, setMembers] = useState<Member[]>([]);
   const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set());
+  const [statuses, setStatuses] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!serverId) return;
@@ -42,41 +50,44 @@ export default function MemberList() {
   }, [socket, serverId]);
 
   const handlePresenceList = useCallback(
-    ({ onlineUserIds }: { onlineUserIds: string[] }) => {
+    ({ onlineUserIds, userStatuses }: { onlineUserIds: string[]; userStatuses?: Record<string, string> }) => {
       setOnlineIds(new Set(onlineUserIds));
+      if (userStatuses) setStatuses(userStatuses);
     },
     []
   );
 
-  const handleOnline = useCallback(
-    ({ userId }: { userId: string }) => {
-      setOnlineIds((prev) => new Set(prev).add(userId));
-    },
-    []
-  );
+  const handleOnline = useCallback(({ userId }: { userId: string }) => {
+    setOnlineIds((prev) => new Set(prev).add(userId));
+    setStatuses((prev) => ({ ...prev, [userId]: prev[userId] === "offline" ? "online" : prev[userId] || "online" }));
+  }, []);
 
-  const handleOffline = useCallback(
-    ({ userId }: { userId: string }) => {
-      setOnlineIds((prev) => {
-        const next = new Set(prev);
-        next.delete(userId);
-        return next;
-      });
-    },
-    []
-  );
+  const handleOffline = useCallback(({ userId }: { userId: string }) => {
+    setOnlineIds((prev) => {
+      const next = new Set(prev);
+      next.delete(userId);
+      return next;
+    });
+    setStatuses((prev) => ({ ...prev, [userId]: "offline" }));
+  }, []);
+
+  const handleStatus = useCallback(({ userId, status }: { userId: string; status: string }) => {
+    setStatuses((prev) => ({ ...prev, [userId]: status }));
+  }, []);
 
   useEffect(() => {
     if (!socket) return;
     socket.on("presence:list", handlePresenceList);
     socket.on("presence:online", handleOnline);
     socket.on("presence:offline", handleOffline);
+    socket.on("presence:status", handleStatus);
     return () => {
       socket.off("presence:list", handlePresenceList);
       socket.off("presence:online", handleOnline);
       socket.off("presence:offline", handleOffline);
+      socket.off("presence:status", handleStatus);
     };
-  }, [socket, handlePresenceList, handleOnline, handleOffline]);
+  }, [socket, handlePresenceList, handleOnline, handleOffline, handleStatus]);
 
   const grouped = ROLE_ORDER.map((role) => ({
     role,
@@ -105,7 +116,8 @@ export default function MemberList() {
           </Typography>
           <List dense disablePadding>
             {group.items.map((m) => {
-              const isOnline = onlineIds.has(m.user.id);
+              const userStatus = statuses[m.user.id] || (onlineIds.has(m.user.id) ? "online" : "offline");
+              const isOnline = userStatus !== "offline";
               return (
                 <ListItem key={m.id} sx={{ px: 2, py: 0.5, opacity: isOnline ? 1 : 0.5 }}>
                   <ListItemAvatar sx={{ minWidth: 40 }}>
@@ -119,7 +131,7 @@ export default function MemberList() {
                           bottom: -2,
                           right: -2,
                           fontSize: 12,
-                          color: isOnline ? "success.main" : "text.disabled",
+                          color: STATUS_COLORS[userStatus] || STATUS_COLORS.offline,
                         }}
                       />
                     </Box>
