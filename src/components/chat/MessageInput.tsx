@@ -1,32 +1,112 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ChangeEvent } from "react";
 import { Box, IconButton, LinearProgress, TextField, Typography } from "@mui/material";
 import { AttachFile, Close, Reply as ReplyIcon, Send } from "@mui/icons-material";
 import { useSocket } from "@/hooks/useSocket";
 import { FILE_UPLOAD_MAX_BYTES, MESSAGE_MAX } from "@/lib/constants";
 import type { SocketMessage } from "@/types/socket";
+import MentionAutocomplete, { type MentionMember } from "./MentionAutocomplete";
 
 const TYPING_EMIT_INTERVAL_MS = 2000;
 const TYPING_STOP_DELAY_MS = 3000;
 
 interface MessageInputProps {
   channelId: string;
+  serverId: string;
   replyTo?: SocketMessage | null;
   onCancelReply?: () => void;
 }
 
-export default function MessageInput({ channelId, replyTo, onCancelReply }: MessageInputProps) {
+function getMentionQuery(value: string, cursorPos: number): { query: string; start: number } | null {
+  const before = value.slice(0, cursorPos);
+  const match = before.match(/@(\w*)$/);
+  if (!match) return null;
+  return { query: match[1], start: match.index! };
+}
+
+export default function MessageInput({ channelId, serverId, replyTo, onCancelReply }: MessageInputProps) {
   const [content, setContent] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [pendingFile, setPendingFile] = useState<{ name: string; url: string } | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [members, setMembers] = useState<MentionMember[]>([]);
+  const [mentionAnchor, setMentionAnchor] = useState<HTMLElement | null>(null);
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [mentionStart, setMentionStart] = useState(-1);
+  const [mentionIdx, setMentionIdx] = useState(0);
   const { socket } = useSocket();
   const lastTypingEmit = useRef(0);
   const stopTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTyping = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!serverId) return;
+    fetch(`/api/servers/${serverId}/members`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.members) {
+          setMembers(data.members.map((m: { user: MentionMember }) => m.user));
+        }
+      });
+  }, [serverId]);
+
+  const filtered = useMemo(
+    () =>
+      mentionAnchor
+        ? members.filter((m) => m.username.toLowerCase().startsWith(mentionQuery.toLowerCase())).slice(0, 10)
+        : [],
+    [members, mentionQuery, mentionAnchor],
+  );
+
+  const mentionOpen = mentionAnchor !== null && filtered.length > 0;
+
+  const closeMention = useCallback(() => {
+    setMentionAnchor(null);
+    setMentionStart(-1);
+    setMentionIdx(0);
+  }, []);
+
+  const selectMention = useCallback(
+    (username: string) => {
+      if (!username || mentionStart < 0) {
+        closeMention();
+        return;
+      }
+      const before = content.slice(0, mentionStart);
+      const cursorPos = inputRef.current?.selectionStart ?? content.length;
+      const after = content.slice(cursorPos);
+      const inserted = `${before}@${username} ${after}`;
+      setContent(inserted);
+      closeMention();
+      // Restore cursor after React re-render
+      const newPos = mentionStart + username.length + 2; // @username + space
+      requestAnimationFrame(() => {
+        inputRef.current?.setSelectionRange(newPos, newPos);
+        inputRef.current?.focus();
+      });
+    },
+    [content, mentionStart, closeMention],
+  );
+
+  const updateMentionState = useCallback(
+    (value: string, el: HTMLInputElement | null) => {
+      const pos = el?.selectionStart ?? value.length;
+      const result = getMentionQuery(value, pos);
+      if (result) {
+        setMentionQuery(result.query);
+        setMentionStart(result.start);
+        setMentionAnchor(el);
+        setMentionIdx(0);
+      } else {
+        closeMention();
+      }
+    },
+    [closeMention],
+  );
 
   const emitStop = useCallback(() => {
     if (!isTyping.current || !socket) return;
@@ -72,20 +152,43 @@ export default function MessageInput({ channelId, replyTo, onCancelReply }: Mess
     setContent("");
     setPendingFile(null);
     setUploadError(null);
+    closeMention();
     onCancelReply?.();
     clearStopTimer();
     emitStop();
     lastTypingEmit.current = 0;
-  }, [content, pendingFile, socket, channelId, replyTo, onCancelReply, clearStopTimer, emitStop]);
+  }, [content, pendingFile, socket, channelId, replyTo, onCancelReply, clearStopTimer, emitStop, closeMention]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
+      if (mentionOpen) {
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setMentionIdx((prev) => (prev <= 0 ? filtered.length - 1 : prev - 1));
+          return;
+        }
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          setMentionIdx((prev) => (prev >= filtered.length - 1 ? 0 : prev + 1));
+          return;
+        }
+        if (e.key === "Tab" || (e.key === "Enter" && !e.shiftKey)) {
+          e.preventDefault();
+          if (filtered[mentionIdx]) selectMention(filtered[mentionIdx].username);
+          return;
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeMention();
+          return;
+        }
+      }
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         send();
       }
     },
-    [send],
+    [send, mentionOpen, filtered, mentionIdx, selectMention, closeMention],
   );
 
   const handleFileSelect = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +239,7 @@ export default function MessageInput({ channelId, replyTo, onCancelReply }: Mess
   }, []);
 
   return (
-    <Box sx={{ px: 2, py: 1 }}>
+    <Box sx={{ px: 2, py: 1, position: "relative" }}>
       {replyTo && (
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5, pl: 1, borderLeft: 2, borderColor: "primary.main" }}>
           <ReplyIcon sx={{ fontSize: 14, color: "text.secondary", transform: "scaleX(-1)" }} />
@@ -168,6 +271,12 @@ export default function MessageInput({ channelId, replyTo, onCancelReply }: Mess
           </IconButton>
         </Box>
       )}
+      <MentionAutocomplete
+        filtered={filtered}
+        anchorEl={mentionAnchor}
+        selectedIndex={mentionIdx}
+        onSelect={selectMention}
+      />
       <Box sx={{ display: "flex", gap: 1, alignItems: "flex-end" }}>
         <input type="file" hidden ref={fileInputRef} onChange={handleFileSelect} />
         <IconButton
@@ -188,8 +297,10 @@ export default function MessageInput({ channelId, replyTo, onCancelReply }: Mess
           onChange={(e) => {
             setContent(e.target.value);
             handleTyping();
+            updateMentionState(e.target.value, e.target as HTMLInputElement);
           }}
           onKeyDown={handleKeyDown}
+          inputRef={inputRef}
           slotProps={{ htmlInput: { maxLength: MESSAGE_MAX } }}
           sx={{ "& .MuiOutlinedInput-root": { bgcolor: "background.default" } }}
         />

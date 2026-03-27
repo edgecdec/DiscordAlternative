@@ -95,7 +95,7 @@ export default function ChannelPage() {
         <>
           <MessageList channelId={channelId} onReply={setReplyTo} />
           <TypingIndicator channelId={channelId} />
-          <MessageInput channelId={channelId} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} />
+          <MessageInput channelId={channelId} serverId={serverId} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} />
         </>
       ) : !channel ? (
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>

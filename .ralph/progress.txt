@@ -580,3 +580,13 @@
 - Client-side: Created `MentionText` component that splits message content on `@(\w+)` regex and renders mentions as highlighted `<span>` elements with `primary.main` color and `action.hover` background
 - Updated `MessageList` to use `MentionText` for rendering non-deleted message content
 - Lessons: Starting Nova Act from `about:blank` then injecting cookies before navigating avoids race conditions. The deploy script takes ~60s to rebuild, so 500s during that window are expected.
+
+## TASK-076: Add @mention autocomplete to MessageInput (2026-03-26)
+- Created MentionAutocomplete.tsx as a simple Popper with filtered member list
+- Updated MessageInput to accept serverId prop, fetch members, and track @-trigger position via cursor analysis
+- Keyboard navigation: ArrowUp/Down to navigate, Tab/Enter to select, Escape to dismiss
+- Selecting a member inserts @username with a trailing space and restores cursor position
+- Had to pass serverId from channel page to MessageInput — added it as a new required prop
+- The getMentionQuery helper uses regex to detect @word pattern before cursor position
+- Lesson: MUI TextField with multiline uses a textarea, so selectionStart works correctly for cursor tracking
+- Lesson: Using requestAnimationFrame to set cursor position after React re-render ensures correct placement

@@ -818,7 +818,7 @@
       "title": "Add @mention autocomplete to MessageInput",
       "spec": "specs/ui-layout.md",
       "priority": 76,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "When user types @ in MessageInput, show a dropdown of server members filtered by what they've typed so far. Selecting a member inserts @username into the message. Use MUI Popper or Autocomplete positioned above the input."
     },
