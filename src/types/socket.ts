@@ -100,6 +100,14 @@ export interface ReactionBroadcastPayload {
   channelId: string;
 }
 
+export interface MentionNotifyPayload {
+  messageId: string;
+  channelId: string;
+  serverId: string;
+  fromUsername: string;
+  content: string;
+}
+
 // Typed Socket.io event interfaces
 export interface ServerToClientEvents {
   "message:new": (message: SocketMessage) => void;
@@ -112,6 +120,7 @@ export interface ServerToClientEvents {
   "presence:list": (payload: PresenceListResponse) => void;
   "typing:start": (payload: TypingBroadcastPayload) => void;
   "typing:stop": (payload: TypingBroadcastPayload) => void;
+  "mention:notify": (payload: MentionNotifyPayload) => void;
 }
 
 export interface ClientToServerEvents {

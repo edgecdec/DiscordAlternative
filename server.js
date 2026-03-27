@@ -243,6 +243,40 @@ app.prepare().then(() => {
           author: message.author,
           replyTo,
         });
+
+        // Parse @mentions and notify mentioned users
+        const mentionPattern = /@(\w+)/g;
+        const mentionedNames = new Set();
+        let match;
+        while ((match = mentionPattern.exec(message.content)) !== null) {
+          mentionedNames.add(match[1].toLowerCase());
+        }
+        if (mentionedNames.size > 0) {
+          try {
+            const members = await prisma.serverMember.findMany({
+              where: { serverId: channel.serverId },
+              include: { user: { select: { id: true, username: true } } },
+            });
+            for (const m of members) {
+              if (mentionedNames.has(m.user.username.toLowerCase()) && m.userId !== socket.data.userId) {
+                const sockets = onlineUsers.get(m.userId);
+                if (sockets) {
+                  for (const sid of sockets) {
+                    io.to(sid).emit("mention:notify", {
+                      messageId: message.id,
+                      channelId,
+                      serverId: channel.serverId,
+                      fromUsername: socket.data.username,
+                      content: message.content,
+                    });
+                  }
+                }
+              }
+            }
+          } catch (mentionErr) {
+            console.error("mention:notify error:", mentionErr);
+          }
+        }
       } catch (err) {
         console.error("message:create error:", err);
       }

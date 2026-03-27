@@ -809,7 +809,7 @@
       "title": "Implement @mention parsing and highlighting",
       "spec": "specs/socket-events.md",
       "priority": 75,
-      "status": "open",
+      "status": "in_progress",
       "dependencies": [],
       "description": "When a message contains @username, the server should check if that user is a member of the server. In MessageList, parse @username patterns and render them as highlighted styled spans (primary color, clickable). Add a Socket.io event mention:notify that alerts the mentioned user."
     },

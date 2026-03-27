@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import MessageAttachment from "@/components/chat/MessageAttachment";
 import ReactionBar from "@/components/chat/ReactionBar";
 import ReplyQuote from "@/components/chat/ReplyQuote";
+import MentionText from "@/components/chat/MentionText";
 
 interface MessageListProps {
   channelId: string;
@@ -249,7 +250,7 @@ export default function MessageList({ channelId, onReply }: MessageListProps) {
                 fontStyle: msg.deleted ? "italic" : "normal",
               }}
             >
-              {msg.deleted ? "This message has been deleted" : msg.content}
+              {msg.deleted ? "This message has been deleted" : <MentionText content={msg.content} />}
             </Typography>
             {!msg.deleted && msg.fileUrl && (
               <MessageAttachment fileUrl={msg.fileUrl} />
