@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ChangeEvent } from "react";
 import { Box, IconButton, LinearProgress, TextField, Typography } from "@mui/material";
-import { AttachFile, Close, Reply as ReplyIcon, Send } from "@mui/icons-material";
+import { AttachFile, Close, EmojiEmotions, Reply as ReplyIcon, Send } from "@mui/icons-material";
+import EmojiPicker from "./EmojiPicker";
 import { useSocket } from "@/hooks/useSocket";
 import { FILE_UPLOAD_MAX_BYTES, MESSAGE_MAX } from "@/lib/constants";
 import type { SocketMessage } from "@/types/socket";
@@ -36,6 +37,7 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
   const [mentionQuery, setMentionQuery] = useState("");
   const [mentionStart, setMentionStart] = useState(-1);
   const [mentionIdx, setMentionIdx] = useState(0);
+  const [emojiAnchor, setEmojiAnchor] = useState<HTMLElement | null>(null);
   const { socket } = useSocket();
   const lastTypingEmit = useRef(0);
   const stopTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -238,6 +240,20 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
     setUploadError(null);
   }, []);
 
+  const handleEmojiSelect = useCallback(
+    (emoji: string) => {
+      const el = inputRef.current;
+      const pos = el?.selectionStart ?? content.length;
+      setContent((prev) => prev.slice(0, pos) + emoji + prev.slice(pos));
+      requestAnimationFrame(() => {
+        const newPos = pos + emoji.length;
+        el?.setSelectionRange(newPos, newPos);
+        el?.focus();
+      });
+    },
+    [content],
+  );
+
   return (
     <Box sx={{ px: 2, py: 1, position: "relative" }}>
       {replyTo && (
@@ -305,6 +321,13 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
           sx={{ "& .MuiOutlinedInput-root": { bgcolor: "background.default" } }}
         />
         <IconButton
+          onClick={(e) => setEmojiAnchor(e.currentTarget)}
+          aria-label="Emoji picker"
+          sx={{ color: "text.secondary" }}
+        >
+          <EmojiEmotions />
+        </IconButton>
+        <IconButton
           color="primary"
           onClick={send}
           disabled={!content.trim() && !pendingFile}
@@ -313,6 +336,11 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
           <Send />
         </IconButton>
       </Box>
+      <EmojiPicker
+        anchorEl={emojiAnchor}
+        onClose={() => setEmojiAnchor(null)}
+        onSelect={handleEmojiSelect}
+      />
     </Box>
   );
 }

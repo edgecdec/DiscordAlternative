@@ -836,7 +836,7 @@
       "title": "Add emoji picker to MessageInput",
       "spec": "specs/ui-layout.md",
       "priority": 78,
-      "status": "open",
+      "status": "in_progress",
       "dependencies": [],
       "description": "Add a smiley face IconButton next to the send button in MessageInput. On click, show a popover with a grid of common emoji (use a static list of ~100 popular emoji, no external library). Clicking an emoji inserts it at cursor position in the input."
     },
