@@ -634,3 +634,10 @@
 - Returns 400 for empty/missing query param
 - Reused existing patterns: getAuthUser, MESSAGES_PER_PAGE constant, cursor pagination
 - Lesson: Simple Prisma `contains` filter works well for SQLite text search — no need for complex full-text search setup
+
+## TASK-083: Build message search UI (2026-03-26)
+- Created SearchDialog component with debounced search, result snippets, pagination ("Load more"), and click-to-navigate.
+- Added search IconButton to channel header with aria-label for accessibility.
+- Search results show author avatar, username, date, content snippet with query context, and channel name.
+- Clicking a result navigates to the channel (scrolling to specific message not implemented — would need MessageList changes for anchor scrolling).
+- Lessons: Keep dialog components self-contained with their own state management. Debounced search avoids hammering the API on every keystroke.

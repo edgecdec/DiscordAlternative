@@ -881,7 +881,7 @@
       "title": "Build message search UI",
       "spec": "specs/ui-layout.md",
       "priority": 83,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add a search IconButton in the channel header. Opens a search panel/dialog with a TextField. Results show message snippets with channel name and author. Clicking a result navigates to that channel and scrolls to the message."
     },

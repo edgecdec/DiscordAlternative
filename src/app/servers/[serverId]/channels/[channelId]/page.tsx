@@ -2,14 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Box, Typography, useMediaQuery } from "@mui/material";
-import { Tag, VolumeUp } from "@mui/icons-material";
+import { Box, IconButton, Typography, useMediaQuery } from "@mui/material";
+import { Search, Tag, VolumeUp } from "@mui/icons-material";
 import { useSocket } from "@/hooks/useSocket";
 import type { SocketMessage } from "@/types/socket";
 import MessageList from "@/components/chat/MessageList";
 import MessageInput from "@/components/chat/MessageInput";
 import TypingIndicator from "@/components/chat/TypingIndicator";
 import VoiceChannel from "@/components/voice/VoiceChannel";
+import SearchDialog from "@/components/chat/SearchDialog";
 
 interface ChannelInfo {
   name: string;
@@ -28,6 +29,7 @@ export default function ChannelPage() {
   const { socket, joinChannel, leaveChannel, connected } = useSocket();
   const isMobile = useMediaQuery("(max-width:767px)");
   const [replyTo, setReplyTo] = useState<SocketMessage | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     setReplyTo(null);
@@ -90,7 +92,11 @@ export default function ChannelPage() {
         <Typography variant="subtitle1" fontWeight={700}>
           {channel?.name ?? "Loading..."}
         </Typography>
+        <IconButton size="small" onClick={() => setSearchOpen(true)} sx={{ ml: "auto" }} aria-label="Search messages">
+          <Search sx={{ fontSize: 20 }} />
+        </IconButton>
       </Box>
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} serverId={serverId} />
       {isText && channel ? (
         <>
           <MessageList channelId={channelId} onReply={setReplyTo} />
