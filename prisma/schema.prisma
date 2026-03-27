@@ -21,28 +21,31 @@ model User {
 }
 
 model Server {
-  id         String         @id @default(cuid())
+  id         String            @id @default(cuid())
   name       String
   imageUrl   String?
-  inviteCode String         @unique @default(uuid())
+  inviteCode String            @unique @default(uuid())
   ownerId    String
-  owner      User           @relation(fields: [ownerId], references: [id])
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  owner      User              @relation(fields: [ownerId], references: [id])
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
   channels   Channel[]
   members    ServerMember[]
+  categories ChannelCategory[]
 }
 
 model Channel {
-  id        String        @id @default(cuid())
-  name      String
-  type      String        @default("TEXT")
-  serverId  String
-  server    Server        @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  messages  Message[]
-  reads     ChannelRead[]
+  id         String           @id @default(cuid())
+  name       String
+  type       String           @default("TEXT")
+  serverId   String
+  server     Server           @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  categoryId String?
+  category   ChannelCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  messages   Message[]
+  reads      ChannelRead[]
 }
 
 model Message {
@@ -99,4 +102,15 @@ model Reaction {
 
   @@unique([userId, messageId, emoji])
   @@index([messageId])
+}
+
+model ChannelCategory {
+  id       String    @id @default(cuid())
+  name     String
+  position Int
+  serverId String
+  server   Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  channels Channel[]
+
+  @@index([serverId])
 }

@@ -845,7 +845,7 @@
       "title": "Add channel categories to database and API",
       "spec": "specs/database.md",
       "priority": 79,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add ChannelCategory model to Prisma: id, name, serverId, position (Int). Add optional categoryId to Channel model. Create POST /api/servers/[serverId]/categories \u2014 create category. Create PATCH/DELETE for categories. Update channel creation to accept optional categoryId."
     },

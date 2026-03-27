@@ -26,7 +26,7 @@ export async function POST(
   }
 
   const body = await req.json();
-  const { name, type } = body as { name?: string; type?: string };
+  const { name, type, categoryId } = body as { name?: string; type?: string; categoryId?: string };
 
   if (!name || name.trim().length < CHANNEL_NAME_MIN || name.trim().length > CHANNEL_NAME_MAX) {
     return NextResponse.json(
@@ -42,11 +42,19 @@ export async function POST(
     );
   }
 
+  if (categoryId) {
+    const category = await prisma.channelCategory.findUnique({ where: { id: categoryId } });
+    if (!category || category.serverId !== serverId) {
+      return NextResponse.json({ error: "Category not found in this server" }, { status: 400 });
+    }
+  }
+
   const channel = await prisma.channel.create({
     data: {
       name: name.trim(),
       type,
       serverId,
+      ...(categoryId ? { categoryId } : {}),
     },
   });
 

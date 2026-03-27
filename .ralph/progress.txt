@@ -603,3 +603,13 @@
 - Emoji inserts at cursor position in the input field using selectionStart.
 - Nova Act first attempt failed because the agent's click didn't properly trigger the MUI Popover — using Playwright's direct `.click()` on the aria-label selector worked reliably.
 - Lesson: For MUI Popover/Popover components, use Playwright direct clicks in Nova Act tests rather than relying on the agent's visual click, which may miss the exact target.
+
+## TASK-079: Add channel categories to database and API (2026-03-26)
+- Added ChannelCategory model with id, name, position, serverId fields
+- Added optional categoryId to Channel model (onDelete: SetNull so channels survive category deletion)
+- Created POST /api/servers/[serverId]/categories — auto-increments position
+- Created PATCH/DELETE /api/categories/[categoryId] — supports name and position updates
+- Updated channel creation to accept optional categoryId with validation that category belongs to same server
+- Added CATEGORY_NAME_MIN/MAX constants
+- Lesson: After schema changes, must run `npx prisma generate` before tsc will pass — migrate dev alone doesn't always update the local client types fast enough
+- Lesson: Deploy webhook deletes .next before rebuilding, so 500s are expected for ~60s after push — poll longer before panicking
