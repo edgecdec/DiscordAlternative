@@ -836,7 +836,7 @@
       "title": "Add emoji picker to MessageInput",
       "spec": "specs/ui-layout.md",
       "priority": 78,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [],
       "description": "Add a smiley face IconButton next to the send button in MessageInput. On click, show a popover with a grid of common emoji (use a static list of ~100 popular emoji, no external library). Clicking an emoji inserts it at cursor position in the input."
     },
@@ -1163,6 +1163,132 @@
       "status": "open",
       "dependencies": [],
       "description": "Show a small banner or indicator when the Socket.io connection is lost (e.g. yellow bar: 'Reconnecting...'). Auto-dismiss when reconnected. Show 'Connected' briefly on reconnect. Helps users understand why messages might not be appearing in real-time."
+    },
+    {
+      "id": "TASK-115",
+      "title": "Auto-scroll to newest messages and 'jump to bottom' button",
+      "spec": "specs/ui-layout.md",
+      "priority": 115,
+      "status": "open",
+      "dependencies": [],
+      "description": "When new messages arrive and user is scrolled to the bottom, auto-scroll to show them. If user has scrolled up (reading history), do NOT auto-scroll \u2014 instead show a floating 'Jump to latest' button at the bottom of MessageList. Clicking it scrolls to bottom. Show unread count on the button."
+    },
+    {
+      "id": "TASK-116",
+      "title": "Add copy invite link button to server UI",
+      "spec": "specs/servers.md",
+      "priority": 116,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a prominent 'Invite People' button in the ChannelPanel header or server settings. Clicking copies the full invite URL (https://discord.edgecdec.com/invite/CODE) to clipboard. Show a Snackbar confirmation 'Invite link copied!'. This is how users actually share servers."
+    },
+    {
+      "id": "TASK-117",
+      "title": "Add message context menu (right-click / hover actions)",
+      "spec": "specs/ui-layout.md",
+      "priority": 117,
+      "status": "open",
+      "dependencies": [],
+      "description": "On message hover, show a small action bar with icon buttons: Reply, React (emoji), Pin (if permitted), Edit (if author), Delete (if author/admin). On right-click, show a MUI Menu with the same options plus 'Copy Text'. This is the primary way users interact with messages."
+    },
+    {
+      "id": "TASK-118",
+      "title": "Implement channel reordering",
+      "spec": "specs/database.md",
+      "priority": 118,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add position (Int) field to Channel model. Channels display in position order in ChannelPanel. Create PATCH /api/servers/[serverId]/channels/reorder \u2014 accepts array of { channelId, position }. OWNER/ADMIN only. In ChannelPanel, allow drag-to-reorder or up/down buttons."
+    },
+    {
+      "id": "TASK-119",
+      "title": "Show who reacted on reaction tooltip",
+      "spec": "specs/ui-layout.md",
+      "priority": 119,
+      "status": "open",
+      "dependencies": [],
+      "description": "When hovering over a reaction chip on a message, show a MUI Tooltip listing the usernames who reacted with that emoji. Clicking the chip still toggles your own reaction."
+    },
+    {
+      "id": "TASK-120",
+      "title": "Improve message timestamps and date separators",
+      "spec": "specs/ui-layout.md",
+      "priority": 120,
+      "status": "open",
+      "dependencies": [],
+      "description": "Show relative timestamps on messages ('2m ago', '1h ago', 'Yesterday at 3:45 PM'). On hover, show full date/time in a tooltip. Add date separator bars between messages from different days ('March 25, 2026'). Group consecutive messages from the same author within 5 minutes (compact mode \u2014 no repeated avatar/name)."
+    },
+    {
+      "id": "TASK-121",
+      "title": "Handle failed message sends gracefully",
+      "spec": "specs/socket-events.md",
+      "priority": 121,
+      "status": "open",
+      "dependencies": [],
+      "description": "If a message:create emission fails (socket disconnected, server error), show the message in red/italic with a retry button. Don't silently lose messages. Show a toast/snackbar for transient errors. Queue messages if socket is temporarily disconnected and resend on reconnect."
+    },
+    {
+      "id": "TASK-122",
+      "title": "Add 'Join Server' dialog with invite code input",
+      "spec": "specs/servers.md",
+      "priority": 122,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a 'Join Server' button in ServerSidebar (next to Create Server). Opens a MUI Dialog with a TextField to paste an invite code or full invite URL. Parses the code from the URL if pasted. Calls the join API. On success navigates to the server."
+    },
+    {
+      "id": "TASK-123",
+      "title": "Add loading skeletons and spinners throughout the app",
+      "spec": "specs/ui-layout.md",
+      "priority": 123,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add MUI Skeleton placeholders while data loads: message list (skeleton message bubbles), channel list (skeleton list items), server sidebar (skeleton circles), member list (skeleton rows). Show CircularProgress spinner on buttons during async operations (login, register, create server, send message). Replace blank screens with loading states."
+    },
+    {
+      "id": "TASK-124",
+      "title": "Add error boundaries and error states",
+      "spec": "specs/ui-layout.md",
+      "priority": 124,
+      "status": "open",
+      "dependencies": [],
+      "description": "Wrap major sections (ServerSidebar, ChannelPanel, MessageList, VoiceChannel) in React error boundaries. Show a friendly error message with a 'Retry' button instead of a white screen. Add error states for failed API calls (e.g. 'Failed to load messages \u2014 click to retry')."
+    },
+    {
+      "id": "TASK-125",
+      "title": "Add favicon, dynamic page titles, and meta tags",
+      "spec": "specs/ui-layout.md",
+      "priority": 125,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a favicon (simple chat bubble icon or generate one). Set dynamic page titles: 'ServerName | #channel \u2014 Discord Alt' when in a channel, 'Discord Alternative' on login. Add basic meta description. Update the tab title with unread count: '(3) ServerName | #channel'."
+    },
+    {
+      "id": "TASK-126",
+      "title": "Implement inline message editing",
+      "spec": "specs/ui-layout.md",
+      "priority": 126,
+      "status": "open",
+      "dependencies": [],
+      "description": "When clicking Edit on your own message, replace the message content with an inline TextField pre-filled with the current content. Enter saves (emits message:update), Escape cancels. Show 'editing...' indicator. Much better UX than a dialog."
+    },
+    {
+      "id": "TASK-127",
+      "title": "Show member count and online count in server header",
+      "spec": "specs/ui-layout.md",
+      "priority": 127,
+      "status": "open",
+      "dependencies": [],
+      "description": "In the ChannelPanel server header area, show 'X members, Y online' as a small subtitle. Updates in real-time via presence events. Gives users a sense of the community size."
+    },
+    {
+      "id": "TASK-128",
+      "title": "Preserve scroll position when switching channels",
+      "spec": "specs/ui-layout.md",
+      "priority": 128,
+      "status": "open",
+      "dependencies": [],
+      "description": "When switching between channels, remember the scroll position per channel. When returning to a channel, restore the scroll position instead of jumping to the bottom. Store in a React ref map keyed by channelId."
     }
   ]
 }

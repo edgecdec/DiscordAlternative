@@ -596,3 +596,10 @@
 - Created LinkPreview component showing domain name with a link icon in a bordered card (max-width 400px).
 - Integrated into MessageList: for non-deleted messages, extracts the first URL and renders a LinkPreview below the content.
 - Lesson: Combining URL and mention regex into one pass avoids double-parsing and keeps the component simple. The IIFE pattern `{(() => { ... })()}` works for inline conditional rendering with local variables in JSX.
+
+## TASK-078: Add emoji picker to MessageInput (2026-03-26)
+- Created EmojiPicker.tsx as a separate component with ~100 emoji in 4 categories (Smileys, Gestures, Objects, Nature) using MUI Popover.
+- Integrated into MessageInput with EmojiEmotions icon button between TextField and Send button.
+- Emoji inserts at cursor position in the input field using selectionStart.
+- Nova Act first attempt failed because the agent's click didn't properly trigger the MUI Popover — using Playwright's direct `.click()` on the aria-label selector worked reliably.
+- Lesson: For MUI Popover/Popover components, use Playwright direct clicks in Nova Act tests rather than relying on the agent's visual click, which may miss the exact target.
