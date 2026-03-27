@@ -620,3 +620,9 @@
 - Category headers show channel count (e.g. "General — 3").
 - Collapsed state stored in local React state (Record<categoryId, boolean>).
 - Lesson: The server API didn't include categories — always check what the API returns before building UI that depends on new data shapes.
+
+## TASK-081: Build first-time user onboarding flow (2026-03-26)
+- Created JoinServerDialog component at src/components/layout/JoinServerDialog.tsx — parses both raw invite codes and full invite URLs.
+- Updated src/app/servers/page.tsx to fetch server count and show a welcome page with "Create a Server" and "Join a Server" buttons when user has no servers.
+- When user has servers, the normal sidebar + "Select or create a server" view is shown.
+- Lesson: The servers page already fetched servers in ServerSidebar, but the page itself needed its own fetch to determine whether to show onboarding vs normal view. Kept it simple with a single /api/servers call.
