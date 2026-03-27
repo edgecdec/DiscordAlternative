@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, usePathname } from "next/navigation";
 import { Badge, Box, Avatar, Tooltip, IconButton, Divider } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, ChatBubble } from "@mui/icons-material";
 
 const SIDEBAR_WIDTH = 72;
 const UNREAD_POLL_MS = 30_000;
@@ -24,7 +24,9 @@ export default function ServerSidebar({ onCreateClick, onNavigate }: ServerSideb
   const [serverUnreads, setServerUnreads] = useState<Record<string, boolean>>({});
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
   const activeServerId = params?.serverId as string | undefined;
+  const isDmActive = pathname?.startsWith("/dm") ?? false;
 
   const fetchServers = useCallback(async () => {
     const res = await fetch("/api/servers");
@@ -76,6 +78,26 @@ export default function ServerSidebar({ onCreateClick, onNavigate }: ServerSideb
         borderColor: "divider",
       }}
     >
+      <Tooltip title="Direct Messages" placement="right">
+        <IconButton
+          onClick={() => { router.push("/dm"); onNavigate?.(); }}
+          sx={{
+            width: 48,
+            height: 48,
+            bgcolor: isDmActive ? "primary.main" : "background.paper",
+            color: isDmActive ? "common.white" : "text.primary",
+            borderRadius: isDmActive ? 2 : "50%",
+            transition: "border-radius 0.2s",
+            "&:hover": { bgcolor: isDmActive ? "primary.main" : "action.hover" },
+          }}
+          aria-label="Direct Messages"
+        >
+          <ChatBubble />
+        </IconButton>
+      </Tooltip>
+
+      <Divider flexItem sx={{ mx: 1 }} />
+
       {servers.map((server) => {
         const isActive = server.id === activeServerId;
         const hasUnread = serverUnreads[server.id] && !isActive;

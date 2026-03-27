@@ -926,7 +926,7 @@
       "title": "Build direct messages UI",
       "spec": "specs/ui-layout.md",
       "priority": 88,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add a DM section to ServerSidebar (above server list) with a chat bubble icon. Clicking shows a list of recent DM conversations. Clicking a conversation opens a DM view (reuse MessageList and MessageInput components). Show unread DM indicator on the icon."
     },

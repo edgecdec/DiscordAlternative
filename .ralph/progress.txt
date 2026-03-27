@@ -680,3 +680,15 @@
 - Added dm:create Socket.io handler in server.js that broadcasts dm:new to both sender and receiver sockets
 - Added DM types (DirectMessagePayload, DMCreatePayload) and events to socket.ts
 - Lesson: Prisma client needs regeneration after schema changes before tsc will pass — always run `npx prisma generate` after `npx prisma migrate dev`
+
+## TASK-088: Build direct messages UI (2026-03-27)
+- Added ChatBubble icon to ServerSidebar above server list with active state highlighting (matches server icon pattern)
+- Created /dm layout with ServerSidebar (reuses existing component)
+- Created /dm page showing recent DM conversations list with user avatars and last message timestamps
+- Created /dm/[userId] page with DM chat view using dedicated DMMessageList and DMMessageInput components
+- DMMessageList listens for dm:new socket events filtered by otherUserId for real-time message delivery
+- DMMessageInput emits dm:create via socket (server.js already handles this from TASK-087)
+- DMMessageList supports cursor-based pagination (scroll to top to load older messages)
+- Used usePathname from next/navigation for reactive DM active state detection in sidebar
+- Lesson: MessageList and MessageInput are tightly coupled to channel concepts (channelId, serverId, reactions, replies, mentions, typing indicators) — creating simpler DM-specific versions was cleaner than trying to make the channel components generic
+- Lesson: Deploy webhook may rebuild during test window — first Nova Act test hit a rebuild cycle and failed, second attempt passed after waiting for build to complete
