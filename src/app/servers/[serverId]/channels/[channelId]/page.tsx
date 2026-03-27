@@ -2,23 +2,33 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Box, IconButton, Typography, useMediaQuery } from "@mui/material";
-import { Search, Tag, VolumeUp } from "@mui/icons-material";
+import { Box, IconButton, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { Schedule, Search, Settings, Tag, VolumeUp } from "@mui/icons-material";
 import { useSocket } from "@/hooks/useSocket";
+import { useAuth } from "@/hooks/useAuth";
 import type { SocketMessage } from "@/types/socket";
 import MessageList from "@/components/chat/MessageList";
 import MessageInput from "@/components/chat/MessageInput";
 import TypingIndicator from "@/components/chat/TypingIndicator";
 import VoiceChannel from "@/components/voice/VoiceChannel";
 import SearchDialog from "@/components/chat/SearchDialog";
+import ChannelSettingsDialog from "@/components/layout/ChannelSettingsDialog";
 
 interface ChannelInfo {
   name: string;
   type: string;
+  slowModeSeconds: number;
 }
+
+const ADMIN_ROLES = ["OWNER", "ADMIN"];
 
 function markChannelRead(channelId: string) {
   fetch(`/api/channels/${channelId}/read`, { method: "PATCH" });
+}
+
+function formatSlowMode(seconds: number): string {
+  if (seconds >= 60) return `${seconds / 60}m`;
+  return `${seconds}s`;
 }
 
 export default function ChannelPage() {
@@ -26,10 +36,13 @@ export default function ChannelPage() {
   const channelId = params?.channelId as string;
   const serverId = params?.serverId as string;
   const [channel, setChannel] = useState<ChannelInfo | null>(null);
+  const [userRole, setUserRole] = useState<string>("GUEST");
   const { socket, joinChannel, leaveChannel, connected } = useSocket();
+  const { user } = useAuth();
   const isMobile = useMediaQuery("(max-width:767px)");
   const [replyTo, setReplyTo] = useState<SocketMessage | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     setReplyTo(null);
@@ -42,15 +55,23 @@ export default function ChannelPage() {
       .then((data) => {
         if (!data) return;
         const ch = data.server.channels.find(
-          (c: { id: string; name: string; type: string }) => c.id === channelId
+          (c: { id: string; name: string; type: string; slowModeSeconds: number }) => c.id === channelId
         );
-        if (ch) setChannel({ name: ch.name, type: ch.type });
+        if (ch) setChannel({ name: ch.name, type: ch.type, slowModeSeconds: ch.slowModeSeconds ?? 0 });
+        if (user) {
+          const member = data.server.members.find(
+            (m: { user: { id: string }; role: string }) => m.user.id === user.id
+          );
+          if (member) setUserRole(member.role);
+        }
       });
-  }, [serverId, channelId]);
+  }, [serverId, channelId, user]);
 
   const isText = !channel || channel.type === "TEXT";
   const isVoice = channel?.type === "VOICE" || channel?.type === "VIDEO";
   const ChannelIcon = isVoice ? VolumeUp : Tag;
+  const canManage = ADMIN_ROLES.includes(userRole);
+  const showSlowModeIcon = isText && channel && channel.slowModeSeconds > 0;
 
   useEffect(() => {
     if (!channelId || !connected || !isText) return;
@@ -74,6 +95,10 @@ export default function ChannelPage() {
     };
   }, [channelId, isText, socket, onNewMessage]);
 
+  const handleSlowModeUpdated = useCallback((newSlowMode: number) => {
+    setChannel((prev) => prev ? { ...prev, slowModeSeconds: newSlowMode } : prev);
+  }, []);
+
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
       <Box
@@ -92,16 +117,46 @@ export default function ChannelPage() {
         <Typography variant="subtitle1" fontWeight={700}>
           {channel?.name ?? "Loading..."}
         </Typography>
-        <IconButton size="small" onClick={() => setSearchOpen(true)} sx={{ ml: "auto" }} aria-label="Search messages">
-          <Search sx={{ fontSize: 20 }} />
-        </IconButton>
+        {showSlowModeIcon && (
+          <Tooltip title={`Slow mode: ${formatSlowMode(channel.slowModeSeconds)}`}>
+            <Schedule sx={{ fontSize: 16, color: "text.secondary" }} />
+          </Tooltip>
+        )}
+        <Box sx={{ ml: "auto", display: "flex", gap: 0.5 }}>
+          {canManage && isText && channel && (
+            <Tooltip title="Channel Settings">
+              <IconButton size="small" onClick={() => setSettingsOpen(true)} aria-label="Channel settings">
+                <Settings sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
+          )}
+          <IconButton size="small" onClick={() => setSearchOpen(true)} aria-label="Search messages">
+            <Search sx={{ fontSize: 20 }} />
+          </IconButton>
+        </Box>
       </Box>
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} serverId={serverId} />
+      {channel && isText && canManage && (
+        <ChannelSettingsDialog
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          channelId={channelId}
+          channelName={channel.name}
+          slowModeSeconds={channel.slowModeSeconds}
+          onUpdated={handleSlowModeUpdated}
+        />
+      )}
       {isText && channel ? (
         <>
           <MessageList channelId={channelId} onReply={setReplyTo} />
           <TypingIndicator channelId={channelId} />
-          <MessageInput channelId={channelId} serverId={serverId} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} />
+          <MessageInput
+            channelId={channelId}
+            serverId={serverId}
+            slowModeSeconds={channel.slowModeSeconds}
+            replyTo={replyTo}
+            onCancelReply={() => setReplyTo(null)}
+          />
         </>
       ) : !channel ? (
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>

@@ -727,3 +727,11 @@
 - OWNER/ADMIN roles are exempt from slow mode
 - Added `MessageErrorPayload` and `message:error` event to socket types
 - Lesson: When updating a PATCH route to accept new fields, make all fields optional and only update what's provided — avoids breaking existing callers that only send `name`.
+
+## TASK-092: Build slow mode UI (2026-03-26)
+- Created ChannelSettingsDialog.tsx with slow mode duration selector (off, 5s, 10s, 30s, 1m, 5m)
+- Updated MessageInput to accept slowModeSeconds prop, listen for message:error events from server, show countdown timer in placeholder, disable input during cooldown
+- Updated channel page to pass slowModeSeconds to MessageInput, show Schedule icon in header when slow mode active, add Settings gear button for OWNER/ADMIN
+- The server already enforced slow mode and emitted message:error — just needed the client-side UI
+- Lesson: The server detail API returns all channel fields by default (no select clause), so slowModeSeconds was already available without API changes
+- Lesson: Nova Act navigation can be tricky — the first icon in sidebar might be DM, not a server. Need to be specific in instructions.

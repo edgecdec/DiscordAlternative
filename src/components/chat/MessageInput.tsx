@@ -6,7 +6,7 @@ import { AttachFile, Close, EmojiEmotions, Reply as ReplyIcon, Send } from "@mui
 import EmojiPicker from "./EmojiPicker";
 import { useSocket } from "@/hooks/useSocket";
 import { FILE_UPLOAD_MAX_BYTES, MESSAGE_MAX } from "@/lib/constants";
-import type { SocketMessage } from "@/types/socket";
+import type { SocketMessage, MessageErrorPayload } from "@/types/socket";
 import MentionAutocomplete, { type MentionMember } from "./MentionAutocomplete";
 
 const TYPING_EMIT_INTERVAL_MS = 2000;
@@ -15,6 +15,7 @@ const TYPING_STOP_DELAY_MS = 3000;
 interface MessageInputProps {
   channelId: string;
   serverId: string;
+  slowModeSeconds?: number;
   replyTo?: SocketMessage | null;
   onCancelReply?: () => void;
 }
@@ -26,7 +27,7 @@ function getMentionQuery(value: string, cursorPos: number): { query: string; sta
   return { query: match[1], start: match.index! };
 }
 
-export default function MessageInput({ channelId, serverId, replyTo, onCancelReply }: MessageInputProps) {
+export default function MessageInput({ channelId, serverId, slowModeSeconds = 0, replyTo, onCancelReply }: MessageInputProps) {
   const [content, setContent] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -38,6 +39,7 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
   const [mentionStart, setMentionStart] = useState(-1);
   const [mentionIdx, setMentionIdx] = useState(0);
   const [emojiAnchor, setEmojiAnchor] = useState<HTMLElement | null>(null);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
   const { socket } = useSocket();
   const lastTypingEmit = useRef(0);
   const stopTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -55,6 +57,34 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
         }
       });
   }, [serverId]);
+
+  // Listen for slow mode errors from server
+  useEffect(() => {
+    if (!socket) return;
+    const handleError = (payload: MessageErrorPayload) => {
+      if (payload.remaining && payload.remaining > 0) {
+        setCooldownRemaining(payload.remaining);
+      }
+    };
+    socket.on("message:error", handleError);
+    return () => { socket.off("message:error", handleError); };
+  }, [socket]);
+
+  // Countdown timer for slow mode cooldown
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownRemaining((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
+
+  // Start local cooldown after sending when slow mode is active
+  const startLocalCooldown = useCallback(() => {
+    if (slowModeSeconds > 0) setCooldownRemaining(slowModeSeconds);
+  }, [slowModeSeconds]);
+
+  const isDisabledBySlowMode = cooldownRemaining > 0;
 
   const filtered = useMemo(
     () =>
@@ -144,7 +174,7 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
 
   const send = useCallback(() => {
     const trimmed = content.trim();
-    if ((!trimmed && !pendingFile) || !socket) return;
+    if ((!trimmed && !pendingFile) || !socket || isDisabledBySlowMode) return;
     socket.emit("message:create", {
       channelId,
       content: trimmed || "",
@@ -159,7 +189,8 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
     clearStopTimer();
     emitStop();
     lastTypingEmit.current = 0;
-  }, [content, pendingFile, socket, channelId, replyTo, onCancelReply, clearStopTimer, emitStop, closeMention]);
+    startLocalCooldown();
+  }, [content, pendingFile, socket, channelId, replyTo, onCancelReply, clearStopTimer, emitStop, closeMention, isDisabledBySlowMode, startLocalCooldown]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
@@ -308,8 +339,9 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
           multiline
           maxRows={4}
           size="small"
-          placeholder="Send a message…"
+          placeholder={isDisabledBySlowMode ? `Slow mode: wait ${cooldownRemaining}s` : "Send a message…"}
           value={content}
+          disabled={isDisabledBySlowMode}
           onChange={(e) => {
             setContent(e.target.value);
             handleTyping();
@@ -330,7 +362,7 @@ export default function MessageInput({ channelId, serverId, replyTo, onCancelRep
         <IconButton
           color="primary"
           onClick={send}
-          disabled={!content.trim() && !pendingFile}
+          disabled={isDisabledBySlowMode || (!content.trim() && !pendingFile)}
           aria-label="Send message"
         >
           <Send />

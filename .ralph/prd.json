@@ -971,7 +971,7 @@
       "title": "Build slow mode UI",
       "spec": "specs/ui-layout.md",
       "priority": 93,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "In MessageInput, if the channel has slow mode enabled and user recently sent a message, disable the input and show a countdown timer. In channel settings (accessible from channel header), OWNER/ADMIN can set slow mode duration (off, 5s, 10s, 30s, 1m, 5m). Show a clock icon in the channel header when slow mode is active."
     },
