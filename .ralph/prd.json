@@ -908,7 +908,7 @@
       "title": "Build user status selector UI",
       "spec": "specs/ui-layout.md",
       "priority": 86,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add a status dot next to the user avatar in the user info panel at bottom of ChannelPanel. Clicking opens a small menu to select status (Online, Away, Do Not Disturb, Invisible). Update MemberList to show status dots on all members."
     },

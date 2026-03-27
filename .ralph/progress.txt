@@ -659,3 +659,15 @@
 - Updated presence:list to return userStatuses map alongside onlineUserIds
 - MemberList already shows colored status dots (green=online, yellow=away, red=dnd, gray=offline)
 - Lessons: This task was already fully implemented and committed in a previous iteration but status wasn't updated to "done". Always verify prd.json status is updated before terminating.
+
+## TASK-086: Build user status selector UI (2026-03-26)
+- Created StatusSelector component with clickable status dot overlay on user avatar
+- Dot shows current status color (green=online, yellow=away, red=dnd, gray=invisible)
+- Clicking opens MUI Menu with 4 status options: Online, Away, Do Not Disturb, Invisible
+- Selecting a status calls PATCH /api/auth/status and emits presence:status via Socket.io
+- Added status field to /api/auth/me response so UserInfoPanel can load initial status
+- UserInfoPanel listens for presence:status socket events to stay in sync
+- MemberList already showed status dots from TASK-085 — no changes needed there
+- Added aria-label="Change status" and tooltip for accessibility
+- Lesson: Nova Act struggles with tiny click targets (14px dots) — use Playwright locators with aria-label for precise element interaction instead of visual act() instructions
+- Lesson: Always add aria-label to small interactive elements for both accessibility and testability
