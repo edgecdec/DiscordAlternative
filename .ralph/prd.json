@@ -962,7 +962,7 @@
       "title": "Implement slow mode for channels",
       "spec": "specs/database.md",
       "priority": 92,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add slowModeSeconds field to Channel model (Int, default 0, 0 means disabled). Create PATCH /api/channels/[channelId] to accept slowModeSeconds. In the Socket.io message:create handler, check if user's last message in the channel was within the slow mode window \u2014 reject if too soon. Return error with seconds remaining."
     },

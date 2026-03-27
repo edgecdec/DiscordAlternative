@@ -718,3 +718,12 @@
 - Rebuilt the app so NEXT_PUBLIC_LIVEKIT_URL is baked into the client bundle.
 - Updated .env.example to use wss:// instead of ws://.
 - Lesson: LiveKit needs a proper UDP port range for ICE candidates, not a single port. Also, if you want WSS, use nginx SSL termination on a separate port rather than trying to share the port with LiveKit.
+
+## TASK-091: Implement slow mode for channels (2026-03-27)
+- Added `slowModeSeconds` Int field (default 0) to Channel model in Prisma
+- Updated PATCH /api/channels/[channelId] to accept `slowModeSeconds` (0-300) alongside `name`, made both fields optional
+- Added SLOW_MODE_MAX_SECONDS=300 constant
+- Added slow mode enforcement in server.js message:create handler: queries user's last message in channel, rejects with `message:error` event if within cooldown window
+- OWNER/ADMIN roles are exempt from slow mode
+- Added `MessageErrorPayload` and `message:error` event to socket types
+- Lesson: When updating a PATCH route to accept new fields, make all fields optional and only update what's provided — avoids breaking existing callers that only send `name`.

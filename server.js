@@ -206,13 +206,31 @@ app.prepare().then(() => {
         if (!content || typeof content !== "string" || content.trim().length === 0 || content.length > 2000) return;
         const channel = await prisma.channel.findUnique({
           where: { id: channelId },
-          select: { serverId: true },
+          select: { serverId: true, slowModeSeconds: true },
         });
         if (!channel) return;
         const member = await prisma.serverMember.findUnique({
           where: { userId_serverId: { userId: socket.data.userId, serverId: channel.serverId } },
         });
         if (!member) return;
+
+        // Slow mode enforcement (skip for OWNER/ADMIN)
+        if (channel.slowModeSeconds > 0 && !["OWNER", "ADMIN"].includes(member.role)) {
+          const lastMsg = await prisma.message.findFirst({
+            where: { channelId, authorId: socket.data.userId },
+            orderBy: { createdAt: "desc" },
+            select: { createdAt: true },
+          });
+          if (lastMsg) {
+            const elapsed = (Date.now() - lastMsg.createdAt.getTime()) / 1000;
+            if (elapsed < channel.slowModeSeconds) {
+              const remaining = Math.ceil(channel.slowModeSeconds - elapsed);
+              socket.emit("message:error", { error: `Slow mode: wait ${remaining}s`, remaining });
+              return;
+            }
+          }
+        }
+
         const message = await prisma.message.create({
           data: {
             content: content.trim(),

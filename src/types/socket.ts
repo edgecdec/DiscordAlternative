@@ -131,11 +131,17 @@ export interface DMCreatePayload {
   fileUrl?: string;
 }
 
+export interface MessageErrorPayload {
+  error: string;
+  remaining?: number;
+}
+
 // Typed Socket.io event interfaces
 export interface ServerToClientEvents {
   "message:new": (message: SocketMessage) => void;
   "message:updated": (message: SocketMessage) => void;
   "message:deleted": (payload: MessageDeletedPayload) => void;
+  "message:error": (payload: MessageErrorPayload) => void;
   "reaction:add": (payload: ReactionBroadcastPayload) => void;
   "reaction:remove": (payload: ReactionBroadcastPayload) => void;
   "presence:online": (payload: PresenceOnlinePayload) => void;

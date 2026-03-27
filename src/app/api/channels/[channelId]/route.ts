@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
-import { CHANNEL_NAME_MIN, CHANNEL_NAME_MAX } from "@/lib/constants";
+import { CHANNEL_NAME_MIN, CHANNEL_NAME_MAX, SLOW_MODE_MAX_SECONDS } from "@/lib/constants";
 import { logAudit } from "@/lib/auditLog";
 
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
@@ -33,17 +33,37 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   const result = await getChannelAndValidateAdmin(channelId, user.userId);
   if ("error" in result) return NextResponse.json({ error: result.error }, { status: result.status });
 
-  const { name } = (await req.json()) as { name?: string };
-  if (!name || name.trim().length < CHANNEL_NAME_MIN || name.trim().length > CHANNEL_NAME_MAX) {
-    return NextResponse.json(
-      { error: `Channel name must be ${CHANNEL_NAME_MIN}-${CHANNEL_NAME_MAX} characters` },
-      { status: 400 }
-    );
+  const body = (await req.json()) as { name?: string; slowModeSeconds?: number };
+  const data: { name?: string; slowModeSeconds?: number } = {};
+
+  if (body.name !== undefined) {
+    const trimmed = body.name.trim();
+    if (trimmed.length < CHANNEL_NAME_MIN || trimmed.length > CHANNEL_NAME_MAX) {
+      return NextResponse.json(
+        { error: `Channel name must be ${CHANNEL_NAME_MIN}-${CHANNEL_NAME_MAX} characters` },
+        { status: 400 }
+      );
+    }
+    data.name = trimmed;
+  }
+
+  if (body.slowModeSeconds !== undefined) {
+    if (typeof body.slowModeSeconds !== "number" || !Number.isInteger(body.slowModeSeconds) || body.slowModeSeconds < 0 || body.slowModeSeconds > SLOW_MODE_MAX_SECONDS) {
+      return NextResponse.json(
+        { error: `slowModeSeconds must be 0-${SLOW_MODE_MAX_SECONDS}` },
+        { status: 400 }
+      );
+    }
+    data.slowModeSeconds = body.slowModeSeconds;
+  }
+
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
   }
 
   const updated = await prisma.channel.update({
     where: { id: channelId },
-    data: { name: name.trim() },
+    data,
   });
 
   return NextResponse.json({ channel: updated });
