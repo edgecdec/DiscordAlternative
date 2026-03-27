@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
+import { logAudit } from "@/lib/auditLog";
 
 const VALID_ROLES = ["ADMIN", "MODERATOR", "GUEST"];
 
@@ -39,6 +40,12 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     include: { user: { select: { id: true, username: true, avatarUrl: true } } },
   });
 
+  await logAudit(serverId, user.userId, "member_role_change", target.userId, {
+    username: updated.user.username,
+    oldRole: target.role,
+    newRole: role,
+  });
+
   return NextResponse.json({ member: updated });
 }
 
@@ -57,6 +64,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
 
   const target = await prisma.serverMember.findUnique({
     where: { id: memberId, serverId },
+    include: { user: { select: { username: true } } },
   });
   if (!target) return NextResponse.json({ error: "Member not found" }, { status: 404 });
 
@@ -65,6 +73,10 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   }
 
   await prisma.serverMember.delete({ where: { id: memberId } });
+
+  await logAudit(serverId, user.userId, "member_kick", target.userId, {
+    username: target.user.username,
+  });
 
   return new NextResponse(null, { status: 204 });
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
 import { CHANNEL_NAME_MIN, CHANNEL_NAME_MAX } from "@/lib/constants";
+import { logAudit } from "@/lib/auditLog";
 
 const VALID_CHANNEL_TYPES = ["TEXT", "VOICE", "VIDEO"] as const;
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
@@ -56,6 +57,11 @@ export async function POST(
       serverId,
       ...(categoryId ? { categoryId } : {}),
     },
+  });
+
+  await logAudit(serverId, user.userId, "channel_create", channel.id, {
+    name: channel.name,
+    type: channel.type,
   });
 
   return NextResponse.json({ channel }, { status: 201 });

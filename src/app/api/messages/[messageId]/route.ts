@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
 import { MESSAGE_MAX } from "@/lib/constants";
+import { logAudit } from "@/lib/auditLog";
 
 interface RouteParams {
   params: Promise<{ messageId: string }>;
@@ -63,17 +64,17 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Message not found" }, { status: 404 });
   }
 
+  const channel = await prisma.channel.findUnique({
+    where: { id: message.channelId },
+    select: { serverId: true },
+  });
+  if (!channel) {
+    return NextResponse.json({ error: "Channel not found" }, { status: 404 });
+  }
+
   const isAuthor = message.authorId === user.userId;
 
   if (!isAuthor) {
-    const channel = await prisma.channel.findUnique({
-      where: { id: message.channelId },
-      select: { serverId: true },
-    });
-    if (!channel) {
-      return NextResponse.json({ error: "Channel not found" }, { status: 404 });
-    }
-
     const membership = await prisma.serverMember.findUnique({
       where: { userId_serverId: { userId: user.userId, serverId: channel.serverId } },
       select: { role: true },
@@ -92,6 +93,12 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       author: { select: { id: true, username: true, avatarUrl: true } },
     },
   });
+
+  if (!isAuthor) {
+    await logAudit(channel.serverId, user.userId, "message_delete", messageId, {
+      authorUsername: updated.author.username,
+    });
+  }
 
   return NextResponse.json({ message: updated });
 }

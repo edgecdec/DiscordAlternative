@@ -935,7 +935,7 @@
       "title": "Create audit log database model and API",
       "spec": "specs/database.md",
       "priority": 89,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add AuditLog model to Prisma: id, serverId, userId, action (String: member_kick, member_role_change, channel_create, channel_delete, message_delete, server_update), targetId, details (String, JSON), createdAt. Log actions automatically in the relevant API routes. Create GET /api/servers/[serverId]/audit-log \u2014 OWNER/ADMIN only, paginated."
     },

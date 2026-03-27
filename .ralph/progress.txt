@@ -692,3 +692,11 @@
 - Used usePathname from next/navigation for reactive DM active state detection in sidebar
 - Lesson: MessageList and MessageInput are tightly coupled to channel concepts (channelId, serverId, reactions, replies, mentions, typing indicators) — creating simpler DM-specific versions was cleaner than trying to make the channel components generic
 - Lesson: Deploy webhook may rebuild during test window — first Nova Act test hit a rebuild cycle and failed, second attempt passed after waiting for build to complete
+
+## TASK-089: Create audit log database model and API (2026-03-27)
+- Added AuditLog model to Prisma schema with serverId, userId, action, targetId, details fields
+- Created src/lib/auditLog.ts helper with typed AuditAction union and logAudit() function
+- Created GET /api/servers/[serverId]/audit-log — OWNER/ADMIN only, cursor-based pagination
+- Added audit logging to: member role change, member kick, channel create, channel delete, admin message delete, server update
+- Lesson: After adding a new Prisma model, must run `npx prisma generate` before tsc will recognize the new model on the client — `migrate dev` alone doesn't update the generated client in all cases
+- Lesson: Message delete audit only logs admin-initiated deletes (not self-deletes) to keep the log meaningful

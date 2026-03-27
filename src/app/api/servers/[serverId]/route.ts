@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
 import { SERVER_NAME_MIN, SERVER_NAME_MAX, AVATAR_URL_MAX } from "@/lib/constants";
+import { logAudit } from "@/lib/auditLog";
 
 interface RouteParams {
   params: Promise<{ serverId: string }>;
@@ -94,6 +95,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     where: { id: serverId },
     data,
   });
+
+  await logAudit(serverId, user.userId, "server_update", serverId, data);
 
   return NextResponse.json({ server });
 }

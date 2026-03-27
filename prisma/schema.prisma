@@ -21,6 +21,7 @@ model User {
   reactions    Reaction[]
   sentDMs      DirectMessage[] @relation("DMSender")
   receivedDMs  DirectMessage[] @relation("DMReceiver")
+  auditLogs    AuditLog[]
 }
 
 model Server {
@@ -35,6 +36,7 @@ model Server {
   channels   Channel[]
   members    ServerMember[]
   categories ChannelCategory[]
+  auditLogs  AuditLog[]
 }
 
 model Channel {
@@ -114,6 +116,20 @@ model ChannelCategory {
   serverId String
   server   Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
   channels Channel[]
+
+  @@index([serverId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  serverId  String
+  server    Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  targetId  String?
+  details   String?
+  createdAt DateTime @default(now())
 
   @@index([serverId])
 }

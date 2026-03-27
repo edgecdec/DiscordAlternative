@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
 import { CHANNEL_NAME_MIN, CHANNEL_NAME_MAX } from "@/lib/constants";
+import { logAudit } from "@/lib/auditLog";
 
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
 
@@ -68,6 +69,11 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   }
 
   await prisma.channel.delete({ where: { id: channelId } });
+
+  await logAudit(result.channel.serverId, user.userId, "channel_delete", channelId, {
+    name: result.channel.name,
+    type: result.channel.type,
+  });
 
   return new NextResponse(null, { status: 204 });
 }
