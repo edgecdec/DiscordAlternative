@@ -809,7 +809,7 @@
       "title": "Implement @mention parsing and highlighting",
       "spec": "specs/socket-events.md",
       "priority": 75,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [],
       "description": "When a message contains @username, the server should check if that user is a member of the server. In MessageList, parse @username patterns and render them as highlighted styled spans (primary color, clickable). Add a Socket.io event mention:notify that alerts the mentioned user."
     },
@@ -965,6 +965,204 @@
       "status": "open",
       "dependencies": [],
       "description": "In MessageInput, if the channel has slow mode enabled and user recently sent a message, disable the input and show a countdown timer. In channel settings (accessible from channel header), OWNER/ADMIN can set slow mode duration (off, 5s, 10s, 30s, 1m, 5m). Show a clock icon in the channel header when slow mode is active."
+    },
+    {
+      "id": "TASK-093",
+      "title": "Implement message pinning API",
+      "spec": "specs/database.md",
+      "priority": 93,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add pinned Boolean field to Message model (default false). Create POST /api/messages/[messageId]/pin \u2014 toggles pinned status. OWNER/ADMIN/MODERATOR only. Create GET /api/channels/[channelId]/pins \u2014 returns all pinned messages in a channel. Broadcast pin:toggle via Socket.io."
+    },
+    {
+      "id": "TASK-094",
+      "title": "Build pinned messages UI",
+      "spec": "specs/ui-layout.md",
+      "priority": 94,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a pin icon in the channel header. Clicking opens a drawer/panel showing pinned messages. Add a pin button on message hover (for permitted roles). Pinned messages show a small pin icon. Notify channel via Socket.io when a message is pinned/unpinned."
+    },
+    {
+      "id": "TASK-095",
+      "title": "Show edit indicator on edited messages",
+      "spec": "specs/ui-layout.md",
+      "priority": 95,
+      "status": "open",
+      "dependencies": [],
+      "description": "In MessageList, if a message's updatedAt differs from createdAt and it's not deleted, show a small '(edited)' label next to the timestamp. Tooltip on hover shows the edit timestamp."
+    },
+    {
+      "id": "TASK-096",
+      "title": "Implement custom server emoji upload",
+      "spec": "specs/database.md",
+      "priority": 96,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add ServerEmoji model: id, name (String, unique per server), imageUrl, serverId, uploadedById, createdAt. Create POST /api/servers/[serverId]/emoji \u2014 upload custom emoji image (max 256KB, 128x128). Create GET /api/servers/[serverId]/emoji \u2014 list all. Create DELETE. OWNER/ADMIN only for upload/delete."
+    },
+    {
+      "id": "TASK-097",
+      "title": "Integrate custom emoji into emoji picker and messages",
+      "spec": "specs/ui-layout.md",
+      "priority": 97,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a 'Server' tab to the emoji picker showing custom emoji for the current server. When a custom emoji is used in a message (syntax :emoji_name:), render the image inline. Parse and display in MessageList."
+    },
+    {
+      "id": "TASK-098",
+      "title": "Implement thread creation from messages",
+      "spec": "specs/database.md",
+      "priority": 98,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add Thread model: id, name, parentMessageId, channelId, creatorId, createdAt, archived Boolean. A thread is a sub-conversation spawned from a message. Create POST /api/messages/[messageId]/thread \u2014 creates a thread. Messages in a thread have a threadId field. Create GET /api/threads/[threadId]/messages."
+    },
+    {
+      "id": "TASK-099",
+      "title": "Build thread UI",
+      "spec": "specs/ui-layout.md",
+      "priority": 99,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a 'Create Thread' button on message hover. Clicking opens a side panel showing the thread conversation (reuse MessageList/MessageInput). Show thread reply count on the parent message. Thread panel slides in from the right, overlaying or beside the main chat."
+    },
+    {
+      "id": "TASK-100",
+      "title": "Show who's in voice channels",
+      "spec": "specs/ui-layout.md",
+      "priority": 100,
+      "status": "open",
+      "dependencies": [],
+      "description": "In ChannelPanel, under each voice channel, show avatars/usernames of users currently connected. Use LiveKit room participant list or track via Socket.io events voice:join/voice:leave. Show participant count next to the channel name."
+    },
+    {
+      "id": "TASK-101",
+      "title": "Add notification sounds",
+      "spec": "specs/ui-layout.md",
+      "priority": 101,
+      "status": "open",
+      "dependencies": [],
+      "description": "Play a subtle notification sound when: a new message arrives in a channel you're not viewing, someone mentions you, you receive a DM. Use the Web Audio API with a small embedded sound. Add a mute toggle in user settings (persist to localStorage). No sound for your own messages."
+    },
+    {
+      "id": "TASK-102",
+      "title": "Add markdown rendering to messages",
+      "spec": "specs/ui-layout.md",
+      "priority": 102,
+      "status": "open",
+      "dependencies": [],
+      "description": "Parse message content as basic markdown: **bold**, *italic*, ~~strikethrough~~, `inline code`, ```code blocks```. Use a lightweight parser (regex-based, no external library). Render in MessageList with appropriate MUI Typography styles. Keep it simple \u2014 no full markdown spec."
+    },
+    {
+      "id": "TASK-103",
+      "title": "Add channel topic/description",
+      "spec": "specs/database.md",
+      "priority": 103,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add topic field to Channel model (String, optional, max 1024 chars). Create PATCH /api/channels/[channelId] to accept { topic }. OWNER/ADMIN only."
+    },
+    {
+      "id": "TASK-104",
+      "title": "Display channel topic in header",
+      "spec": "specs/ui-layout.md",
+      "priority": 104,
+      "status": "open",
+      "dependencies": [],
+      "description": "Show the channel topic as a subtitle in the channel header area. Truncate with ellipsis if long. Clicking expands to show full topic. Editable inline for OWNER/ADMIN."
+    },
+    {
+      "id": "TASK-105",
+      "title": "Implement user ban API",
+      "spec": "specs/database.md",
+      "priority": 105,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add BannedUser model: id, userId, serverId, reason (optional String), bannedById, createdAt. @@unique([userId, serverId]). Create POST /api/servers/[serverId]/bans \u2014 ban a user (OWNER/ADMIN). Removes their ServerMember and prevents rejoin via invite. Create DELETE to unban. Create GET to list bans."
+    },
+    {
+      "id": "TASK-106",
+      "title": "Build ban management UI",
+      "spec": "specs/ui-layout.md",
+      "priority": 106,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add ban option to member context menu in MemberList and server settings members tab. Show confirmation dialog with optional reason field. Add a 'Bans' tab in server settings showing banned users with unban button. OWNER/ADMIN only."
+    },
+    {
+      "id": "TASK-107",
+      "title": "Implement read receipts",
+      "spec": "specs/socket-events.md",
+      "priority": 107,
+      "status": "open",
+      "dependencies": [],
+      "description": "When a user views a channel, broadcast read:update { userId, channelId, lastReadMessageId } to other users in that channel via Socket.io. In MessageList, show small avatars of users who have read up to each message (only show for the last few messages to avoid clutter)."
+    },
+    {
+      "id": "TASK-108",
+      "title": "Implement server icon upload",
+      "spec": "specs/servers.md",
+      "priority": 108,
+      "status": "open",
+      "dependencies": [],
+      "description": "Update server creation and settings to allow uploading a server icon image. Use the existing /api/upload endpoint. Store the URL in Server.imageUrl. In ServerSidebar, show the uploaded image in the Avatar instead of the first letter. Crop/resize to fit the circular avatar."
+    },
+    {
+      "id": "TASK-109",
+      "title": "Add drag-and-drop file upload to chat",
+      "spec": "specs/ui-layout.md",
+      "priority": 109,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a drop zone overlay to the channel view. When user drags a file over the chat area, show a visual indicator. On drop, upload via /api/upload and send as a message with fileUrl. Support multiple files (one message per file)."
+    },
+    {
+      "id": "TASK-110",
+      "title": "Add delete confirmation dialog for messages",
+      "spec": "specs/ui-layout.md",
+      "priority": 110,
+      "status": "open",
+      "dependencies": [],
+      "description": "When clicking delete on a message, show a MUI Dialog confirming the action with the message content preview. 'Delete' button in red. Cancel to dismiss. Prevents accidental deletions."
+    },
+    {
+      "id": "TASK-111",
+      "title": "Implement leave server functionality",
+      "spec": "specs/servers.md",
+      "priority": 111,
+      "status": "open",
+      "dependencies": [],
+      "description": "Create POST /api/servers/[serverId]/leave \u2014 removes the authenticated user's ServerMember. Cannot leave if you're the OWNER (must transfer or delete). Add a 'Leave Server' option in server settings or right-click server icon context menu. Redirect to home after leaving."
+    },
+    {
+      "id": "TASK-112",
+      "title": "Implement per-channel notification settings",
+      "spec": "specs/database.md",
+      "priority": 112,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add ChannelNotificationSetting model: id, userId, channelId, muted Boolean (default false). @@unique([userId, channelId]). Create PATCH /api/channels/[channelId]/notifications \u2014 toggle mute. Muted channels don't trigger notification sounds or unread indicators. Add a bell/mute icon toggle in the channel header."
+    },
+    {
+      "id": "TASK-113",
+      "title": "Support paste-to-upload images in chat",
+      "spec": "specs/ui-layout.md",
+      "priority": 113,
+      "status": "open",
+      "dependencies": [],
+      "description": "Listen for paste events in MessageInput. If clipboard contains an image (e.g. screenshot), upload it via /api/upload and attach to the message. Show a preview before sending. Common workflow: screenshot \u2192 Cmd+V \u2192 send."
+    },
+    {
+      "id": "TASK-114",
+      "title": "Show Socket.io connection status",
+      "spec": "specs/ui-layout.md",
+      "priority": 114,
+      "status": "open",
+      "dependencies": [],
+      "description": "Show a small banner or indicator when the Socket.io connection is lost (e.g. yellow bar: 'Reconnecting...'). Auto-dismiss when reconnected. Show 'Connected' briefly on reconnect. Helps users understand why messages might not be appearing in real-time."
     }
   ]
 }

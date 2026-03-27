@@ -573,3 +573,10 @@
 - MessageInput sends replyToId when replying, clears reply state on send
 - Reply state resets on channel change
 - Lessons: Nova Act hover actions fail with INVALID_INPUT errors — use Playwright's .hover() directly instead. MUI TextField's textarea selector needs get_by_placeholder, not generic textarea selector (hidden textarea confuses Playwright).
+
+## TASK-075: Implement @mention parsing and highlighting (2026-03-26)
+- Added `MentionNotifyPayload` type and `mention:notify` event to socket types
+- Server-side: In `message:create` handler, parse @username patterns from message content, look up server members, emit `mention:notify` to each mentioned user's sockets (excluding sender)
+- Client-side: Created `MentionText` component that splits message content on `@(\w+)` regex and renders mentions as highlighted `<span>` elements with `primary.main` color and `action.hover` background
+- Updated `MessageList` to use `MentionText` for rendering non-deleted message content
+- Lessons: Starting Nova Act from `about:blank` then injecting cookies before navigating avoids race conditions. The deploy script takes ~60s to rebuild, so 500s during that window are expected.
