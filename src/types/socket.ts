@@ -23,6 +23,7 @@ export interface SocketMessage {
   content: string;
   fileUrl: string | null;
   deleted: boolean;
+  pinned?: boolean;
   createdAt: string;
   updatedAt: string;
   channelId: string;
@@ -136,6 +137,12 @@ export interface MessageErrorPayload {
   remaining?: number;
 }
 
+export interface PinTogglePayload {
+  messageId: string;
+  pinned: boolean;
+  channelId: string;
+}
+
 // Typed Socket.io event interfaces
 export interface ServerToClientEvents {
   "message:new": (message: SocketMessage) => void;
@@ -151,11 +158,16 @@ export interface ServerToClientEvents {
   "typing:start": (payload: TypingBroadcastPayload) => void;
   "typing:stop": (payload: TypingBroadcastPayload) => void;
   "mention:notify": (payload: MentionNotifyPayload) => void;
+  "pin:toggle": (payload: PinTogglePayload) => void;
   "dm:new": (payload: DirectMessagePayload) => void;
 }
 
 export interface StatusUpdatePayload {
   status: string;
+}
+
+export interface PinToggleClientPayload {
+  messageId: string;
 }
 
 export interface ClientToServerEvents {
@@ -165,6 +177,7 @@ export interface ClientToServerEvents {
   "message:update": (payload: MessageUpdatePayload) => void;
   "message:delete": (payload: MessageDeletePayload) => void;
   "reaction:toggle": (payload: ReactionTogglePayload) => void;
+  "pin:toggle": (payload: PinToggleClientPayload) => void;
   "presence:list": (payload: PresenceListPayload) => void;
   "presence:status": (payload: StatusUpdatePayload) => void;
   "typing:start": (payload: TypingPayload) => void;

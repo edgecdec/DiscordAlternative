@@ -384,6 +384,33 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("pin:toggle", async ({ messageId }) => {
+      try {
+        if (!messageId) return;
+        const message = await prisma.message.findUnique({
+          where: { id: messageId },
+          select: { id: true, deleted: true, pinned: true, channelId: true, channel: { select: { serverId: true } } },
+        });
+        if (!message || message.deleted) return;
+        const member = await prisma.serverMember.findUnique({
+          where: { userId_serverId: { userId: socket.data.userId, serverId: message.channel.serverId } },
+          select: { role: true },
+        });
+        if (!member || !["OWNER", "ADMIN", "MODERATOR"].includes(member.role)) return;
+        await prisma.message.update({
+          where: { id: messageId },
+          data: { pinned: !message.pinned },
+        });
+        io.to(`channel:${message.channelId}`).emit("pin:toggle", {
+          messageId,
+          pinned: !message.pinned,
+          channelId: message.channelId,
+        });
+      } catch (err) {
+        console.error("pin:toggle error:", err);
+      }
+    });
+
     const VALID_STATUSES = ["online", "away", "dnd", "offline"];
 
     socket.on("presence:status", async ({ status }) => {

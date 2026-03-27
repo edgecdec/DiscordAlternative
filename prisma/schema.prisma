@@ -59,6 +59,7 @@ model Message {
   content   String
   fileUrl   String?
   deleted   Boolean    @default(false)
+  pinned    Boolean    @default(false)
   authorId  String
   author    User       @relation(fields: [authorId], references: [id])
   channelId String
