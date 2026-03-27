@@ -985,10 +985,19 @@
       "description": "Add pinned Boolean field to Message model (default false). Create POST /api/messages/[messageId]/pin \u2014 toggles pinned status. OWNER/ADMIN/MODERATOR only. Create GET /api/channels/[channelId]/pins \u2014 returns all pinned messages in a channel. Broadcast pin:toggle via Socket.io."
     },
     {
+      "id": "TASK-151",
+      "title": "Persist voice channel connection across page navigation",
+      "spec": "specs/webrtc.md",
+      "priority": 95,
+      "status": "open",
+      "dependencies": [],
+      "description": "BUG: Navigating away from a voice channel disconnects you. In Discord, voice persists while you browse text channels. Fix: lift the LiveKit connection state out of the channel page into a global context/provider (e.g. VoiceProvider wrapping the app in layout.tsx). Store the active voice channelId and token in context. The LiveKitRoom component renders in the layout, not the channel page. Show a small 'Connected to Voice' bar at the bottom of ChannelPanel showing the voice channel name, a disconnect button, and mic/deafen toggles \u2014 so the user can control voice from anywhere. Clicking the voice channel name navigates back to it."
+    },
+    {
       "id": "TASK-148",
       "title": "Add noise gate / voice activity detection to voice channels",
       "spec": "specs/webrtc.md",
-      "priority": 95,
+      "priority": 96,
       "status": "open",
       "dependencies": [],
       "description": "BUG: Background noise is transmitted in voice channels. Enable LiveKit's built-in noise suppression by setting audioCaptureDefaults in the LiveKitRoom component: { noiseSuppression: true, autoGainControl: true, echoCancellation: true }. Additionally, configure voice activity detection so the mic only transmits when the user is actually speaking \u2014 set publishDefaults with dtx (discontinuous transmission) enabled. This prevents constant background noise from being broadcast."
@@ -997,7 +1006,7 @@
       "id": "TASK-149",
       "title": "Preserve invite redirect through registration flow",
       "spec": "specs/auth.md",
-      "priority": 96,
+      "priority": 97,
       "status": "open",
       "dependencies": [],
       "description": "BUG: If a user clicks an invite link (e.g. /invite/ABC123) but isn't logged in, they get redirected to the login page. After registering, they land on the home page instead of being taken to the invite. Fix: when redirecting unauthenticated users to login, store the original URL (e.g. in a query param like /login?redirect=/invite/ABC123 or in sessionStorage). After successful login/register, redirect to that stored URL instead of the default home page."
@@ -1006,7 +1015,7 @@
       "id": "TASK-150",
       "title": "Fix image/file upload failing",
       "spec": "specs/deployment.md",
-      "priority": 97,
+      "priority": 98,
       "status": "open",
       "dependencies": [],
       "description": "BUG: Image uploads fail when sending messages. Diagnose: 1) Check /api/upload route exists and works \u2014 curl a test upload from the server. 2) Check the uploads/ directory exists on the server and is writable. 3) Check server.js serves the uploads/ directory as static files. 4) Check nginx passes requests to /uploads/ correctly. 5) Check file size limits match constants.ts FILE_UPLOAD_MAX_BYTES. 6) Check the MessageInput attachment flow actually calls /api/upload before sending the message. Fix whatever is broken and verify by uploading an image in chat."
@@ -1015,7 +1024,7 @@
       "id": "TASK-094",
       "title": "Build pinned messages UI",
       "spec": "specs/ui-layout.md",
-      "priority": 104,
+      "priority": 105,
       "status": "open",
       "dependencies": [],
       "description": "Add a pin icon in the channel header. Clicking opens a drawer/panel showing pinned messages. Add a pin button on message hover (for permitted roles). Pinned messages show a small pin icon. Notify channel via Socket.io when a message is pinned/unpinned."
@@ -1024,7 +1033,7 @@
       "id": "TASK-095",
       "title": "Show edit indicator on edited messages",
       "spec": "specs/ui-layout.md",
-      "priority": 105,
+      "priority": 106,
       "status": "open",
       "dependencies": [],
       "description": "In MessageList, if a message's updatedAt differs from createdAt and it's not deleted, show a small '(edited)' label next to the timestamp. Tooltip on hover shows the edit timestamp."
@@ -1033,7 +1042,7 @@
       "id": "TASK-096",
       "title": "Implement custom server emoji upload",
       "spec": "specs/database.md",
-      "priority": 106,
+      "priority": 107,
       "status": "open",
       "dependencies": [],
       "description": "Add ServerEmoji model: id, name (String, unique per server), imageUrl, serverId, uploadedById, createdAt. Create POST /api/servers/[serverId]/emoji \u2014 upload custom emoji image (max 256KB, 128x128). Create GET /api/servers/[serverId]/emoji \u2014 list all. Create DELETE. OWNER/ADMIN only for upload/delete."
@@ -1042,7 +1051,7 @@
       "id": "TASK-097",
       "title": "Integrate custom emoji into emoji picker and messages",
       "spec": "specs/ui-layout.md",
-      "priority": 107,
+      "priority": 108,
       "status": "open",
       "dependencies": [],
       "description": "Add a 'Server' tab to the emoji picker showing custom emoji for the current server. When a custom emoji is used in a message (syntax :emoji_name:), render the image inline. Parse and display in MessageList."
@@ -1051,7 +1060,7 @@
       "id": "TASK-098",
       "title": "Implement thread creation from messages",
       "spec": "specs/database.md",
-      "priority": 108,
+      "priority": 109,
       "status": "open",
       "dependencies": [],
       "description": "Add Thread model: id, name, parentMessageId, channelId, creatorId, createdAt, archived Boolean. A thread is a sub-conversation spawned from a message. Create POST /api/messages/[messageId]/thread \u2014 creates a thread. Messages in a thread have a threadId field. Create GET /api/threads/[threadId]/messages."
@@ -1060,7 +1069,7 @@
       "id": "TASK-099",
       "title": "Build thread UI",
       "spec": "specs/ui-layout.md",
-      "priority": 109,
+      "priority": 110,
       "status": "open",
       "dependencies": [],
       "description": "Add a 'Create Thread' button on message hover. Clicking opens a side panel showing the thread conversation (reuse MessageList/MessageInput). Show thread reply count on the parent message. Thread panel slides in from the right, overlaying or beside the main chat."
@@ -1069,7 +1078,7 @@
       "id": "TASK-100",
       "title": "Show who's in voice channels",
       "spec": "specs/ui-layout.md",
-      "priority": 110,
+      "priority": 111,
       "status": "open",
       "dependencies": [],
       "description": "In ChannelPanel, under each voice channel, show avatars/usernames of users currently connected. Use LiveKit room participant list or track via Socket.io events voice:join/voice:leave. Show participant count next to the channel name."
@@ -1078,7 +1087,7 @@
       "id": "TASK-101",
       "title": "Add notification sounds",
       "spec": "specs/ui-layout.md",
-      "priority": 111,
+      "priority": 112,
       "status": "open",
       "dependencies": [],
       "description": "Play a subtle notification sound when: a new message arrives in a channel you're not viewing, someone mentions you, you receive a DM. Use the Web Audio API with a small embedded sound. Add a mute toggle in user settings (persist to localStorage). No sound for your own messages."
@@ -1087,7 +1096,7 @@
       "id": "TASK-102",
       "title": "Add markdown rendering to messages",
       "spec": "specs/ui-layout.md",
-      "priority": 112,
+      "priority": 113,
       "status": "open",
       "dependencies": [],
       "description": "Parse message content as basic markdown: **bold**, *italic*, ~~strikethrough~~, `inline code`, ```code blocks```. Use a lightweight parser (regex-based, no external library). Render in MessageList with appropriate MUI Typography styles. Keep it simple \u2014 no full markdown spec."
@@ -1096,7 +1105,7 @@
       "id": "TASK-103",
       "title": "Add channel topic/description",
       "spec": "specs/database.md",
-      "priority": 113,
+      "priority": 114,
       "status": "open",
       "dependencies": [],
       "description": "Add topic field to Channel model (String, optional, max 1024 chars). Create PATCH /api/channels/[channelId] to accept { topic }. OWNER/ADMIN only."
@@ -1105,7 +1114,7 @@
       "id": "TASK-104",
       "title": "Display channel topic in header",
       "spec": "specs/ui-layout.md",
-      "priority": 114,
+      "priority": 115,
       "status": "open",
       "dependencies": [],
       "description": "Show the channel topic as a subtitle in the channel header area. Truncate with ellipsis if long. Clicking expands to show full topic. Editable inline for OWNER/ADMIN."
@@ -1114,7 +1123,7 @@
       "id": "TASK-105",
       "title": "Implement user ban API",
       "spec": "specs/database.md",
-      "priority": 115,
+      "priority": 116,
       "status": "open",
       "dependencies": [],
       "description": "Add BannedUser model: id, userId, serverId, reason (optional String), bannedById, createdAt. @@unique([userId, serverId]). Create POST /api/servers/[serverId]/bans \u2014 ban a user (OWNER/ADMIN). Removes their ServerMember and prevents rejoin via invite. Create DELETE to unban. Create GET to list bans."
@@ -1123,7 +1132,7 @@
       "id": "TASK-106",
       "title": "Build ban management UI",
       "spec": "specs/ui-layout.md",
-      "priority": 116,
+      "priority": 117,
       "status": "open",
       "dependencies": [],
       "description": "Add ban option to member context menu in MemberList and server settings members tab. Show confirmation dialog with optional reason field. Add a 'Bans' tab in server settings showing banned users with unban button. OWNER/ADMIN only."
@@ -1132,7 +1141,7 @@
       "id": "TASK-107",
       "title": "Implement read receipts",
       "spec": "specs/socket-events.md",
-      "priority": 117,
+      "priority": 118,
       "status": "open",
       "dependencies": [],
       "description": "When a user views a channel, broadcast read:update { userId, channelId, lastReadMessageId } to other users in that channel via Socket.io. In MessageList, show small avatars of users who have read up to each message (only show for the last few messages to avoid clutter)."
@@ -1141,7 +1150,7 @@
       "id": "TASK-108",
       "title": "Implement server icon upload",
       "spec": "specs/servers.md",
-      "priority": 118,
+      "priority": 119,
       "status": "open",
       "dependencies": [],
       "description": "Update server creation and settings to allow uploading a server icon image. Use the existing /api/upload endpoint. Store the URL in Server.imageUrl. In ServerSidebar, show the uploaded image in the Avatar instead of the first letter. Crop/resize to fit the circular avatar."
@@ -1150,7 +1159,7 @@
       "id": "TASK-109",
       "title": "Add drag-and-drop file upload to chat",
       "spec": "specs/ui-layout.md",
-      "priority": 119,
+      "priority": 120,
       "status": "open",
       "dependencies": [],
       "description": "Add a drop zone overlay to the channel view. When user drags a file over the chat area, show a visual indicator. On drop, upload via /api/upload and send as a message with fileUrl. Support multiple files (one message per file)."
@@ -1159,7 +1168,7 @@
       "id": "TASK-110",
       "title": "Add delete confirmation dialog for messages",
       "spec": "specs/ui-layout.md",
-      "priority": 120,
+      "priority": 121,
       "status": "open",
       "dependencies": [],
       "description": "When clicking delete on a message, show a MUI Dialog confirming the action with the message content preview. 'Delete' button in red. Cancel to dismiss. Prevents accidental deletions."
@@ -1168,7 +1177,7 @@
       "id": "TASK-111",
       "title": "Implement leave server functionality",
       "spec": "specs/servers.md",
-      "priority": 121,
+      "priority": 122,
       "status": "open",
       "dependencies": [],
       "description": "Create POST /api/servers/[serverId]/leave \u2014 removes the authenticated user's ServerMember. Cannot leave if you're the OWNER (must transfer or delete). Add a 'Leave Server' option in server settings or right-click server icon context menu. Redirect to home after leaving."
@@ -1177,7 +1186,7 @@
       "id": "TASK-112",
       "title": "Implement per-channel notification settings",
       "spec": "specs/database.md",
-      "priority": 122,
+      "priority": 123,
       "status": "open",
       "dependencies": [],
       "description": "Add ChannelNotificationSetting model: id, userId, channelId, muted Boolean (default false). @@unique([userId, channelId]). Create PATCH /api/channels/[channelId]/notifications \u2014 toggle mute. Muted channels don't trigger notification sounds or unread indicators. Add a bell/mute icon toggle in the channel header."
@@ -1186,7 +1195,7 @@
       "id": "TASK-113",
       "title": "Support paste-to-upload images in chat",
       "spec": "specs/ui-layout.md",
-      "priority": 123,
+      "priority": 124,
       "status": "open",
       "dependencies": [],
       "description": "Listen for paste events in MessageInput. If clipboard contains an image (e.g. screenshot), upload it via /api/upload and attach to the message. Show a preview before sending. Common workflow: screenshot \u2192 Cmd+V \u2192 send."
@@ -1195,7 +1204,7 @@
       "id": "TASK-114",
       "title": "Show Socket.io connection status",
       "spec": "specs/ui-layout.md",
-      "priority": 124,
+      "priority": 125,
       "status": "open",
       "dependencies": [],
       "description": "Show a small banner or indicator when the Socket.io connection is lost (e.g. yellow bar: 'Reconnecting...'). Auto-dismiss when reconnected. Show 'Connected' briefly on reconnect. Helps users understand why messages might not be appearing in real-time."
@@ -1204,7 +1213,7 @@
       "id": "TASK-115",
       "title": "Auto-scroll to newest messages and 'jump to bottom' button",
       "spec": "specs/ui-layout.md",
-      "priority": 125,
+      "priority": 126,
       "status": "open",
       "dependencies": [],
       "description": "When new messages arrive and user is scrolled to the bottom, auto-scroll to show them. If user has scrolled up (reading history), do NOT auto-scroll \u2014 instead show a floating 'Jump to latest' button at the bottom of MessageList. Clicking it scrolls to bottom. Show unread count on the button."
@@ -1213,7 +1222,7 @@
       "id": "TASK-116",
       "title": "Add copy invite link button to server UI",
       "spec": "specs/servers.md",
-      "priority": 126,
+      "priority": 127,
       "status": "open",
       "dependencies": [],
       "description": "Add a prominent 'Invite People' button in the ChannelPanel header or server settings. Clicking copies the full invite URL (https://discord.edgecdec.com/invite/CODE) to clipboard. Show a Snackbar confirmation 'Invite link copied!'. This is how users actually share servers."
@@ -1222,7 +1231,7 @@
       "id": "TASK-117",
       "title": "Add message context menu (right-click / hover actions)",
       "spec": "specs/ui-layout.md",
-      "priority": 127,
+      "priority": 128,
       "status": "open",
       "dependencies": [],
       "description": "On message hover, show a small action bar with icon buttons: Reply, React (emoji), Pin (if permitted), Edit (if author), Delete (if author/admin). On right-click, show a MUI Menu with the same options plus 'Copy Text'. This is the primary way users interact with messages."
@@ -1231,7 +1240,7 @@
       "id": "TASK-118",
       "title": "Implement channel reordering",
       "spec": "specs/database.md",
-      "priority": 128,
+      "priority": 129,
       "status": "open",
       "dependencies": [],
       "description": "Add position (Int) field to Channel model. Channels display in position order in ChannelPanel. Create PATCH /api/servers/[serverId]/channels/reorder \u2014 accepts array of { channelId, position }. OWNER/ADMIN only. In ChannelPanel, allow drag-to-reorder or up/down buttons."
@@ -1240,7 +1249,7 @@
       "id": "TASK-119",
       "title": "Show who reacted on reaction tooltip",
       "spec": "specs/ui-layout.md",
-      "priority": 129,
+      "priority": 130,
       "status": "open",
       "dependencies": [],
       "description": "When hovering over a reaction chip on a message, show a MUI Tooltip listing the usernames who reacted with that emoji. Clicking the chip still toggles your own reaction."
@@ -1249,7 +1258,7 @@
       "id": "TASK-120",
       "title": "Improve message timestamps and date separators",
       "spec": "specs/ui-layout.md",
-      "priority": 130,
+      "priority": 131,
       "status": "open",
       "dependencies": [],
       "description": "Show relative timestamps on messages ('2m ago', '1h ago', 'Yesterday at 3:45 PM'). On hover, show full date/time in a tooltip. Add date separator bars between messages from different days ('March 25, 2026'). Group consecutive messages from the same author within 5 minutes (compact mode \u2014 no repeated avatar/name)."
@@ -1258,7 +1267,7 @@
       "id": "TASK-121",
       "title": "Handle failed message sends gracefully",
       "spec": "specs/socket-events.md",
-      "priority": 131,
+      "priority": 132,
       "status": "open",
       "dependencies": [],
       "description": "If a message:create emission fails (socket disconnected, server error), show the message in red/italic with a retry button. Don't silently lose messages. Show a toast/snackbar for transient errors. Queue messages if socket is temporarily disconnected and resend on reconnect."
@@ -1267,7 +1276,7 @@
       "id": "TASK-122",
       "title": "Add 'Join Server' dialog with invite code input",
       "spec": "specs/servers.md",
-      "priority": 132,
+      "priority": 133,
       "status": "open",
       "dependencies": [],
       "description": "Add a 'Join Server' button in ServerSidebar (next to Create Server). Opens a MUI Dialog with a TextField to paste an invite code or full invite URL. Parses the code from the URL if pasted. Calls the join API. On success navigates to the server."
@@ -1276,7 +1285,7 @@
       "id": "TASK-123",
       "title": "Add loading skeletons and spinners throughout the app",
       "spec": "specs/ui-layout.md",
-      "priority": 133,
+      "priority": 134,
       "status": "open",
       "dependencies": [],
       "description": "Add MUI Skeleton placeholders while data loads: message list (skeleton message bubbles), channel list (skeleton list items), server sidebar (skeleton circles), member list (skeleton rows). Show CircularProgress spinner on buttons during async operations (login, register, create server, send message). Replace blank screens with loading states."
@@ -1285,7 +1294,7 @@
       "id": "TASK-124",
       "title": "Add error boundaries and error states",
       "spec": "specs/ui-layout.md",
-      "priority": 134,
+      "priority": 135,
       "status": "open",
       "dependencies": [],
       "description": "Wrap major sections (ServerSidebar, ChannelPanel, MessageList, VoiceChannel) in React error boundaries. Show a friendly error message with a 'Retry' button instead of a white screen. Add error states for failed API calls (e.g. 'Failed to load messages \u2014 click to retry')."
@@ -1294,7 +1303,7 @@
       "id": "TASK-125",
       "title": "Add favicon, dynamic page titles, and meta tags",
       "spec": "specs/ui-layout.md",
-      "priority": 135,
+      "priority": 136,
       "status": "open",
       "dependencies": [],
       "description": "Add a favicon (simple chat bubble icon or generate one). Set dynamic page titles: 'ServerName | #channel \u2014 Discord Alt' when in a channel, 'Discord Alternative' on login. Add basic meta description. Update the tab title with unread count: '(3) ServerName | #channel'."
@@ -1303,7 +1312,7 @@
       "id": "TASK-126",
       "title": "Implement inline message editing",
       "spec": "specs/ui-layout.md",
-      "priority": 136,
+      "priority": 137,
       "status": "open",
       "dependencies": [],
       "description": "When clicking Edit on your own message, replace the message content with an inline TextField pre-filled with the current content. Enter saves (emits message:update), Escape cancels. Show 'editing...' indicator. Much better UX than a dialog."
@@ -1312,7 +1321,7 @@
       "id": "TASK-127",
       "title": "Show member count and online count in server header",
       "spec": "specs/ui-layout.md",
-      "priority": 137,
+      "priority": 138,
       "status": "open",
       "dependencies": [],
       "description": "In the ChannelPanel server header area, show 'X members, Y online' as a small subtitle. Updates in real-time via presence events. Gives users a sense of the community size."
@@ -1321,7 +1330,7 @@
       "id": "TASK-128",
       "title": "Preserve scroll position when switching channels",
       "spec": "specs/ui-layout.md",
-      "priority": 138,
+      "priority": 139,
       "status": "open",
       "dependencies": [],
       "description": "When switching between channels, remember the scroll position per channel. When returning to a channel, restore the scroll position instead of jumping to the bottom. Store in a React ref map keyed by channelId."
@@ -1330,7 +1339,7 @@
       "id": "TASK-132",
       "title": "Add database backup script",
       "spec": "specs/deployment.md",
-      "priority": 142,
+      "priority": 143,
       "status": "open",
       "dependencies": [],
       "description": "Create a backup.sh script that copies data/discord.db to /var/www/DiscordAlternative/backups/ with a date-stamped filename. Keep only the last 2 backups, delete older ones. Add a cron job on the server to run it once per day at 3am. SQLite can be safely copied while the app is running if using WAL mode."
@@ -1339,7 +1348,7 @@
       "id": "TASK-133",
       "title": "Enable SQLite WAL mode for concurrent reads",
       "spec": "specs/database.md",
-      "priority": 143,
+      "priority": 144,
       "status": "open",
       "dependencies": [],
       "description": "Configure Prisma/SQLite to use WAL (Write-Ahead Logging) mode. This allows concurrent reads while writing, which is important when Socket.io handlers and API routes hit the DB simultaneously. Add PRAGMA journal_mode=WAL to the database connection. Verify it's set on server startup."
@@ -1348,7 +1357,7 @@
       "id": "TASK-134",
       "title": "Handle expired JWT tokens gracefully",
       "spec": "specs/auth.md",
-      "priority": 144,
+      "priority": 145,
       "status": "open",
       "dependencies": [],
       "description": "When any API call returns 401, the useAuth hook should clear the user state and redirect to login. Currently if a JWT expires mid-session, the user sees broken API calls but stays on the page. Add a global fetch wrapper or interceptor that catches 401s. Show a toast: 'Session expired, please log in again'."
@@ -1357,7 +1366,7 @@
       "id": "TASK-136",
       "title": "Sync missed messages on Socket.io reconnect",
       "spec": "specs/socket-events.md",
-      "priority": 146,
+      "priority": 147,
       "status": "open",
       "dependencies": [],
       "description": "When Socket.io reconnects after a disconnect, fetch messages newer than the last displayed message from the REST API and merge them into the MessageList. Currently if the connection drops for 30 seconds, those messages are lost until page refresh. Add a reconnect handler in useSocket that triggers a catch-up fetch."
@@ -1366,7 +1375,7 @@
       "id": "TASK-142",
       "title": "Add health check endpoint",
       "spec": "specs/deployment.md",
-      "priority": 152,
+      "priority": 153,
       "status": "open",
       "dependencies": [],
       "description": "Create GET /api/health that returns { status: 'ok', uptime: process.uptime(), dbOk: true/false }. Check DB connectivity with a simple Prisma query. Used by monitoring, load balancers, and the deploy verification step. Should respond in <100ms."
@@ -1375,7 +1384,7 @@
       "id": "TASK-144",
       "title": "Add camera toggle to voice channels",
       "spec": "specs/webrtc.md",
-      "priority": 153,
+      "priority": 154,
       "status": "open",
       "dependencies": [],
       "description": "Update VoiceChannel component to add a camera toggle IconButton (Videocam/VideocamOff). Call localParticipant.setCameraEnabled(). Update the LiveKitRoom to include video={true}. Render video tracks for participants who have camera on \u2014 show their video in a tile grid instead of just an avatar. Participants with camera off still show avatar."
@@ -1384,7 +1393,7 @@
       "id": "TASK-145",
       "title": "Add screen sharing to voice channels",
       "spec": "specs/webrtc.md",
-      "priority": 154,
+      "priority": 155,
       "status": "open",
       "dependencies": [],
       "description": "Update VoiceChannel component to add a ScreenShare IconButton. Call localParticipant.setScreenShareEnabled() to toggle. Render screen share tracks prominently \u2014 when someone is sharing, show their screen as a large video element above the participant grid. Only one person can share at a time. Show a 'X is sharing their screen' indicator."
@@ -1393,7 +1402,7 @@
       "id": "TASK-146",
       "title": "Add deafen toggle to voice channels",
       "spec": "specs/webrtc.md",
-      "priority": 155,
+      "priority": 156,
       "status": "open",
       "dependencies": [],
       "description": "Add a deafen IconButton (Headset/HeadsetOff) next to the mic toggle in VoiceChannel. When deafened, mute all incoming audio (set volume to 0 on RoomAudioRenderer or disable audio tracks). Also auto-mute mic when deafening (same as Discord behavior). Show deafen icon on participant tile when deafened."
