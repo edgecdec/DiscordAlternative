@@ -1334,6 +1334,33 @@
       "status": "open",
       "dependencies": [],
       "description": "Create GET /api/health that returns { status: 'ok', uptime: process.uptime(), dbOk: true/false }. Check DB connectivity with a simple Prisma query. Used by monitoring, load balancers, and the deploy verification step. Should respond in <100ms."
+    },
+    {
+      "id": "TASK-144",
+      "title": "Add camera toggle to voice channels",
+      "spec": "specs/webrtc.md",
+      "priority": 143,
+      "status": "open",
+      "dependencies": [],
+      "description": "Update VoiceChannel component to add a camera toggle IconButton (Videocam/VideocamOff). Call localParticipant.setCameraEnabled(). Update the LiveKitRoom to include video={true}. Render video tracks for participants who have camera on \u2014 show their video in a tile grid instead of just an avatar. Participants with camera off still show avatar."
+    },
+    {
+      "id": "TASK-145",
+      "title": "Add screen sharing to voice channels",
+      "spec": "specs/webrtc.md",
+      "priority": 144,
+      "status": "open",
+      "dependencies": [],
+      "description": "Update VoiceChannel component to add a ScreenShare IconButton. Call localParticipant.setScreenShareEnabled() to toggle. Render screen share tracks prominently \u2014 when someone is sharing, show their screen as a large video element above the participant grid. Only one person can share at a time. Show a 'X is sharing their screen' indicator."
+    },
+    {
+      "id": "TASK-146",
+      "title": "Add deafen toggle to voice channels",
+      "spec": "specs/webrtc.md",
+      "priority": 145,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a deafen IconButton (Headset/HeadsetOff) next to the mic toggle in VoiceChannel. When deafened, mute all incoming audio (set volume to 0 on RoomAudioRenderer or disable audio tracks). Also auto-mute mic when deafening (same as Discord behavior). Show deafen icon on participant tile when deafened."
     }
   ]
 }
