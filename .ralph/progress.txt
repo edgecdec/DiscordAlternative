@@ -641,3 +641,12 @@
 - Search results show author avatar, username, date, content snippet with query context, and channel name.
 - Clicking a result navigates to the channel (scrolling to specific message not implemented — would need MessageList changes for anchor scrolling).
 - Lessons: Keep dialog components self-contained with their own state management. Debounced search avoids hammering the API on every keystroke.
+
+## TASK-084: Add keyboard shortcuts (2026-03-26)
+- Implemented Cmd+K / Ctrl+K quick channel switcher dialog
+- Added global keyboard shortcut hook (useKeyboardShortcuts) that auto-focuses message input on printable key press
+- Escape closes dialogs (MUI handles this natively, hook covers quick switcher explicitly)
+- Added keyboard shortcut hint icon (bottom-right corner, tooltip with shortcut list)
+- Lesson: MUI ListItemButton renders as div with role="button", not li — use role-based selectors in tests
+- Lesson: Nova Act tests need extra wait time (2s) for API fetches inside dialogs to complete
+- Lesson: testbot user lands on /servers (onboarding) not inside a server — tests need to click into a server first

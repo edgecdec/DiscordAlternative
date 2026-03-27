@@ -890,7 +890,7 @@
       "title": "Add keyboard shortcuts",
       "spec": "specs/ui-layout.md",
       "priority": 84,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Escape closes any open dialog/drawer. Ctrl+K (or Cmd+K on Mac) opens a quick-switch dialog to search and jump to channels. Focus message input when typing in a channel view (if no dialog is open). Add a small keyboard shortcut hint in the UI."
     },
