@@ -700,3 +700,10 @@
 - Added audit logging to: member role change, member kick, channel create, channel delete, admin message delete, server update
 - Lesson: After adding a new Prisma model, must run `npx prisma generate` before tsc will recognize the new model on the client — `migrate dev` alone doesn't update the generated client in all cases
 - Lesson: Message delete audit only logs admin-initiated deletes (not self-deletes) to keep the log meaningful
+
+## TASK-090: Build audit log UI in server settings (2026-03-26)
+- Created AuditLogTab component with paginated list of audit log entries
+- Added Audit Log tab to ServerSettings dialog, visible to OWNER and ADMIN roles
+- Tab shows user avatar, action description, parsed details, and timestamp
+- Supports cursor-based pagination with "Load More" button
+- Lessons: MUI Tabs with conditional children auto-assigns sequential indices to rendered tabs — no manual index mapping needed. Owner implies Admin so Danger Zone tab index is always 3 when Audit Log is present. Use `domcontentloaded` instead of `networkidle` for Nova Act page.goto when Socket.io keeps connections alive.
