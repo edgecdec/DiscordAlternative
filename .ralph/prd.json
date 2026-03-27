@@ -1289,6 +1289,141 @@
       "status": "open",
       "dependencies": [],
       "description": "When switching between channels, remember the scroll position per channel. When returning to a channel, restore the scroll position instead of jumping to the bottom. Store in a React ref map keyed by channelId."
+    },
+    {
+      "id": "TASK-129",
+      "title": "Rate limit auth endpoints",
+      "spec": "specs/auth.md",
+      "priority": 129,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add rate limiting to /api/auth/login and /api/auth/register \u2014 max 5 attempts per IP per minute. Use an in-memory map with TTL cleanup. Return 429 Too Many Requests when exceeded. Prevents brute force password attacks. This is critical for a public-facing app."
+    },
+    {
+      "id": "TASK-130",
+      "title": "Sanitize message content to prevent XSS",
+      "spec": "specs/socket-events.md",
+      "priority": 130,
+      "status": "open",
+      "dependencies": [],
+      "description": "All user-generated content (messages, server names, channel names, usernames) must be sanitized before rendering. Ensure React's default escaping is not bypassed anywhere (no dangerouslySetInnerHTML on user content). Audit MessageList, MentionText, ReplyQuote, LinkPreview for any raw HTML injection vectors. If markdown rendering uses innerHTML, sanitize it."
+    },
+    {
+      "id": "TASK-131",
+      "title": "Add CSRF protection to state-changing API routes",
+      "spec": "specs/auth.md",
+      "priority": 131,
+      "status": "open",
+      "dependencies": [],
+      "description": "Verify that all POST/PATCH/DELETE API routes check the Origin or Referer header matches the app domain, OR implement a CSRF token pattern. Since we use httpOnly cookies for auth, the app is vulnerable to CSRF without this. Add a middleware helper in src/lib/auth.ts."
+    },
+    {
+      "id": "TASK-132",
+      "title": "Add database backup script",
+      "spec": "specs/deployment.md",
+      "priority": 132,
+      "status": "open",
+      "dependencies": [],
+      "description": "Create a backup.sh script that copies data/discord.db to a timestamped backup file in /var/www/DiscordAlternative/backups/. Add a cron job on the server to run it daily. Keep last 7 backups, delete older ones. SQLite can be safely copied while the app is running if using WAL mode. This is critical \u2014 one bad migration could wipe all data."
+    },
+    {
+      "id": "TASK-133",
+      "title": "Enable SQLite WAL mode for concurrent reads",
+      "spec": "specs/database.md",
+      "priority": 133,
+      "status": "open",
+      "dependencies": [],
+      "description": "Configure Prisma/SQLite to use WAL (Write-Ahead Logging) mode. This allows concurrent reads while writing, which is important when Socket.io handlers and API routes hit the DB simultaneously. Add PRAGMA journal_mode=WAL to the database connection. Verify it's set on server startup."
+    },
+    {
+      "id": "TASK-134",
+      "title": "Handle expired JWT tokens gracefully",
+      "spec": "specs/auth.md",
+      "priority": 134,
+      "status": "open",
+      "dependencies": [],
+      "description": "When any API call returns 401, the useAuth hook should clear the user state and redirect to login. Currently if a JWT expires mid-session, the user sees broken API calls but stays on the page. Add a global fetch wrapper or interceptor that catches 401s. Show a toast: 'Session expired, please log in again'."
+    },
+    {
+      "id": "TASK-135",
+      "title": "Add 'Remember me' and session management",
+      "spec": "specs/auth.md",
+      "priority": 135,
+      "status": "open",
+      "dependencies": [],
+      "description": "Add a 'Remember me' checkbox to AuthForm. If checked, JWT expiry is 30 days. If unchecked, JWT expiry is 24 hours (session cookie, no explicit expiry). Add a 'Log out everywhere' button in profile settings that changes the user's JWT secret seed (invalidating all existing tokens)."
+    },
+    {
+      "id": "TASK-136",
+      "title": "Sync missed messages on Socket.io reconnect",
+      "spec": "specs/socket-events.md",
+      "priority": 136,
+      "status": "open",
+      "dependencies": [],
+      "description": "When Socket.io reconnects after a disconnect, fetch messages newer than the last displayed message from the REST API and merge them into the MessageList. Currently if the connection drops for 30 seconds, those messages are lost until page refresh. Add a reconnect handler in useSocket that triggers a catch-up fetch."
+    },
+    {
+      "id": "TASK-137",
+      "title": "Add optimistic message sending",
+      "spec": "specs/ui-layout.md",
+      "priority": 137,
+      "status": "open",
+      "dependencies": [],
+      "description": "When user sends a message, immediately show it in the MessageList with a pending indicator (slightly faded or with a clock icon) before the server confirms. Replace with the real message on message:new confirmation. If send fails, show error state with retry. Makes chat feel instant."
+    },
+    {
+      "id": "TASK-138",
+      "title": "Add keyboard navigation and ARIA labels",
+      "spec": "specs/ui-layout.md",
+      "priority": 138,
+      "status": "open",
+      "dependencies": [],
+      "description": "Ensure all interactive elements are keyboard accessible: Tab through server list, channel list, messages. Add aria-label to IconButtons (send, attach, react, etc). Add role='list' and role='listitem' to message list. Add aria-live='polite' to typing indicator and new message notifications. Screen reader users should be able to navigate the full app."
+    },
+    {
+      "id": "TASK-139",
+      "title": "Fix mobile viewport and touch interactions",
+      "spec": "specs/ui-layout.md",
+      "priority": 139,
+      "status": "open",
+      "dependencies": [],
+      "description": "Ensure the app fills the mobile viewport correctly (no horizontal scroll, no content behind the address bar). Add touch-friendly tap targets (min 44px). Ensure the message input doesn't get hidden behind the mobile keyboard (scroll into view on focus). Test on iOS Safari and Android Chrome viewport quirks."
+    },
+    {
+      "id": "TASK-140",
+      "title": "Add message virtualization for large channels",
+      "spec": "specs/ui-layout.md",
+      "priority": 140,
+      "status": "open",
+      "dependencies": [],
+      "description": "If a channel has hundreds of messages loaded, rendering them all causes lag. Implement virtual scrolling \u2014 only render messages visible in the viewport plus a small buffer. Use a lightweight approach (intersection observer or manual calculation). Keep scroll position stable when loading older messages."
+    },
+    {
+      "id": "TASK-141",
+      "title": "Add server-side caching for frequently accessed data",
+      "spec": "specs/deployment.md",
+      "priority": 141,
+      "status": "open",
+      "dependencies": [],
+      "description": "Cache server member lists and channel lists in memory on the server.js process (simple Map with TTL). Invalidate on mutations. These are fetched on every page navigation and rarely change. Reduces SQLite reads significantly for active servers."
+    },
+    {
+      "id": "TASK-142",
+      "title": "Add health check endpoint",
+      "spec": "specs/deployment.md",
+      "priority": 142,
+      "status": "open",
+      "dependencies": [],
+      "description": "Create GET /api/health that returns { status: 'ok', uptime: process.uptime(), dbOk: true/false }. Check DB connectivity with a simple Prisma query. Used by monitoring, load balancers, and the deploy verification step. Should respond in <100ms."
+    },
+    {
+      "id": "TASK-143",
+      "title": "Add structured server-side logging",
+      "spec": "specs/deployment.md",
+      "priority": 143,
+      "status": "open",
+      "dependencies": [],
+      "description": "Replace console.log/console.error in server.js with a simple structured logger that outputs JSON lines: { timestamp, level, event, userId?, channelId?, error? }. Log socket connections, disconnections, message sends, and errors. Makes pm2 logs actually useful for debugging production issues."
     }
   ]
 }
