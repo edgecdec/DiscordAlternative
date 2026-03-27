@@ -20,8 +20,10 @@ import { ContentCopy, Close } from "@mui/icons-material";
 import { SERVER_NAME_MAX } from "@/lib/constants";
 import MembersTab from "@/components/layout/MembersTab";
 import DangerZoneTab from "@/components/layout/DangerZoneTab";
+import AuditLogTab from "@/components/layout/AuditLogTab";
 
 const OWNER_ROLE = "OWNER";
+const ADMIN_ROLES = ["OWNER", "ADMIN"];
 
 interface ServerSettingsProps {
   open: boolean;
@@ -40,6 +42,7 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const isOwner = userRole === OWNER_ROLE;
+  const isAdmin = ADMIN_ROLES.includes(userRole);
 
   useEffect(() => {
     setName(serverName);
@@ -104,6 +107,7 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ px: 3 }}>
         <Tab label="General" />
         <Tab label="Members" />
+        {isAdmin && <Tab label="Audit Log" />}
         {isOwner && <Tab label="Danger Zone" />}
       </Tabs>
       <DialogContent>
@@ -139,7 +143,8 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
           </>
         )}
         {tab === 1 && <MembersTab serverId={serverId} userRole={userRole} />}
-        {tab === 2 && isOwner && <DangerZoneTab serverId={serverId} serverName={serverName} />}
+        {tab === 2 && isAdmin && <AuditLogTab serverId={serverId} />}
+        {tab === 3 && isOwner && <DangerZoneTab serverId={serverId} serverName={serverName} />}
       </DialogContent>
       {tab === 0 && (
         <DialogActions>

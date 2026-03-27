@@ -944,7 +944,7 @@
       "title": "Build audit log UI in server settings",
       "spec": "specs/ui-layout.md",
       "priority": 90,
-      "status": "open",
+      "status": "in_progress",
       "dependencies": [],
       "description": "Add an Audit Log tab to ServerSettings dialog (OWNER/ADMIN only). Shows a chronological list of actions: who did what, when. Each entry shows user avatar, action description, and timestamp. Paginated with load more."
     },
