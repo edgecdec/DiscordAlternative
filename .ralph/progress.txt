@@ -590,3 +590,9 @@
 - The getMentionQuery helper uses regex to detect @word pattern before cursor position
 - Lesson: MUI TextField with multiline uses a textarea, so selectionStart works correctly for cursor tracking
 - Lesson: Using requestAnimationFrame to set cursor position after React re-render ensures correct placement
+
+## TASK-077: Add link preview rendering to messages (2026-03-26)
+- Updated MentionText to parse URLs alongside @mentions using a combined regex, rendering URLs as MUI Link components with target="_blank".
+- Created LinkPreview component showing domain name with a link icon in a bordered card (max-width 400px).
+- Integrated into MessageList: for non-deleted messages, extracts the first URL and renders a LinkPreview below the content.
+- Lesson: Combining URL and mention regex into one pass avoids double-parsing and keeps the component simple. The IIFE pattern `{(() => { ... })()}` works for inline conditional rendering with local variables in JSX.

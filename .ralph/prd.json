@@ -827,7 +827,7 @@
       "title": "Add link preview rendering to messages",
       "spec": "specs/ui-layout.md",
       "priority": 77,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "In MessageList, detect URLs in message content using regex. Render them as clickable links. For the first URL in a message, show a simple preview card below the message with the URL domain and a link icon. Keep it lightweight \u2014 no server-side fetching of metadata for now."
     },

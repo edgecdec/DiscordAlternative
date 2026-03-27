@@ -9,7 +9,8 @@ import { useAuth } from "@/hooks/useAuth";
 import MessageAttachment from "@/components/chat/MessageAttachment";
 import ReactionBar from "@/components/chat/ReactionBar";
 import ReplyQuote from "@/components/chat/ReplyQuote";
-import MentionText from "@/components/chat/MentionText";
+import MentionText, { extractFirstUrl } from "@/components/chat/MentionText";
+import LinkPreview from "@/components/chat/LinkPreview";
 
 interface MessageListProps {
   channelId: string;
@@ -255,6 +256,10 @@ export default function MessageList({ channelId, onReply }: MessageListProps) {
             {!msg.deleted && msg.fileUrl && (
               <MessageAttachment fileUrl={msg.fileUrl} />
             )}
+            {!msg.deleted && (() => {
+              const url = extractFirstUrl(msg.content);
+              return url ? <LinkPreview url={url} /> : null;
+            })()}
             {!msg.deleted && (
               <ReactionBar
                 reactions={msg.reactions ?? {}}
