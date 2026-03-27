@@ -872,7 +872,7 @@
       "title": "Implement message search API",
       "spec": "specs/database.md",
       "priority": 82,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Create GET /api/servers/[serverId]/search?q=query \u2014 full-text search across all messages in the server the user has access to. Return matching messages with channel name, author, timestamp. Paginated. Use Prisma contains filter on content field."
     },

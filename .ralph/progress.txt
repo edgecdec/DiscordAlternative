@@ -626,3 +626,11 @@
 - Updated src/app/servers/page.tsx to fetch server count and show a welcome page with "Create a Server" and "Join a Server" buttons when user has no servers.
 - When user has servers, the normal sidebar + "Select or create a server" view is shown.
 - Lesson: The servers page already fetched servers in ServerSidebar, but the page itself needed its own fetch to determine whether to show onboarding vs normal view. Kept it simple with a single /api/servers call.
+
+## TASK-082: Implement message search API (2026-03-26)
+- Created GET /api/servers/[serverId]/search?q=query with cursor-based pagination
+- Returns messages with author info (id, username, avatarUrl) and channel info (id, name)
+- Filters out deleted messages, validates server membership
+- Returns 400 for empty/missing query param
+- Reused existing patterns: getAuthUser, MESSAGES_PER_PAGE constant, cursor pagination
+- Lesson: Simple Prisma `contains` filter works well for SQLite text search — no need for complex full-text search setup
