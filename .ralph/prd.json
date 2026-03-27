@@ -917,7 +917,7 @@
       "title": "Create direct message database model and API",
       "spec": "specs/database.md",
       "priority": 87,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add DirectMessage model to Prisma: id, content, fileUrl, senderId, receiverId, createdAt, updatedAt. Create GET /api/dm/[userId] \u2014 get DM history with a user (paginated). Create POST /api/dm/[userId] \u2014 send a DM. Add Socket.io events dm:new for real-time delivery."
     },

@@ -114,6 +114,23 @@ export interface PresenceStatusPayload {
   status: string;
 }
 
+export interface DirectMessagePayload {
+  id: string;
+  content: string;
+  fileUrl: string | null;
+  senderId: string;
+  receiverId: string;
+  createdAt: string;
+  updatedAt: string;
+  sender: MessageAuthor;
+}
+
+export interface DMCreatePayload {
+  receiverId: string;
+  content: string;
+  fileUrl?: string;
+}
+
 // Typed Socket.io event interfaces
 export interface ServerToClientEvents {
   "message:new": (message: SocketMessage) => void;
@@ -128,6 +145,7 @@ export interface ServerToClientEvents {
   "typing:start": (payload: TypingBroadcastPayload) => void;
   "typing:stop": (payload: TypingBroadcastPayload) => void;
   "mention:notify": (payload: MentionNotifyPayload) => void;
+  "dm:new": (payload: DirectMessagePayload) => void;
 }
 
 export interface StatusUpdatePayload {
@@ -145,4 +163,5 @@ export interface ClientToServerEvents {
   "presence:status": (payload: StatusUpdatePayload) => void;
   "typing:start": (payload: TypingPayload) => void;
   "typing:stop": (payload: TypingPayload) => void;
+  "dm:create": (payload: DMCreatePayload) => void;
 }

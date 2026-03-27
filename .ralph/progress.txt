@@ -671,3 +671,12 @@
 - Added aria-label="Change status" and tooltip for accessibility
 - Lesson: Nova Act struggles with tiny click targets (14px dots) — use Playwright locators with aria-label for precise element interaction instead of visual act() instructions
 - Lesson: Always add aria-label to small interactive elements for both accessibility and testability
+
+## TASK-087: Create direct message database model and API (2026-03-27)
+- Added DirectMessage model to Prisma with sender/receiver relations and composite indexes
+- Created GET /api/dm/[userId] for paginated DM history between two users
+- Created POST /api/dm/[userId] for sending DMs with content validation
+- Created GET /api/dm/conversations for listing recent DM partners sorted by last message
+- Added dm:create Socket.io handler in server.js that broadcasts dm:new to both sender and receiver sockets
+- Added DM types (DirectMessagePayload, DMCreatePayload) and events to socket.ts
+- Lesson: Prisma client needs regeneration after schema changes before tsc will pass — always run `npx prisma generate` after `npx prisma migrate dev`

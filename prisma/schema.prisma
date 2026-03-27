@@ -7,18 +7,20 @@ generator client {
 }
 
 model User {
-  id           String         @id @default(cuid())
-  username     String         @unique
+  id           String          @id @default(cuid())
+  username     String          @unique
   passwordHash String
   avatarUrl    String?
-  status       String         @default("online")
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  status       String          @default("online")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
   messages     Message[]
   memberships  ServerMember[]
   ownedServers Server[]
   channelReads ChannelRead[]
   reactions    Reaction[]
+  sentDMs      DirectMessage[] @relation("DMSender")
+  receivedDMs  DirectMessage[] @relation("DMReceiver")
 }
 
 model Server {
@@ -114,4 +116,19 @@ model ChannelCategory {
   channels Channel[]
 
   @@index([serverId])
+}
+
+model DirectMessage {
+  id         String   @id @default(cuid())
+  content    String
+  fileUrl    String?
+  senderId   String
+  sender     User     @relation("DMSender", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User     @relation("DMReceiver", fields: [receiverId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([senderId, receiverId])
+  @@index([receiverId, senderId])
 }

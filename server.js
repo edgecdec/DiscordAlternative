@@ -402,6 +402,50 @@ app.prepare().then(() => {
       });
     });
 
+    socket.on("dm:create", async ({ receiverId, content, fileUrl }) => {
+      try {
+        if (!content || typeof content !== "string" || !content.trim() || content.length > 2000) return;
+        if (!receiverId || receiverId === socket.data.userId) return;
+        const receiver = await prisma.user.findUnique({ where: { id: receiverId }, select: { id: true } });
+        if (!receiver) return;
+        const dm = await prisma.directMessage.create({
+          data: {
+            content: content.trim(),
+            fileUrl: fileUrl || null,
+            senderId: socket.data.userId,
+            receiverId,
+          },
+          include: { sender: { select: { id: true, username: true, avatarUrl: true } } },
+        });
+        const payload = {
+          id: dm.id,
+          content: dm.content,
+          fileUrl: dm.fileUrl,
+          senderId: dm.senderId,
+          receiverId: dm.receiverId,
+          createdAt: dm.createdAt.toISOString(),
+          updatedAt: dm.updatedAt.toISOString(),
+          sender: dm.sender,
+        };
+        // Send to all receiver's sockets
+        const receiverSockets = onlineUsers.get(receiverId);
+        if (receiverSockets) {
+          for (const sid of receiverSockets) {
+            io.to(sid).emit("dm:new", payload);
+          }
+        }
+        // Send back to sender's sockets
+        const senderSockets = onlineUsers.get(socket.data.userId);
+        if (senderSockets) {
+          for (const sid of senderSockets) {
+            io.to(sid).emit("dm:new", payload);
+          }
+        }
+      } catch (err) {
+        console.error("dm:create error:", err);
+      }
+    });
+
     socket.on("disconnect", async () => {
       const { userId, username } = socket.data;
       console.log(`Socket disconnected: ${username} (${userId})`);
