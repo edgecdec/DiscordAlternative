@@ -953,7 +953,7 @@
       "title": "Install and configure LiveKit server on production",
       "spec": "specs/webrtc.md",
       "priority": 91,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "URGENT: Voice channels show 'Failed to connect to voice server' because LiveKit is not installed. SSH into the server and: 1) Download the LiveKit server binary for linux amd64 from https://github.com/livekit/livekit/releases (use curl). 2) Move to /usr/local/bin/livekit-server, chmod +x. 3) Generate API keys: livekit-server generate-keys. 4) Create /etc/livekit.yaml with the keys, bind to 0.0.0.0, ports 7880/7881. 5) Start with pm2: pm2 start livekit-server -- --config /etc/livekit.yaml --name livekit && pm2 save. 6) Add LIVEKIT_API_KEY, LIVEKIT_API_SECRET, and NEXT_PUBLIC_LIVEKIT_URL=wss://discord.edgecdec.com:7880 to /var/www/DiscordAlternative/.env. 7) Open ports 7880 and 7881/udp in the firewall (ufw allow 7880 && ufw allow 7881/udp). 8) Restart discord-alt: pm2 restart discord-alt. 9) Verify voice channel works by checking pm2 logs for livekit and curling localhost:7880."
     },

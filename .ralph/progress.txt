@@ -707,3 +707,14 @@
 - Tab shows user avatar, action description, parsed details, and timestamp
 - Supports cursor-based pagination with "Load More" button
 - Lessons: MUI Tabs with conditional children auto-assigns sequential indices to rendered tabs — no manual index mapping needed. Owner implies Admin so Danger Zone tab index is always 3 when Audit Log is present. Use `domcontentloaded` instead of `networkidle` for Nova Act page.goto when Socket.io keeps connections alive.
+
+## TASK-147: Install and configure LiveKit server on production (2026-03-26)
+- Installed LiveKit v1.10.0 binary at /usr/local/bin/livekit-server on the production server.
+- Generated API keys and created /etc/livekit.yaml config.
+- LiveKit panics with `invalid argument to Intn` when port_range is only 1 port (7881-7881). Fixed by using range 50000-50100.
+- LiveKit runs internally on port 7890. nginx proxies wss://discord.edgecdec.com:7880 → http://127.0.0.1:7890 with SSL termination and WebSocket upgrade headers.
+- Opened firewall ports: 7880 (TCP for WSS via nginx), 7881/udp (RTC TCP), 50000-50100/udp (ICE range).
+- Added LIVEKIT_API_KEY, LIVEKIT_API_SECRET, NEXT_PUBLIC_LIVEKIT_URL=wss://discord.edgecdec.com:7880 to server .env.
+- Rebuilt the app so NEXT_PUBLIC_LIVEKIT_URL is baked into the client bundle.
+- Updated .env.example to use wss:// instead of ws://.
+- Lesson: LiveKit needs a proper UDP port range for ICE candidates, not a single port. Also, if you want WSS, use nginx SSL termination on a separate port rather than trying to share the port with LiveKit.
