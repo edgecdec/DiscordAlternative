@@ -2,18 +2,21 @@
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ChangeEvent } from "react";
 import { Box, IconButton, LinearProgress, TextField, Typography } from "@mui/material";
-import { AttachFile, Close, Send } from "@mui/icons-material";
+import { AttachFile, Close, Reply as ReplyIcon, Send } from "@mui/icons-material";
 import { useSocket } from "@/hooks/useSocket";
 import { FILE_UPLOAD_MAX_BYTES, MESSAGE_MAX } from "@/lib/constants";
+import type { SocketMessage } from "@/types/socket";
 
 const TYPING_EMIT_INTERVAL_MS = 2000;
 const TYPING_STOP_DELAY_MS = 3000;
 
 interface MessageInputProps {
   channelId: string;
+  replyTo?: SocketMessage | null;
+  onCancelReply?: () => void;
 }
 
-export default function MessageInput({ channelId }: MessageInputProps) {
+export default function MessageInput({ channelId, replyTo, onCancelReply }: MessageInputProps) {
   const [content, setContent] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -64,14 +67,16 @@ export default function MessageInput({ channelId }: MessageInputProps) {
       channelId,
       content: trimmed || "",
       ...(pendingFile ? { fileUrl: pendingFile.url } : {}),
+      ...(replyTo ? { replyToId: replyTo.id } : {}),
     });
     setContent("");
     setPendingFile(null);
     setUploadError(null);
+    onCancelReply?.();
     clearStopTimer();
     emitStop();
     lastTypingEmit.current = 0;
-  }, [content, pendingFile, socket, channelId, clearStopTimer, emitStop]);
+  }, [content, pendingFile, socket, channelId, replyTo, onCancelReply, clearStopTimer, emitStop]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
@@ -132,6 +137,20 @@ export default function MessageInput({ channelId }: MessageInputProps) {
 
   return (
     <Box sx={{ px: 2, py: 1 }}>
+      {replyTo && (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5, pl: 1, borderLeft: 2, borderColor: "primary.main" }}>
+          <ReplyIcon sx={{ fontSize: 14, color: "text.secondary", transform: "scaleX(-1)" }} />
+          <Typography variant="caption" fontWeight={600} color="text.secondary">
+            Replying to {replyTo.author.username}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" noWrap sx={{ flex: 1, maxWidth: 300 }}>
+            — {replyTo.content.length > 60 ? replyTo.content.slice(0, 60) + "…" : replyTo.content}
+          </Typography>
+          <IconButton size="small" onClick={onCancelReply} aria-label="Cancel reply">
+            <Close sx={{ fontSize: 14 }} />
+          </IconButton>
+        </Box>
+      )}
       {uploading && <LinearProgress variant="determinate" value={uploadProgress} sx={{ mb: 1, borderRadius: 1 }} />}
       {uploadError && (
         <Typography variant="caption" color="error" sx={{ display: "block", mb: 0.5 }}>

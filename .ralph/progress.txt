@@ -564,3 +564,12 @@
 - Updated SocketMessage and MessageCreatePayload types in socket.ts
 - Lesson: After `prisma migrate dev`, must also run `prisma generate` for TypeScript types to update — the migration alone doesn't regenerate the client types locally
 - Lesson: Deploy webhook may temporarily show 500 while .next is being rebuilt — poll with retries instead of checking once
+
+## TASK-074: Build reply UI in chat (2026-03-26)
+- Created ReplyQuote component to render reply-to snippets above messages
+- Added reply button (hover-visible) to each message in MessageList
+- Added reply bar above MessageInput showing "Replying to <username>" with cancel button
+- Lifted reply state to channel page, passed as props to MessageList and MessageInput
+- MessageInput sends replyToId when replying, clears reply state on send
+- Reply state resets on channel change
+- Lessons: Nova Act hover actions fail with INVALID_INPUT errors — use Playwright's .hover() directly instead. MUI TextField's textarea selector needs get_by_placeholder, not generic textarea selector (hidden textarea confuses Playwright).

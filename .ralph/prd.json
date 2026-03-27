@@ -800,7 +800,7 @@
       "title": "Build reply UI in chat",
       "spec": "specs/ui-layout.md",
       "priority": 74,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add reply button to messages (on hover). Clicking sets a reply-to bar above MessageInput showing the quoted message snippet with an X to cancel. Sending includes replyToId. In MessageList, render replied-to messages with a small quote block above the message content."
     },

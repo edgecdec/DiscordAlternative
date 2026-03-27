@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Box, Typography, useMediaQuery } from "@mui/material";
 import { Tag, VolumeUp } from "@mui/icons-material";
 import { useSocket } from "@/hooks/useSocket";
+import type { SocketMessage } from "@/types/socket";
 import MessageList from "@/components/chat/MessageList";
 import MessageInput from "@/components/chat/MessageInput";
 import TypingIndicator from "@/components/chat/TypingIndicator";
@@ -26,6 +27,11 @@ export default function ChannelPage() {
   const [channel, setChannel] = useState<ChannelInfo | null>(null);
   const { socket, joinChannel, leaveChannel, connected } = useSocket();
   const isMobile = useMediaQuery("(max-width:767px)");
+  const [replyTo, setReplyTo] = useState<SocketMessage | null>(null);
+
+  useEffect(() => {
+    setReplyTo(null);
+  }, [channelId]);
 
   useEffect(() => {
     if (!serverId) return;
@@ -87,9 +93,9 @@ export default function ChannelPage() {
       </Box>
       {isText && channel ? (
         <>
-          <MessageList channelId={channelId} />
+          <MessageList channelId={channelId} onReply={setReplyTo} />
           <TypingIndicator channelId={channelId} />
-          <MessageInput channelId={channelId} />
+          <MessageInput channelId={channelId} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} />
         </>
       ) : !channel ? (
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>

@@ -1,15 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Avatar, Box, CircularProgress, Typography } from "@mui/material";
+import { Avatar, Box, CircularProgress, IconButton, Typography } from "@mui/material";
+import { Reply as ReplyIcon } from "@mui/icons-material";
 import type { SocketMessage, MessageDeletedPayload, ReactionBroadcastPayload } from "@/types/socket";
 import { useSocket } from "@/hooks/useSocket";
 import { useAuth } from "@/hooks/useAuth";
 import MessageAttachment from "@/components/chat/MessageAttachment";
 import ReactionBar from "@/components/chat/ReactionBar";
+import ReplyQuote from "@/components/chat/ReplyQuote";
 
 interface MessageListProps {
   channelId: string;
+  onReply?: (msg: SocketMessage) => void;
 }
 
 function formatTimestamp(iso: string): string {
@@ -22,7 +25,7 @@ function formatTimestamp(iso: string): string {
   });
 }
 
-export default function MessageList({ channelId }: MessageListProps) {
+export default function MessageList({ channelId, onReply }: MessageListProps) {
   const [messages, setMessages] = useState<SocketMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -207,6 +210,7 @@ export default function MessageList({ channelId }: MessageListProps) {
             gap: 1.5,
             py: 0.75,
             "&:hover .reaction-add-btn": { opacity: 1 },
+            "&:hover .reply-btn": { opacity: 1 },
           }}
         >
           <Avatar
@@ -215,7 +219,8 @@ export default function MessageList({ channelId }: MessageListProps) {
           >
             {msg.author.username[0].toUpperCase()}
           </Avatar>
-          <Box sx={{ minWidth: 0 }}>
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            {msg.replyTo && <ReplyQuote replyTo={msg.replyTo} />}
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
               <Typography variant="body2" fontWeight={600}>
                 {msg.author.username}
@@ -223,6 +228,17 @@ export default function MessageList({ channelId }: MessageListProps) {
               <Typography variant="caption" color="text.secondary">
                 {formatTimestamp(msg.createdAt)}
               </Typography>
+              {!msg.deleted && onReply && (
+                <IconButton
+                  size="small"
+                  className="reply-btn"
+                  onClick={() => onReply(msg)}
+                  sx={{ opacity: 0, ml: "auto", p: 0.25 }}
+                  aria-label="Reply"
+                >
+                  <ReplyIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              )}
             </Box>
             <Typography
               variant="body2"
