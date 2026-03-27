@@ -613,3 +613,10 @@
 - Added CATEGORY_NAME_MIN/MAX constants
 - Lesson: After schema changes, must run `npx prisma generate` before tsc will pass — migrate dev alone doesn't always update the local client types fast enough
 - Lesson: Deploy webhook deletes .next before rebuilding, so 500s are expected for ~60s after push — poll longer before panicking
+
+## TASK-080: Render channel categories in ChannelPanel (2026-03-26)
+- Updated GET /api/servers/[serverId] to include `categories` in the Prisma query (ordered by position).
+- Rewrote ChannelPanel to group channels by categoryId. Uncategorized channels appear at top under a generic "Channels" header. Each category is collapsible via MUI Collapse with expand/chevron icons.
+- Category headers show channel count (e.g. "General — 3").
+- Collapsed state stored in local React state (Record<categoryId, boolean>).
+- Lesson: The server API didn't include categories — always check what the API returns before building UI that depends on new data shapes.

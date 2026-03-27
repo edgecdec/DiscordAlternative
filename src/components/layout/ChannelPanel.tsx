@@ -11,8 +11,9 @@ import {
   ListItemText,
   IconButton,
   Tooltip,
+  Collapse,
 } from "@mui/material";
-import { Tag, VolumeUp, Add, Settings, FiberManualRecord } from "@mui/icons-material";
+import { Tag, VolumeUp, Add, Settings, FiberManualRecord, ExpandMore, ChevronRight } from "@mui/icons-material";
 import CreateChannelDialog from "@/components/layout/CreateChannelDialog";
 import ServerSettings from "@/components/layout/ServerSettings";
 import UserInfoPanel from "@/components/layout/UserInfoPanel";
@@ -25,6 +26,13 @@ interface Channel {
   id: string;
   name: string;
   type: string;
+  categoryId: string | null;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  position: number;
 }
 
 interface Member {
@@ -37,6 +45,7 @@ interface ServerData {
   name: string;
   channels: Channel[];
   members: Member[];
+  categories: Category[];
 }
 
 interface ChannelPanelProps {
@@ -44,9 +53,14 @@ interface ChannelPanelProps {
   onNavigate?: () => void;
 }
 
+function getChannelIcon(type: string) {
+  return type === "TEXT" ? <Tag sx={{ fontSize: 20 }} /> : <VolumeUp sx={{ fontSize: 20 }} />;
+}
+
 export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) {
   const [server, setServer] = useState<ServerData | null>(null);
   const [unreads, setUnreads] = useState<Record<string, boolean>>({});
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const router = useRouter();
@@ -87,57 +101,87 @@ export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) 
   const currentMember = server.members.find((m) => m.user.id === userId);
   const canManage = currentMember ? ADMIN_ROLES.includes(currentMember.role) : false;
 
-  const textChannels = server.channels.filter((c) => c.type === "TEXT");
-  const voiceChannels = server.channels.filter((c) => c.type === "VOICE" || c.type === "VIDEO");
+  const toggleCollapse = (categoryId: string) => {
+    setCollapsed((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }));
+  };
 
-  const renderChannelGroup = (label: string, channels: Channel[], icon: React.ReactNode) => (
-    <>
-      <Box sx={{ display: "flex", alignItems: "center", px: 1, pt: 2, pb: 0.5 }}>
-        <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "uppercase", fontWeight: 700, flex: 1 }}>
-          {label}
-        </Typography>
-        {canManage && (
-          <Tooltip title="Create Channel">
-            <IconButton size="small" onClick={() => setDialogOpen(true)} sx={{ color: "text.secondary" }}>
-              <Add sx={{ fontSize: 16 }} />
-            </IconButton>
-          </Tooltip>
+  const uncategorized = server.channels.filter((c) => !c.categoryId);
+  const categories = (server.categories || []).slice().sort((a, b) => a.position - b.position);
+
+  const renderChannel = (ch: Channel) => {
+    const isUnread = unreads[ch.id] && ch.id !== channelId;
+    return (
+      <ListItemButton
+        key={ch.id}
+        selected={ch.id === channelId}
+        onClick={() => { router.push(`/servers/${server.id}/channels/${ch.id}`); onNavigate?.(); }}
+        sx={{ borderRadius: 1, mx: 0.5, px: 1 }}
+      >
+        <ListItemIcon sx={{ minWidth: 28, color: "text.secondary" }}>
+          {getChannelIcon(ch.type)}
+        </ListItemIcon>
+        <ListItemText
+          primary={ch.name}
+          slotProps={{
+            primary: {
+              noWrap: true,
+              sx: {
+                fontSize: 14,
+                fontWeight: isUnread ? 700 : 400,
+                color: isUnread ? "text.primary" : "text.secondary",
+              },
+            },
+          }}
+        />
+        {isUnread && (
+          <FiberManualRecord sx={{ fontSize: 8, color: "primary.main", ml: 0.5 }} />
         )}
-      </Box>
-      <List dense disablePadding>
-        {channels.map((ch) => {
-          const isUnread = unreads[ch.id] && ch.id !== channelId;
-          return (
-            <ListItemButton
-              key={ch.id}
-              selected={ch.id === channelId}
-              onClick={() => { router.push(`/servers/${server.id}/channels/${ch.id}`); onNavigate?.(); }}
-              sx={{ borderRadius: 1, mx: 0.5, px: 1 }}
-            >
-              <ListItemIcon sx={{ minWidth: 28, color: "text.secondary" }}>
-                {icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={ch.name}
-                slotProps={{
-                  primary: {
-                    noWrap: true,
-                    sx: {
-                      fontSize: 14,
-                      fontWeight: isUnread ? 700 : 400,
-                      color: isUnread ? "text.primary" : "text.secondary",
-                    },
-                  },
-                }}
-              />
-              {isUnread && (
-                <FiberManualRecord sx={{ fontSize: 8, color: "primary.main", ml: 0.5 }} />
-              )}
-            </ListItemButton>
-          );
-        })}
-      </List>
-    </>
+      </ListItemButton>
+    );
+  };
+
+  const renderCategoryHeader = (label: string, count: number, categoryId?: string) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        px: 0.5,
+        pt: 2,
+        pb: 0.5,
+        cursor: categoryId ? "pointer" : undefined,
+        userSelect: "none",
+      }}
+      onClick={categoryId ? () => toggleCollapse(categoryId) : undefined}
+    >
+      {categoryId && (
+        collapsed[categoryId]
+          ? <ChevronRight sx={{ fontSize: 16, color: "text.secondary" }} />
+          : <ExpandMore sx={{ fontSize: 16, color: "text.secondary" }} />
+      )}
+      <Typography
+        variant="caption"
+        sx={{
+          color: "text.secondary",
+          textTransform: "uppercase",
+          fontWeight: 700,
+          flex: 1,
+          ml: categoryId ? 0 : 1.5,
+        }}
+      >
+        {label} — {count}
+      </Typography>
+      {canManage && (
+        <Tooltip title="Create Channel">
+          <IconButton
+            size="small"
+            onClick={(e) => { e.stopPropagation(); setDialogOpen(true); }}
+            sx={{ color: "text.secondary" }}
+          >
+            <Add sx={{ fontSize: 16 }} />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Box>
   );
 
   return (
@@ -167,8 +211,29 @@ export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) 
       </Box>
 
       <Box sx={{ flex: 1, overflowY: "auto", py: 0.5 }}>
-        {textChannels.length > 0 && renderChannelGroup("Text Channels", textChannels, <Tag sx={{ fontSize: 20 }} />)}
-        {voiceChannels.length > 0 && renderChannelGroup("Voice Channels", voiceChannels, <VolumeUp sx={{ fontSize: 20 }} />)}
+        {uncategorized.length > 0 && (
+          <>
+            {renderCategoryHeader("Channels", uncategorized.length)}
+            <List dense disablePadding>
+              {uncategorized.map(renderChannel)}
+            </List>
+          </>
+        )}
+        {categories.map((cat) => {
+          const catChannels = server.channels.filter((c) => c.categoryId === cat.id);
+          if (catChannels.length === 0) return null;
+          const isCollapsed = collapsed[cat.id] ?? false;
+          return (
+            <Box key={cat.id}>
+              {renderCategoryHeader(cat.name, catChannels.length, cat.id)}
+              <Collapse in={!isCollapsed}>
+                <List dense disablePadding>
+                  {catChannels.map(renderChannel)}
+                </List>
+              </Collapse>
+            </Box>
+          );
+        })}
       </Box>
 
       <CreateChannelDialog

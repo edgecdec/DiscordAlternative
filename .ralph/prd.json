@@ -854,7 +854,7 @@
       "title": "Render channel categories in ChannelPanel",
       "spec": "specs/ui-layout.md",
       "priority": 80,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Update ChannelPanel to group channels under collapsible category headers. Uncategorized channels appear at top. Categories are collapsible (click header to toggle). Show channel count per category."
     },

@@ -33,6 +33,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
         include: { user: { select: { id: true, username: true, avatarUrl: true } } },
         orderBy: { joinedAt: "asc" },
       },
+      categories: { orderBy: { position: "asc" } },
     },
   });
 
