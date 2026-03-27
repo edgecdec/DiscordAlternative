@@ -11,6 +11,13 @@ export interface ReactionGroup {
   userReacted: boolean;
 }
 
+export interface MessageReplyTo {
+  id: string;
+  content: string;
+  author: { id: string; username: string };
+  deleted: boolean;
+}
+
 export interface SocketMessage {
   id: string;
   content: string;
@@ -21,6 +28,7 @@ export interface SocketMessage {
   channelId: string;
   author: MessageAuthor;
   reactions?: Record<string, ReactionGroup>;
+  replyTo?: MessageReplyTo | null;
 }
 
 // Client → Server payloads
@@ -36,6 +44,7 @@ export interface MessageCreatePayload {
   channelId: string;
   content: string;
   fileUrl?: string;
+  replyToId?: string;
 }
 
 export interface MessageUpdatePayload {

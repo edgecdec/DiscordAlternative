@@ -791,7 +791,7 @@
       "title": "Add reply support to messages database and API",
       "spec": "specs/database.md",
       "priority": 73,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add replyToId field (optional String) to Message model, self-relation to Message. Update POST /api/channels/[channelId]/messages to accept optional replyToId. Update GET messages to include replyTo message (id, content snippet, author username) when present."
     },

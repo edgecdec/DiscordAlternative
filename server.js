@@ -197,7 +197,7 @@ app.prepare().then(() => {
       }
     });
 
-    socket.on("message:create", async ({ channelId, content, fileUrl }) => {
+    socket.on("message:create", async ({ channelId, content, fileUrl, replyToId }) => {
       try {
         if (!content || typeof content !== "string" || content.trim().length === 0 || content.length > 2000) return;
         const channel = await prisma.channel.findUnique({
@@ -213,11 +213,25 @@ app.prepare().then(() => {
           data: {
             content: content.trim(),
             fileUrl: fileUrl || null,
+            replyToId: replyToId || null,
             channelId,
             authorId: socket.data.userId,
           },
-          include: { author: { select: { id: true, username: true, avatarUrl: true } } },
+          include: {
+            author: { select: { id: true, username: true, avatarUrl: true } },
+            replyTo: {
+              select: {
+                id: true,
+                content: true,
+                deleted: true,
+                author: { select: { id: true, username: true } },
+              },
+            },
+          },
         });
+        const replyTo = message.replyTo
+          ? { id: message.replyTo.id, content: message.replyTo.deleted ? "" : message.replyTo.content, author: message.replyTo.author, deleted: message.replyTo.deleted }
+          : null;
         io.to(`channel:${channelId}`).emit("message:new", {
           id: message.id,
           content: message.content,
@@ -227,6 +241,7 @@ app.prepare().then(() => {
           updatedAt: message.updatedAt.toISOString(),
           channelId: message.channelId,
           author: message.author,
+          replyTo,
         });
       } catch (err) {
         console.error("message:create error:", err);

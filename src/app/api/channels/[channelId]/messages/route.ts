@@ -40,6 +40,14 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     include: {
       author: { select: { id: true, username: true, avatarUrl: true } },
       reactions: { select: { emoji: true, userId: true } },
+      replyTo: {
+        select: {
+          id: true,
+          content: true,
+          deleted: true,
+          author: { select: { id: true, username: true } },
+        },
+      },
     },
   });
 
@@ -50,7 +58,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       reactionMap[r.emoji].count++;
       if (r.userId === user.userId) reactionMap[r.emoji].userReacted = true;
     }
-    return { ...m, reactions: reactionMap };
+    const replyTo = m.replyTo
+      ? { id: m.replyTo.id, content: m.replyTo.deleted ? "" : m.replyTo.content, author: m.replyTo.author, deleted: m.replyTo.deleted }
+      : null;
+    return { ...m, reactions: reactionMap, replyTo };
   });
 
   const nextCursor = messages.length === MESSAGES_PER_PAGE ? messages[messages.length - 1].id : null;
@@ -91,18 +102,32 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
   }
 
   const fileUrl = typeof body.fileUrl === "string" ? body.fileUrl : undefined;
+  const replyToId = typeof body.replyToId === "string" ? body.replyToId : undefined;
 
   const message = await prisma.message.create({
     data: {
       content: body.content.trim(),
       fileUrl,
+      replyToId,
       authorId: user.userId,
       channelId,
     },
     include: {
       author: { select: { id: true, username: true, avatarUrl: true } },
+      replyTo: {
+        select: {
+          id: true,
+          content: true,
+          deleted: true,
+          author: { select: { id: true, username: true } },
+        },
+      },
     },
   });
 
-  return NextResponse.json({ message }, { status: 201 });
+  const replyTo = message.replyTo
+    ? { id: message.replyTo.id, content: message.replyTo.deleted ? "" : message.replyTo.content, author: message.replyTo.author, deleted: message.replyTo.deleted }
+    : null;
+
+  return NextResponse.json({ message: { ...message, replyTo } }, { status: 201 });
 }

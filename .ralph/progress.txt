@@ -555,3 +555,12 @@
 - MessageList listens for reaction:add/reaction:remove socket events and updates state in real-time
 - Server.js reaction:toggle handler broadcasts to channel room
 - Lesson: Task was already fully implemented from a previous interrupted iteration — just needed status update. Always check git log before re-implementing.
+
+## TASK-073: Add reply support to messages database and API (2026-03-26)
+- Added `replyToId` optional field to Message model with self-relation (onDelete: SetNull)
+- Updated GET /api/channels/[channelId]/messages to include replyTo (id, content snippet, author username, deleted flag)
+- Updated POST /api/channels/[channelId]/messages to accept optional replyToId
+- Updated Socket.io message:create handler in server.js to persist and broadcast replyTo data
+- Updated SocketMessage and MessageCreatePayload types in socket.ts
+- Lesson: After `prisma migrate dev`, must also run `prisma generate` for TypeScript types to update — the migration alone doesn't regenerate the client types locally
+- Lesson: Deploy webhook may temporarily show 500 while .next is being rebuilt — poll with retries instead of checking once
