@@ -1297,7 +1297,7 @@
       "priority": 132,
       "status": "open",
       "dependencies": [],
-      "description": "Create a backup.sh script that copies data/discord.db to a timestamped backup file in /var/www/DiscordAlternative/backups/. Add a cron job on the server to run it daily. Keep last 7 backups, delete older ones. SQLite can be safely copied while the app is running if using WAL mode. This is critical \u2014 one bad migration could wipe all data."
+      "description": "Create a backup.sh script that copies data/discord.db to /var/www/DiscordAlternative/backups/ with a date-stamped filename. Keep only the last 2 backups, delete older ones. Add a cron job on the server to run it once per day at 3am. SQLite can be safely copied while the app is running if using WAL mode."
     },
     {
       "id": "TASK-133",
