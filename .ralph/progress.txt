@@ -847,3 +847,11 @@
 - Wrapped app in NotificationSoundProvider in root layout (inside SocketProvider)
 - Lesson: UserInfoPanel only renders inside server layout (ChannelPanel), not on DM or welcome pages — Nova Act tests need to navigate to a server first
 - Lesson: Web Audio API AudioContext may be suspended by browser autoplay policy — calling resume() on user interaction ensures it works
+
+## TASK-102: Add markdown rendering to messages (2026-03-27)
+- Created `src/lib/markdown.ts` with regex-based parser for **bold**, *italic*, ~~strikethrough~~, `inline code`, and ```code blocks```.
+- Integrated into MentionText component — text parts from the existing mention/link/emoji parser are further parsed for markdown.
+- Used an iterative "find earliest match" approach to handle multiple markdown types in one string without nesting complexity.
+- Code blocks and inline code use `action.hover` bgcolor with monospace font via MUI Box `sx` (no hardcoded colors).
+- Nova Act test confirmed all 4 inline markdown types render correctly in the live browser.
+- Lesson: ActMetadata has no `completed` field — just check if `act()` returns without exception.

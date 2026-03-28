@@ -1097,7 +1097,7 @@
       "title": "Add markdown rendering to messages",
       "spec": "specs/ui-layout.md",
       "priority": 113,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Parse message content as basic markdown: **bold**, *italic*, ~~strikethrough~~, `inline code`, ```code blocks```. Use a lightweight parser (regex-based, no external library). Render in MessageList with appropriate MUI Typography styles. Keep it simple \u2014 no full markdown spec."
     },

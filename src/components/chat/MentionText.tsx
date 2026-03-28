@@ -3,6 +3,8 @@
 import { Fragment, useEffect, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import type { CustomEmoji } from "@/components/chat/EmojiPicker";
+import { parseMarkdown } from "@/lib/markdown";
+import type { MdPart } from "@/lib/markdown";
 
 const URL_REGEX = /https?:\/\/[^\s<>)"']+/g;
 const MENTION_REGEX = /@(\w+)/g;
@@ -46,6 +48,61 @@ export function extractFirstUrl(content: string): string | null {
 
 // Cache for server emoji keyed by serverId
 const emojiCache = new Map<string, CustomEmoji[]>();
+
+function renderMdPart(part: MdPart, idx: number) {
+  switch (part.type) {
+    case "bold":
+      return <strong key={idx}>{part.value}</strong>;
+    case "italic":
+      return <em key={idx}>{part.value}</em>;
+    case "strikethrough":
+      return <s key={idx}>{part.value}</s>;
+    case "inlineCode":
+      return (
+        <Box
+          key={idx}
+          component="code"
+          sx={{
+            bgcolor: "action.hover",
+            borderRadius: 0.5,
+            px: 0.5,
+            py: 0.125,
+            fontFamily: "monospace",
+            fontSize: "0.85em",
+          }}
+        >
+          {part.value}
+        </Box>
+      );
+    case "codeBlock":
+      return (
+        <Box
+          key={idx}
+          component="pre"
+          sx={{
+            bgcolor: "action.hover",
+            borderRadius: 1,
+            p: 1,
+            my: 0.5,
+            fontFamily: "monospace",
+            fontSize: "0.85em",
+            overflowX: "auto",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
+        >
+          {part.value}
+        </Box>
+      );
+    default:
+      return <Fragment key={idx}>{part.value}</Fragment>;
+  }
+}
+
+function MarkdownSpan({ text }: { text: string }) {
+  const parts = parseMarkdown(text);
+  return <>{parts.map(renderMdPart)}</>;
+}
 
 interface MentionTextProps {
   content: string;
@@ -137,7 +194,7 @@ export default function MentionText({ content, serverId }: MentionTextProps) {
           // Not found — render as plain text
           return <Fragment key={i}>:{part.value}:</Fragment>;
         }
-        return <Fragment key={i}>{part.value}</Fragment>;
+        return <MarkdownSpan key={i} text={part.value} />;
       })}
     </>
   );
