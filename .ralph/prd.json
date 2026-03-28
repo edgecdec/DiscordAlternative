@@ -1016,7 +1016,7 @@
       "title": "Fix image/file upload failing",
       "spec": "specs/deployment.md",
       "priority": 98,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "BUG: Image uploads fail when sending messages. Diagnose: 1) Check /api/upload route exists and works \u2014 curl a test upload from the server. 2) Check the uploads/ directory exists on the server and is writable. 3) Check server.js serves the uploads/ directory as static files. 4) Check nginx passes requests to /uploads/ correctly. 5) Check file size limits match constants.ts FILE_UPLOAD_MAX_BYTES. 6) Check the MessageInput attachment flow actually calls /api/upload before sending the message. Fix whatever is broken and verify by uploading an image in chat."
     },

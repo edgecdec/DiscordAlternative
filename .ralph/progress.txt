@@ -767,3 +767,10 @@
 - Used `useSearchParams()` in page.tsx to read the `redirect` query param and pass it to `router.replace()` after auth.
 - Required wrapping the component in `<Suspense>` because `useSearchParams()` needs it in Next.js App Router.
 - Lesson: When using `useSearchParams()` in Next.js 15 App Router, always wrap in Suspense or the build will warn/fail.
+
+## TASK-150: Fix image/file upload failing (2026-03-27)
+- Root cause: nginx default `client_max_body_size` is 1MB, but our FILE_UPLOAD_MAX_BYTES is 5MB. Any file over 1MB was rejected by nginx with 413 before reaching the app.
+- Fix: Added `client_max_body_size 6m;` to the nginx server block for discord.edgecdec.com (6MB to give headroom above the 5MB app limit).
+- The upload API route, server.js static file serving, and MessageInput attachment flow were all correct — the issue was purely nginx config.
+- Lesson: When debugging upload failures, always check the reverse proxy (nginx) body size limits first. The default 1MB is very common to hit.
+- Verified: Small files, 2MB files, 5MB files all upload successfully. 5.5MB files correctly rejected by the app with 400 error. Uploaded files accessible via /uploads/ URL.
