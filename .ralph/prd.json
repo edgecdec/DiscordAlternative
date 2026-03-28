@@ -1034,7 +1034,7 @@
       "title": "Show edit indicator on edited messages",
       "spec": "specs/ui-layout.md",
       "priority": 106,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "In MessageList, if a message's updatedAt differs from createdAt and it's not deleted, show a small '(edited)' label next to the timestamp. Tooltip on hover shows the edit timestamp."
     },

@@ -784,3 +784,10 @@
 - Passed userRole from channel page to MessageList to control pin button visibility
 - Lesson: Use wait_until="load" instead of "networkidle" for Nova Act tests on pages with WebSocket connections — networkidle never resolves due to persistent socket connections
 - Lesson: Navigate directly to a known channel URL in Nova Act tests instead of relying on the agent to find UI elements on complex layouts
+
+## TASK-095: Show edit indicator on edited messages (2026-03-27)
+- Added "(edited)" label next to message timestamp when updatedAt !== createdAt and message is not deleted
+- Wrapped in MUI Tooltip showing the edit timestamp on hover
+- Styled with italic and cursor:default to match Discord's pattern
+- SocketMessage type already had updatedAt field, no type changes needed
+- Lesson: Minimal UI changes like this are low-risk — just compare two existing fields and conditionally render a span

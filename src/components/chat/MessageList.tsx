@@ -250,6 +250,13 @@ export default function MessageList({ channelId, onReply, userRole }: MessageLis
               <Typography variant="caption" color="text.secondary">
                 {formatTimestamp(msg.createdAt)}
               </Typography>
+              {!msg.deleted && msg.updatedAt !== msg.createdAt && (
+                <Tooltip title={`Edited ${formatTimestamp(msg.updatedAt)}`}>
+                  <Typography variant="caption" color="text.secondary" sx={{ cursor: "default", fontStyle: "italic" }}>
+                    (edited)
+                  </Typography>
+                </Tooltip>
+              )}
               {!msg.deleted && msg.pinned && (
                 <Tooltip title="Pinned">
                   <PushPin sx={{ fontSize: 14, color: "text.secondary", alignSelf: "center" }} />
