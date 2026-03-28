@@ -735,3 +735,13 @@
 - The server already enforced slow mode and emitted message:error — just needed the client-side UI
 - Lesson: The server detail API returns all channel fields by default (no select clause), so slowModeSeconds was already available without API changes
 - Lesson: Nova Act navigation can be tricky — the first icon in sidebar might be DM, not a server. Need to be specific in instructions.
+
+## TASK-093: Implement message pinning API (2026-03-27)
+- Task was already fully implemented in a previous iteration but left as in_progress
+- Verified: POST /api/messages/[messageId]/pin toggles pinned status (OWNER/ADMIN/MODERATOR only)
+- Verified: GET /api/channels/[channelId]/pins returns all pinned messages
+- Verified: Socket.io pin:toggle event handler in server.js broadcasts to channel room
+- Verified: PinTogglePayload and PinToggleClientPayload types defined in socket.ts
+- Verified: pinned Boolean field exists on Message model in Prisma schema
+- All APIs tested on production — pin/unpin/get pins all work correctly
+- Lesson: Always check if a task marked in_progress was already completed before re-implementing

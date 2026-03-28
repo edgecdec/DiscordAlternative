@@ -980,7 +980,7 @@
       "title": "Implement message pinning API",
       "spec": "specs/database.md",
       "priority": 94,
-      "status": "in_progress",
+      "status": "done",
       "dependencies": [],
       "description": "Add pinned Boolean field to Message model (default false). Create POST /api/messages/[messageId]/pin \u2014 toggles pinned status. OWNER/ADMIN/MODERATOR only. Create GET /api/channels/[channelId]/pins \u2014 returns all pinned messages in a channel. Broadcast pin:toggle via Socket.io."
     },
