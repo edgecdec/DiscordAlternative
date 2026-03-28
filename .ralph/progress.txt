@@ -774,3 +774,13 @@
 - The upload API route, server.js static file serving, and MessageInput attachment flow were all correct — the issue was purely nginx config.
 - Lesson: When debugging upload failures, always check the reverse proxy (nginx) body size limits first. The default 1MB is very common to hit.
 - Verified: Small files, 2MB files, 5MB files all upload successfully. 5.5MB files correctly rejected by the app with 400 error. Uploaded files accessible via /uploads/ URL.
+
+## TASK-094: Build pinned messages UI (2026-03-27)
+- Created PinnedMessagesDrawer component with real-time pin:toggle socket updates
+- Added PushPin icon button in channel header to open the drawer
+- Added pin/unpin button on message hover (visible only for OWNER/ADMIN/MODERATOR roles)
+- Pinned messages show a small pin icon next to the timestamp
+- MessageList now listens for pin:toggle socket events to update pinned state in real-time
+- Passed userRole from channel page to MessageList to control pin button visibility
+- Lesson: Use wait_until="load" instead of "networkidle" for Nova Act tests on pages with WebSocket connections — networkidle never resolves due to persistent socket connections
+- Lesson: Navigate directly to a known channel URL in Nova Act tests instead of relying on the agent to find UI elements on complex layouts

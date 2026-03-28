@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Box, IconButton, Tooltip, Typography, useMediaQuery } from "@mui/material";
-import { Schedule, Search, Settings, Tag, VolumeUp } from "@mui/icons-material";
+import { PushPin, Schedule, Search, Settings, Tag, VolumeUp } from "@mui/icons-material";
 import { useSocket } from "@/hooks/useSocket";
 import { useAuth } from "@/hooks/useAuth";
 import type { SocketMessage } from "@/types/socket";
@@ -13,6 +13,7 @@ import TypingIndicator from "@/components/chat/TypingIndicator";
 import VoiceChannel from "@/components/voice/VoiceChannel";
 import SearchDialog from "@/components/chat/SearchDialog";
 import ChannelSettingsDialog from "@/components/layout/ChannelSettingsDialog";
+import PinnedMessagesDrawer from "@/components/chat/PinnedMessagesDrawer";
 
 interface ChannelInfo {
   name: string;
@@ -43,6 +44,7 @@ export default function ChannelPage() {
   const [replyTo, setReplyTo] = useState<SocketMessage | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [pinsOpen, setPinsOpen] = useState(false);
 
   useEffect(() => {
     setReplyTo(null);
@@ -123,6 +125,13 @@ export default function ChannelPage() {
           </Tooltip>
         )}
         <Box sx={{ ml: "auto", display: "flex", gap: 0.5 }}>
+          {isText && (
+            <Tooltip title="Pinned Messages">
+              <IconButton size="small" onClick={() => setPinsOpen(true)} aria-label="Pinned messages">
+                <PushPin sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
+          )}
           {canManage && isText && channel && (
             <Tooltip title="Channel Settings">
               <IconButton size="small" onClick={() => setSettingsOpen(true)} aria-label="Channel settings">
@@ -136,6 +145,9 @@ export default function ChannelPage() {
         </Box>
       </Box>
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} serverId={serverId} />
+      {isText && (
+        <PinnedMessagesDrawer open={pinsOpen} onClose={() => setPinsOpen(false)} channelId={channelId} />
+      )}
       {channel && isText && canManage && (
         <ChannelSettingsDialog
           open={settingsOpen}
@@ -148,7 +160,7 @@ export default function ChannelPage() {
       )}
       {isText && channel ? (
         <>
-          <MessageList channelId={channelId} onReply={setReplyTo} />
+          <MessageList channelId={channelId} onReply={setReplyTo} userRole={userRole} />
           <TypingIndicator channelId={channelId} />
           <MessageInput
             channelId={channelId}

@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Avatar, Box, CircularProgress, IconButton, Typography } from "@mui/material";
-import { Reply as ReplyIcon } from "@mui/icons-material";
-import type { SocketMessage, MessageDeletedPayload, ReactionBroadcastPayload } from "@/types/socket";
+import { Avatar, Box, CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
+import { PushPin, Reply as ReplyIcon } from "@mui/icons-material";
+import type { SocketMessage, MessageDeletedPayload, ReactionBroadcastPayload, PinTogglePayload } from "@/types/socket";
 import { useSocket } from "@/hooks/useSocket";
 import { useAuth } from "@/hooks/useAuth";
 import MessageAttachment from "@/components/chat/MessageAttachment";
@@ -15,7 +15,10 @@ import LinkPreview from "@/components/chat/LinkPreview";
 interface MessageListProps {
   channelId: string;
   onReply?: (msg: SocketMessage) => void;
+  userRole?: string;
 }
+
+const PIN_ROLES = ["OWNER", "ADMIN", "MODERATOR"];
 
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
@@ -27,7 +30,7 @@ function formatTimestamp(iso: string): string {
   });
 }
 
-export default function MessageList({ channelId, onReply }: MessageListProps) {
+export default function MessageList({ channelId, onReply, userRole }: MessageListProps) {
   const [messages, setMessages] = useState<SocketMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -161,6 +164,20 @@ export default function MessageList({ channelId, onReply }: MessageListProps) {
     socket.emit("reaction:toggle", { messageId, emoji });
   }, [socket]);
 
+  const canPin = PIN_ROLES.includes(userRole ?? "");
+
+  const handlePinToggle = useCallback((messageId: string) => {
+    if (!socket) return;
+    socket.emit("pin:toggle", { messageId });
+  }, [socket]);
+
+  const handlePinBroadcast = useCallback((payload: PinTogglePayload) => {
+    if (payload.channelId !== channelId) return;
+    setMessages((prev) =>
+      prev.map((m) => (m.id === payload.messageId ? { ...m, pinned: payload.pinned } : m))
+    );
+  }, [channelId]);
+
   useEffect(() => {
     if (!socket) return;
     socket.on("message:new", handleNew);
@@ -168,14 +185,16 @@ export default function MessageList({ channelId, onReply }: MessageListProps) {
     socket.on("message:deleted", handleDeleted);
     socket.on("reaction:add", handleReactionAdd);
     socket.on("reaction:remove", handleReactionRemove);
+    socket.on("pin:toggle", handlePinBroadcast);
     return () => {
       socket.off("message:new", handleNew);
       socket.off("message:updated", handleUpdated);
       socket.off("message:deleted", handleDeleted);
       socket.off("reaction:add", handleReactionAdd);
       socket.off("reaction:remove", handleReactionRemove);
+      socket.off("pin:toggle", handlePinBroadcast);
     };
-  }, [socket, handleNew, handleUpdated, handleDeleted, handleReactionAdd, handleReactionRemove]);
+  }, [socket, handleNew, handleUpdated, handleDeleted, handleReactionAdd, handleReactionRemove, handlePinBroadcast]);
 
   if (loading) {
     return (
@@ -213,6 +232,7 @@ export default function MessageList({ channelId, onReply }: MessageListProps) {
             py: 0.75,
             "&:hover .reaction-add-btn": { opacity: 1 },
             "&:hover .reply-btn": { opacity: 1 },
+            "&:hover .pin-btn": { opacity: 1 },
           }}
         >
           <Avatar
@@ -230,16 +250,38 @@ export default function MessageList({ channelId, onReply }: MessageListProps) {
               <Typography variant="caption" color="text.secondary">
                 {formatTimestamp(msg.createdAt)}
               </Typography>
-              {!msg.deleted && onReply && (
-                <IconButton
-                  size="small"
-                  className="reply-btn"
-                  onClick={() => onReply(msg)}
-                  sx={{ opacity: 0, ml: "auto", p: 0.25 }}
-                  aria-label="Reply"
-                >
-                  <ReplyIcon sx={{ fontSize: 16 }} />
-                </IconButton>
+              {!msg.deleted && msg.pinned && (
+                <Tooltip title="Pinned">
+                  <PushPin sx={{ fontSize: 14, color: "text.secondary", alignSelf: "center" }} />
+                </Tooltip>
+              )}
+              {!msg.deleted && (
+                <Box sx={{ ml: "auto", display: "flex", gap: 0.25 }}>
+                  {canPin && (
+                    <Tooltip title={msg.pinned ? "Unpin" : "Pin"}>
+                      <IconButton
+                        size="small"
+                        className="pin-btn"
+                        onClick={() => handlePinToggle(msg.id)}
+                        sx={{ opacity: 0, p: 0.25 }}
+                        aria-label={msg.pinned ? "Unpin message" : "Pin message"}
+                      >
+                        <PushPin sx={{ fontSize: 16, color: msg.pinned ? "primary.main" : "text.secondary" }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {onReply && (
+                    <IconButton
+                      size="small"
+                      className="reply-btn"
+                      onClick={() => onReply(msg)}
+                      sx={{ opacity: 0, p: 0.25 }}
+                      aria-label="Reply"
+                    >
+                      <ReplyIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  )}
+                </Box>
               )}
             </Box>
             <Typography

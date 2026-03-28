@@ -1025,7 +1025,7 @@
       "title": "Build pinned messages UI",
       "spec": "specs/ui-layout.md",
       "priority": 105,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add a pin icon in the channel header. Clicking opens a drawer/panel showing pinned messages. Add a pin button on message hover (for permitted roles). Pinned messages show a small pin icon. Notify channel via Socket.io when a message is pinned/unpinned."
     },
