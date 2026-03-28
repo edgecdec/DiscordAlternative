@@ -880,3 +880,11 @@
 - Updated invite join route to check for bans before allowing join
 - Added member_ban and member_unban to AuditAction type and AuditLogTab labels
 - Lesson: After adding a new Prisma model, must run `npx prisma generate` to update the client types before tsc will pass — the migration alone doesn't regenerate the client.
+
+## TASK-106: Build ban management UI (2026-03-27)
+- Created BanConfirmDialog.tsx — confirmation dialog with optional reason field
+- Created BansTab.tsx — shows banned users with unban button, fetches from /api/servers/[serverId]/bans
+- Updated MembersTab.tsx — added Ban (Block icon) button next to Kick for OWNER/ADMIN on non-owner members
+- Updated ServerSettings.tsx — added Bans tab for OWNER/ADMIN, refactored tab system to use key-based approach instead of index-based to handle conditional tabs correctly
+- Lesson: When MUI Tabs have conditional tabs, using index-based content rendering breaks. Use a key-based approach (build tabs array with keys, match activeKey) to avoid index shifting issues.
+- Lesson: Use `domcontentloaded` instead of `networkidle` for Nova Act page.goto — Socket.io connections keep the network active and cause networkidle to timeout.

@@ -15,7 +15,8 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
-import { PersonRemove } from "@mui/icons-material";
+import { PersonRemove, Block } from "@mui/icons-material";
+import BanConfirmDialog from "@/components/layout/BanConfirmDialog";
 
 const ASSIGNABLE_ROLES = ["ADMIN", "MODERATOR", "GUEST"] as const;
 
@@ -40,7 +41,9 @@ interface MembersTabProps {
 export default function MembersTab({ serverId, userRole }: MembersTabProps) {
   const [members, setMembers] = useState<Member[]>([]);
   const [error, setError] = useState("");
+  const [banTarget, setBanTarget] = useState<Member | null>(null);
   const isOwner = userRole === "OWNER";
+  const canManage = ["OWNER", "ADMIN"].includes(userRole);
 
   const fetchMembers = useCallback(async () => {
     const res = await fetch(`/api/servers/${serverId}/members`);
@@ -84,6 +87,25 @@ export default function MembersTab({ serverId, userRole }: MembersTabProps) {
     }
   };
 
+  const handleBan = async (reason: string) => {
+    if (!banTarget) return;
+    setError("");
+    const res = await fetch(`/api/servers/${serverId}/bans`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: banTarget.user.id, reason: reason || undefined }),
+    });
+    if (res.ok) {
+      setMembers((prev) => prev.filter((m) => m.id !== banTarget.id));
+    } else {
+      const data = await res.json();
+      setError(data.error || "Failed to ban member");
+    }
+    setBanTarget(null);
+  };
+
+  const canActOn = (m: Member) => m.role !== "OWNER" && canManage;
+
   return (
     <>
       {error && <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>}
@@ -95,21 +117,28 @@ export default function MembersTab({ serverId, userRole }: MembersTabProps) {
           <ListItem
             key={m.id}
             secondaryAction={
-              isOwner && m.role !== "OWNER" ? (
+              canActOn(m) ? (
                 <>
-                  <Select
-                    size="small"
-                    value={m.role}
-                    onChange={(e) => handleRoleChange(m.id, e.target.value)}
-                    sx={{ mr: 1, minWidth: 120 }}
-                  >
-                    {ASSIGNABLE_ROLES.map((r) => (
-                      <MenuItem key={r} value={r}>{r}</MenuItem>
-                    ))}
-                  </Select>
+                  {isOwner && (
+                    <Select
+                      size="small"
+                      value={m.role}
+                      onChange={(e) => handleRoleChange(m.id, e.target.value)}
+                      sx={{ mr: 1, minWidth: 120 }}
+                    >
+                      {ASSIGNABLE_ROLES.map((r) => (
+                        <MenuItem key={r} value={r}>{r}</MenuItem>
+                      ))}
+                    </Select>
+                  )}
                   <Tooltip title="Kick">
-                    <IconButton edge="end" onClick={() => handleKick(m.id, m.user.username)} color="error">
+                    <IconButton onClick={() => handleKick(m.id, m.user.username)} color="warning" size="small">
                       <PersonRemove />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Ban">
+                    <IconButton onClick={() => setBanTarget(m)} color="error" size="small">
+                      <Block />
                     </IconButton>
                   </Tooltip>
                 </>
@@ -117,7 +146,7 @@ export default function MembersTab({ serverId, userRole }: MembersTabProps) {
                 <Chip label={m.role} size="small" color={ROLE_COLORS[m.role] || "default"} />
               )
             }
-            sx={{ pr: isOwner && m.role !== "OWNER" ? 24 : 8 }}
+            sx={{ pr: canActOn(m) ? 24 : 8 }}
           >
             <ListItemAvatar>
               <Avatar src={m.user.avatarUrl || undefined}>
@@ -128,6 +157,12 @@ export default function MembersTab({ serverId, userRole }: MembersTabProps) {
           </ListItem>
         ))}
       </List>
+      <BanConfirmDialog
+        open={!!banTarget}
+        username={banTarget?.user.username ?? ""}
+        onClose={() => setBanTarget(null)}
+        onConfirm={handleBan}
+      />
     </>
   );
 }

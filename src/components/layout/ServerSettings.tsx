@@ -19,6 +19,7 @@ import {
 import { ContentCopy, Close } from "@mui/icons-material";
 import { SERVER_NAME_MAX } from "@/lib/constants";
 import MembersTab from "@/components/layout/MembersTab";
+import BansTab from "@/components/layout/BansTab";
 import DangerZoneTab from "@/components/layout/DangerZoneTab";
 import AuditLogTab from "@/components/layout/AuditLogTab";
 
@@ -43,6 +44,16 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
   const [saving, setSaving] = useState(false);
   const isOwner = userRole === OWNER_ROLE;
   const isAdmin = ADMIN_ROLES.includes(userRole);
+
+  const tabs: { label: string; key: string }[] = [
+    { label: "General", key: "general" },
+    { label: "Members", key: "members" },
+    ...(isAdmin ? [{ label: "Bans", key: "bans" }] : []),
+    ...(isAdmin ? [{ label: "Audit Log", key: "audit" }] : []),
+    ...(isOwner ? [{ label: "Danger Zone", key: "danger" }] : []),
+  ];
+
+  const activeKey = tabs[tab]?.key ?? "general";
 
   useEffect(() => {
     setName(serverName);
@@ -105,13 +116,12 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
         </IconButton>
       </DialogTitle>
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ px: 3 }}>
-        <Tab label="General" />
-        <Tab label="Members" />
-        {isAdmin && <Tab label="Audit Log" />}
-        {isOwner && <Tab label="Danger Zone" />}
+        {tabs.map((t) => (
+          <Tab key={t.key} label={t.label} />
+        ))}
       </Tabs>
       <DialogContent>
-        {tab === 0 && (
+        {activeKey === "general" && (
           <>
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
             <TextField
@@ -142,11 +152,12 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
             </Box>
           </>
         )}
-        {tab === 1 && <MembersTab serverId={serverId} userRole={userRole} />}
-        {tab === 2 && isAdmin && <AuditLogTab serverId={serverId} />}
-        {tab === 3 && isOwner && <DangerZoneTab serverId={serverId} serverName={serverName} />}
+        {activeKey === "members" && <MembersTab serverId={serverId} userRole={userRole} />}
+        {activeKey === "bans" && <BansTab serverId={serverId} />}
+        {activeKey === "audit" && <AuditLogTab serverId={serverId} />}
+        {activeKey === "danger" && <DangerZoneTab serverId={serverId} serverName={serverName} />}
       </DialogContent>
-      {tab === 0 && (
+      {activeKey === "general" && (
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
           <Button onClick={handleSave} variant="contained" disabled={saving}>

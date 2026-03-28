@@ -1133,7 +1133,7 @@
       "title": "Build ban management UI",
       "spec": "specs/ui-layout.md",
       "priority": 117,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add ban option to member context menu in MemberList and server settings members tab. Show confirmation dialog with optional reason field. Add a 'Bans' tab in server settings showing banned users with unban button. OWNER/ADMIN only."
     },
