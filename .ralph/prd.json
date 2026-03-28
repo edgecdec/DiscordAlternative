@@ -1079,7 +1079,7 @@
       "title": "Show who's in voice channels",
       "spec": "specs/ui-layout.md",
       "priority": 111,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "In ChannelPanel, under each voice channel, show avatars/usernames of users currently connected. Use LiveKit room participant list or track via Socket.io events voice:join/voice:leave. Show participant count next to the channel name."
     },

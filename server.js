@@ -117,6 +117,8 @@ app.prepare().then(() => {
 
   const io = new SocketServer(server);
   const onlineUsers = new Map(); // Map<userId, Set<socketId>>
+  const voiceChannels = new Map(); // Map<channelId, Map<userId, { username, socketId }>>
+  const socketVoice = new Map(); // Map<socketId, channelId> — quick lookup for disconnect cleanup
 
   io.use((socket, next) => {
     const cookieHeader = socket.handshake.headers.cookie;
@@ -449,6 +451,74 @@ app.prepare().then(() => {
       });
     });
 
+    socket.on("voice:join", async ({ channelId }) => {
+      if (!channelId) return;
+      try {
+        const channel = await prisma.channel.findUnique({
+          where: { id: channelId },
+          select: { serverId: true, type: true },
+        });
+        if (!channel || (channel.type !== "VOICE" && channel.type !== "VIDEO")) return;
+        const member = await prisma.serverMember.findUnique({
+          where: { userId_serverId: { userId, serverId: channel.serverId } },
+        });
+        if (!member) return;
+
+        // Remove from previous voice channel if any
+        const prevChannel = socketVoice.get(socket.id);
+        if (prevChannel && prevChannel !== channelId) {
+          const prevMap = voiceChannels.get(prevChannel);
+          if (prevMap) {
+            prevMap.delete(userId);
+            if (prevMap.size === 0) voiceChannels.delete(prevChannel);
+          }
+          io.to(`server:${channel.serverId}`).emit("voice:left", { channelId: prevChannel, userId, username });
+        }
+
+        if (!voiceChannels.has(channelId)) voiceChannels.set(channelId, new Map());
+        voiceChannels.get(channelId).set(userId, { username, socketId: socket.id });
+        socketVoice.set(socket.id, channelId);
+
+        io.to(`server:${channel.serverId}`).emit("voice:joined", { channelId, userId, username });
+      } catch (err) {
+        console.error("voice:join error:", err);
+      }
+    });
+
+    socket.on("voice:leave", async ({ channelId }) => {
+      if (!channelId) return;
+      try {
+        const chMap = voiceChannels.get(channelId);
+        if (chMap) {
+          chMap.delete(userId);
+          if (chMap.size === 0) voiceChannels.delete(channelId);
+        }
+        socketVoice.delete(socket.id);
+
+        const channel = await prisma.channel.findUnique({
+          where: { id: channelId },
+          select: { serverId: true },
+        });
+        if (channel) {
+          io.to(`server:${channel.serverId}`).emit("voice:left", { channelId, userId, username });
+        }
+      } catch (err) {
+        console.error("voice:leave error:", err);
+      }
+    });
+
+    socket.on("voice:participants", ({ channelId }) => {
+      if (!channelId) return;
+      const chMap = voiceChannels.get(channelId);
+      const participants = [];
+      if (chMap) {
+        for (const [uid, data] of chMap) {
+          participants.push({ userId: uid, username: data.username });
+        }
+      }
+      socket.emit("voice:participants", { channelId, participants });
+    });
+
     socket.on("dm:create", async ({ receiverId, content, fileUrl }) => {
       try {
         if (!content || typeof content !== "string" || !content.trim() || content.length > 2000) return;
@@ -496,6 +566,28 @@ app.prepare().then(() => {
     socket.on("disconnect", async () => {
       const { userId, username } = socket.data;
       console.log(`Socket disconnected: ${username} (${userId})`);
+
+      // Clean up voice channel presence
+      const voiceChId = socketVoice.get(socket.id);
+      if (voiceChId) {
+        const chMap = voiceChannels.get(voiceChId);
+        if (chMap) {
+          chMap.delete(userId);
+          if (chMap.size === 0) voiceChannels.delete(voiceChId);
+        }
+        socketVoice.delete(socket.id);
+        try {
+          const channel = await prisma.channel.findUnique({
+            where: { id: voiceChId },
+            select: { serverId: true },
+          });
+          if (channel) {
+            io.to(`server:${channel.serverId}`).emit("voice:left", { channelId: voiceChId, userId, username });
+          }
+        } catch (err) {
+          console.error("voice disconnect cleanup error:", err);
+        }
+      }
 
       const sockets = onlineUsers.get(userId);
       if (sockets) {

@@ -18,6 +18,7 @@ import CreateChannelDialog from "@/components/layout/CreateChannelDialog";
 import ServerSettings from "@/components/layout/ServerSettings";
 import UserInfoPanel from "@/components/layout/UserInfoPanel";
 import VoiceBar from "@/components/voice/VoiceBar";
+import VoiceChannelParticipants from "@/components/voice/VoiceChannelParticipants";
 
 const PANEL_WIDTH = 240;
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
@@ -111,33 +112,36 @@ export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) 
 
   const renderChannel = (ch: Channel) => {
     const isUnread = unreads[ch.id] && ch.id !== channelId;
+    const isVoice = ch.type === "VOICE" || ch.type === "VIDEO";
     return (
-      <ListItemButton
-        key={ch.id}
-        selected={ch.id === channelId}
-        onClick={() => { router.push(`/servers/${server.id}/channels/${ch.id}`); onNavigate?.(); }}
-        sx={{ borderRadius: 1, mx: 0.5, px: 1 }}
-      >
-        <ListItemIcon sx={{ minWidth: 28, color: "text.secondary" }}>
-          {getChannelIcon(ch.type)}
-        </ListItemIcon>
-        <ListItemText
-          primary={ch.name}
-          slotProps={{
-            primary: {
-              noWrap: true,
-              sx: {
-                fontSize: 14,
-                fontWeight: isUnread ? 700 : 400,
-                color: isUnread ? "text.primary" : "text.secondary",
+      <Box key={ch.id}>
+        <ListItemButton
+          selected={ch.id === channelId}
+          onClick={() => { router.push(`/servers/${server.id}/channels/${ch.id}`); onNavigate?.(); }}
+          sx={{ borderRadius: 1, mx: 0.5, px: 1 }}
+        >
+          <ListItemIcon sx={{ minWidth: 28, color: "text.secondary" }}>
+            {getChannelIcon(ch.type)}
+          </ListItemIcon>
+          <ListItemText
+            primary={ch.name}
+            slotProps={{
+              primary: {
+                noWrap: true,
+                sx: {
+                  fontSize: 14,
+                  fontWeight: isUnread ? 700 : 400,
+                  color: isUnread ? "text.primary" : "text.secondary",
+                },
               },
-            },
-          }}
-        />
-        {isUnread && (
-          <FiberManualRecord sx={{ fontSize: 8, color: "primary.main", ml: 0.5 }} />
-        )}
-      </ListItemButton>
+            }}
+          />
+          {isUnread && (
+            <FiberManualRecord sx={{ fontSize: 8, color: "primary.main", ml: 0.5 }} />
+          )}
+        </ListItemButton>
+        {isVoice && <VoiceChannelParticipants channelId={ch.id} />}
+      </Box>
     );
   };
 

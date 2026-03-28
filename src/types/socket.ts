@@ -124,6 +124,30 @@ export interface PresenceStatusPayload {
   status: string;
 }
 
+export interface VoiceJoinPayload {
+  channelId: string;
+}
+
+export interface VoiceLeavePayload {
+  channelId: string;
+}
+
+export interface VoiceParticipant {
+  userId: string;
+  username: string;
+}
+
+export interface VoiceBroadcastPayload {
+  channelId: string;
+  userId: string;
+  username: string;
+}
+
+export interface VoiceParticipantsPayload {
+  channelId: string;
+  participants: VoiceParticipant[];
+}
+
 export interface DirectMessagePayload {
   id: string;
   content: string;
@@ -169,6 +193,9 @@ export interface ServerToClientEvents {
   "mention:notify": (payload: MentionNotifyPayload) => void;
   "pin:toggle": (payload: PinTogglePayload) => void;
   "dm:new": (payload: DirectMessagePayload) => void;
+  "voice:joined": (payload: VoiceBroadcastPayload) => void;
+  "voice:left": (payload: VoiceBroadcastPayload) => void;
+  "voice:participants": (payload: VoiceParticipantsPayload) => void;
 }
 
 export interface StatusUpdatePayload {
@@ -192,4 +219,7 @@ export interface ClientToServerEvents {
   "typing:start": (payload: TypingPayload) => void;
   "typing:stop": (payload: TypingPayload) => void;
   "dm:create": (payload: DMCreatePayload) => void;
+  "voice:join": (payload: VoiceJoinPayload) => void;
+  "voice:leave": (payload: VoiceLeavePayload) => void;
+  "voice:participants": (payload: VoiceJoinPayload) => void;
 }

@@ -828,3 +828,11 @@
 - Thread panel uses REST API (POST /api/messages/:id/thread to create, GET/POST /api/threads/:id/messages for messages)
 - Thread panel also listens for socket message:new events filtered by threadId for real-time updates
 - Lessons: Thread messages are sent via REST (not socket) since they go to a different endpoint than channel messages. The socket listener still picks up new thread messages broadcast to the channel room.
+
+## TASK-100: Show who's in voice channels (2026-03-27)
+- Implemented voice channel participant tracking via Socket.io events (voice:join, voice:leave, voice:participants)
+- Server-side: in-memory Maps track which users are in which voice channels, with cleanup on disconnect
+- Client-side: VoiceProvider emits voice:join/voice:leave when connecting/disconnecting from LiveKit
+- Created VoiceChannelParticipants component that listens for real-time updates and shows avatars/usernames under voice channels in ChannelPanel
+- Lesson: When adding socket events, need to update 3 places: types/socket.ts (types), server.js (handlers), and the emitting component
+- Lesson: Nova Act starting_page should be "about:blank" when injecting cookies before navigation to avoid auth redirect issues
