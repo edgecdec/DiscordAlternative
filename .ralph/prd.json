@@ -1106,7 +1106,7 @@
       "title": "Add channel topic/description",
       "spec": "specs/database.md",
       "priority": 114,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add topic field to Channel model (String, optional, max 1024 chars). Create PATCH /api/channels/[channelId] to accept { topic }. OWNER/ADMIN only."
     },

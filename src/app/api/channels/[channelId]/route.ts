@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
-import { CHANNEL_NAME_MIN, CHANNEL_NAME_MAX, SLOW_MODE_MAX_SECONDS } from "@/lib/constants";
+import { CHANNEL_NAME_MIN, CHANNEL_NAME_MAX, CHANNEL_TOPIC_MAX, SLOW_MODE_MAX_SECONDS } from "@/lib/constants";
 import { logAudit } from "@/lib/auditLog";
 
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
@@ -33,8 +33,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   const result = await getChannelAndValidateAdmin(channelId, user.userId);
   if ("error" in result) return NextResponse.json({ error: result.error }, { status: result.status });
 
-  const body = (await req.json()) as { name?: string; slowModeSeconds?: number };
-  const data: { name?: string; slowModeSeconds?: number } = {};
+  const body = (await req.json()) as { name?: string; slowModeSeconds?: number; topic?: string | null };
+  const data: { name?: string; slowModeSeconds?: number; topic?: string | null } = {};
 
   if (body.name !== undefined) {
     const trimmed = body.name.trim();
@@ -55,6 +55,21 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       );
     }
     data.slowModeSeconds = body.slowModeSeconds;
+  }
+
+  if (body.topic !== undefined) {
+    if (body.topic === null) {
+      data.topic = null;
+    } else {
+      const trimmed = body.topic.trim();
+      if (trimmed.length > CHANNEL_TOPIC_MAX) {
+        return NextResponse.json(
+          { error: `Topic must be at most ${CHANNEL_TOPIC_MAX} characters` },
+          { status: 400 }
+        );
+      }
+      data.topic = trimmed || null;
+    }
   }
 
   if (Object.keys(data).length === 0) {

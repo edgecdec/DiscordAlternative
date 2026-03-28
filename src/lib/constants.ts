@@ -7,6 +7,7 @@ export const SERVER_NAME_MIN = 1;
 export const SERVER_NAME_MAX = 50;
 export const CHANNEL_NAME_MIN = 1;
 export const CHANNEL_NAME_MAX = 50;
+export const CHANNEL_TOPIC_MAX = 1024;
 export const CATEGORY_NAME_MIN = 1;
 export const CATEGORY_NAME_MAX = 50;
 export const MESSAGE_MAX = 2000;

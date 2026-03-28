@@ -855,3 +855,11 @@
 - Code blocks and inline code use `action.hover` bgcolor with monospace font via MUI Box `sx` (no hardcoded colors).
 - Nova Act test confirmed all 4 inline markdown types render correctly in the live browser.
 - Lesson: ActMetadata has no `completed` field — just check if `act()` returns without exception.
+
+## TASK-103: Add channel topic/description (2026-03-27)
+- Added `topic` (String?, max 1024 chars) field to Channel model in Prisma schema.
+- Added `CHANNEL_TOPIC_MAX = 1024` constant.
+- Updated PATCH /api/channels/[channelId] to accept `topic` field (string or null to clear).
+- Empty string topics are normalized to null.
+- Migration: `add_channel_topic` applied successfully.
+- Lessons: Prisma `include: { channels: true }` automatically includes new fields after migration + rebuild — no need to update select queries.

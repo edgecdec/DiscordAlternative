@@ -46,6 +46,7 @@ model Channel {
   id               String           @id @default(cuid())
   name             String
   type             String           @default("TEXT")
+  topic            String?
   slowModeSeconds  Int              @default(0)
   serverId         String
   server           Server           @relation(fields: [serverId], references: [id], onDelete: Cascade)
