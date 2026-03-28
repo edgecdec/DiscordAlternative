@@ -3,6 +3,7 @@ import ThemeRegistry from "@/components/common/ThemeRegistry";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SocketProvider } from "@/hooks/useSocket";
 import { VoiceProvider } from "@/hooks/useVoice";
+import { NotificationSoundProvider } from "@/hooks/useNotificationSound";
 import GlobalVoiceRoom from "@/components/voice/GlobalVoiceRoom";
 import "./globals.css";
 
@@ -23,9 +24,11 @@ export default function RootLayout({
           <AuthProvider>
             <SocketProvider>
               <VoiceProvider>
-                <GlobalVoiceRoom>
-                  {children}
-                </GlobalVoiceRoom>
+                <NotificationSoundProvider>
+                  <GlobalVoiceRoom>
+                    {children}
+                  </GlobalVoiceRoom>
+                </NotificationSoundProvider>
               </VoiceProvider>
             </SocketProvider>
           </AuthProvider>

@@ -1088,7 +1088,7 @@
       "title": "Add notification sounds",
       "spec": "specs/ui-layout.md",
       "priority": 112,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Play a subtle notification sound when: a new message arrives in a channel you're not viewing, someone mentions you, you receive a DM. Use the Web Audio API with a small embedded sound. Add a mute toggle in user settings (persist to localStorage). No sound for your own messages."
     },

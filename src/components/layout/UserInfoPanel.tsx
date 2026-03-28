@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Box, Avatar, Typography, IconButton, Tooltip } from "@mui/material";
-import { DarkMode, LightMode, Settings } from "@mui/icons-material";
+import { DarkMode, LightMode, Settings, VolumeOff, VolumeUp } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { useSocket } from "@/hooks/useSocket";
+import { useNotificationSound } from "@/hooks/useNotificationSound";
 import ProfileDialog from "@/components/common/ProfileDialog";
 import StatusSelector from "@/components/common/StatusSelector";
 import type { UserStatus } from "@/lib/constants";
@@ -14,6 +15,7 @@ export default function UserInfoPanel() {
   const { user } = useAuth();
   const { mode, toggleMode } = useThemeMode();
   const { socket } = useSocket();
+  const { muted, toggleMute } = useNotificationSound();
   const [profileOpen, setProfileOpen] = useState(false);
   const [status, setStatus] = useState<UserStatus>("online");
 
@@ -66,6 +68,11 @@ export default function UserInfoPanel() {
       <Typography variant="body2" fontWeight={600} noWrap sx={{ flex: 1 }}>
         {user.username}
       </Typography>
+      <Tooltip title={muted ? "Unmute notifications" : "Mute notifications"}>
+        <IconButton size="small" onClick={toggleMute} sx={{ color: "text.secondary" }}>
+          {muted ? <VolumeOff sx={{ fontSize: 18 }} /> : <VolumeUp sx={{ fontSize: 18 }} />}
+        </IconButton>
+      </Tooltip>
       <Tooltip title={mode === "dark" ? "Light mode" : "Dark mode"}>
         <IconButton size="small" onClick={toggleMode} sx={{ color: "text.secondary" }}>
           {mode === "dark" ? <LightMode sx={{ fontSize: 18 }} /> : <DarkMode sx={{ fontSize: 18 }} />}

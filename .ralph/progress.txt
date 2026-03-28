@@ -836,3 +836,14 @@
 - Created VoiceChannelParticipants component that listens for real-time updates and shows avatars/usernames under voice channels in ChannelPanel
 - Lesson: When adding socket events, need to update 3 places: types/socket.ts (types), server.js (handlers), and the emitting component
 - Lesson: Nova Act starting_page should be "about:blank" when injecting cookies before navigation to avoid auth redirect issues
+
+## TASK-101: Add notification sounds (2026-03-27)
+- Created useNotificationSound hook with NotificationSoundProvider context
+- Uses Web Audio API to generate a sine wave tone (880Hz, 0.15s) — no external sound files needed
+- Plays notification on: message:new (if not from self and not in active channel), mention:notify, dm:new (if not from self)
+- Tracks active channel via URL pathname matching with MutationObserver for Next.js client-side navigation
+- Mute toggle persisted to localStorage under "notification_sound_muted" key
+- Added VolumeUp/VolumeOff toggle button to UserInfoPanel next to theme toggle
+- Wrapped app in NotificationSoundProvider in root layout (inside SocketProvider)
+- Lesson: UserInfoPanel only renders inside server layout (ChannelPanel), not on DM or welcome pages — Nova Act tests need to navigate to a server first
+- Lesson: Web Audio API AudioContext may be suspended by browser autoplay policy — calling resume() on user interaction ensures it works
