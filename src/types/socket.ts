@@ -170,6 +170,19 @@ export interface MessageErrorPayload {
   remaining?: number;
 }
 
+export interface ReadUpdatePayload {
+  userId: string;
+  username: string;
+  channelId: string;
+  lastReadMessageId: string;
+  avatarUrl: string | null;
+}
+
+export interface ReadUpdateClientPayload {
+  channelId: string;
+  lastReadMessageId: string;
+}
+
 export interface PinTogglePayload {
   messageId: string;
   pinned: boolean;
@@ -196,6 +209,7 @@ export interface ServerToClientEvents {
   "voice:joined": (payload: VoiceBroadcastPayload) => void;
   "voice:left": (payload: VoiceBroadcastPayload) => void;
   "voice:participants": (payload: VoiceParticipantsPayload) => void;
+  "read:update": (payload: ReadUpdatePayload) => void;
 }
 
 export interface StatusUpdatePayload {
@@ -222,4 +236,5 @@ export interface ClientToServerEvents {
   "voice:join": (payload: VoiceJoinPayload) => void;
   "voice:leave": (payload: VoiceLeavePayload) => void;
   "voice:participants": (payload: VoiceJoinPayload) => void;
+  "read:update": (payload: ReadUpdateClientPayload) => void;
 }

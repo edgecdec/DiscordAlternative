@@ -451,6 +451,39 @@ app.prepare().then(() => {
       });
     });
 
+    socket.on("read:update", async ({ channelId, lastReadMessageId }) => {
+      if (!channelId || !lastReadMessageId) return;
+      try {
+        const channel = await prisma.channel.findUnique({
+          where: { id: channelId },
+          select: { serverId: true },
+        });
+        if (!channel) return;
+        const member = await prisma.serverMember.findUnique({
+          where: { userId_serverId: { userId, serverId: channel.serverId } },
+        });
+        if (!member) return;
+        await prisma.channelRead.upsert({
+          where: { userId_channelId: { userId, channelId } },
+          update: { lastReadMessageId },
+          create: { userId, channelId, lastReadMessageId },
+        });
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { avatarUrl: true },
+        });
+        socket.to(`channel:${channelId}`).emit("read:update", {
+          userId,
+          username,
+          channelId,
+          lastReadMessageId,
+          avatarUrl: user?.avatarUrl ?? null,
+        });
+      } catch (err) {
+        console.error("read:update error:", err);
+      }
+    });
+
     socket.on("voice:join", async ({ channelId }) => {
       if (!channelId) return;
       try {

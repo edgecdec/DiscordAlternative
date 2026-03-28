@@ -26,8 +26,14 @@ interface ChannelInfo {
 
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
 
-function markChannelRead(channelId: string) {
-  fetch(`/api/channels/${channelId}/read`, { method: "PATCH" });
+function markChannelRead(channelId: string, socket: ReturnType<typeof useSocket>["socket"]) {
+  fetch(`/api/channels/${channelId}/read`, { method: "PATCH" })
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data) => {
+      if (data?.lastReadMessageId && socket) {
+        socket.emit("read:update", { channelId, lastReadMessageId: data.lastReadMessageId });
+      }
+    });
 }
 
 function formatSlowMode(seconds: number): string {
@@ -89,12 +95,12 @@ export default function ChannelPage() {
   }, [channelId, connected, joinChannel, leaveChannel, isText]);
 
   const onNewMessage = useCallback(() => {
-    markChannelRead(channelId);
-  }, [channelId]);
+    markChannelRead(channelId, socket);
+  }, [channelId, socket]);
 
   useEffect(() => {
     if (!channelId || !isText) return;
-    markChannelRead(channelId);
+    markChannelRead(channelId, socket);
     if (!socket) return;
     socket.on("message:new", onNewMessage);
     return () => {

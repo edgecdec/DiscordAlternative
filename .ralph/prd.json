@@ -1142,7 +1142,7 @@
       "title": "Implement read receipts",
       "spec": "specs/socket-events.md",
       "priority": 118,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "When a user views a channel, broadcast read:update { userId, channelId, lastReadMessageId } to other users in that channel via Socket.io. In MessageList, show small avatars of users who have read up to each message (only show for the last few messages to avoid clutter)."
     },

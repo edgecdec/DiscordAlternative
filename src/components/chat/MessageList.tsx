@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Box, CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
 import { ChatBubbleOutline, PushPin, Reply as ReplyIcon } from "@mui/icons-material";
-import type { SocketMessage, MessageDeletedPayload, ReactionBroadcastPayload, PinTogglePayload } from "@/types/socket";
+import type { SocketMessage, MessageDeletedPayload, ReactionBroadcastPayload, PinTogglePayload, ReadUpdatePayload } from "@/types/socket";
 import { useSocket } from "@/hooks/useSocket";
 import { useAuth } from "@/hooks/useAuth";
 import MessageAttachment from "@/components/chat/MessageAttachment";
@@ -11,6 +11,7 @@ import ReactionBar from "@/components/chat/ReactionBar";
 import ReplyQuote from "@/components/chat/ReplyQuote";
 import MentionText, { extractFirstUrl } from "@/components/chat/MentionText";
 import LinkPreview from "@/components/chat/LinkPreview";
+import ReadReceipts from "@/components/chat/ReadReceipts";
 
 interface MessageListProps {
   channelId: string;
@@ -21,6 +22,14 @@ interface MessageListProps {
 }
 
 const PIN_ROLES = ["OWNER", "ADMIN", "MODERATOR"];
+const READ_RECEIPT_TAIL = 10;
+
+interface ReadReceiptUser {
+  userId: string;
+  username: string;
+  avatarUrl: string | null;
+  lastReadMessageId: string;
+}
 
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
@@ -42,6 +51,7 @@ export default function MessageList({ channelId, serverId, onReply, onOpenThread
   const cursorRef = useRef<string | null>(null);
   const { socket } = useSocket();
   const { user } = useAuth();
+  const [readReceipts, setReadReceipts] = useState<ReadReceiptUser[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -58,6 +68,28 @@ export default function MessageList({ channelId, serverId, onReply, onOpenThread
         }
       })
       .finally(() => setLoading(false));
+  }, [channelId]);
+
+  useEffect(() => {
+    setReadReceipts([]);
+    fetch(`/api/channels/${channelId}/read`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.receipts) setReadReceipts(data.receipts);
+      });
+  }, [channelId]);
+
+  const handleReadUpdate = useCallback((payload: ReadUpdatePayload) => {
+    if (payload.channelId !== channelId) return;
+    setReadReceipts((prev) => {
+      const filtered = prev.filter((r) => r.userId !== payload.userId);
+      return [...filtered, {
+        userId: payload.userId,
+        username: payload.username,
+        avatarUrl: payload.avatarUrl,
+        lastReadMessageId: payload.lastReadMessageId,
+      }];
+    });
   }, [channelId]);
 
   useEffect(() => {
@@ -213,6 +245,7 @@ export default function MessageList({ channelId, serverId, onReply, onOpenThread
     socket.on("reaction:add", handleReactionAdd);
     socket.on("reaction:remove", handleReactionRemove);
     socket.on("pin:toggle", handlePinBroadcast);
+    socket.on("read:update", handleReadUpdate);
     return () => {
       socket.off("message:new", handleNew);
       socket.off("message:updated", handleUpdated);
@@ -220,8 +253,24 @@ export default function MessageList({ channelId, serverId, onReply, onOpenThread
       socket.off("reaction:add", handleReactionAdd);
       socket.off("reaction:remove", handleReactionRemove);
       socket.off("pin:toggle", handlePinBroadcast);
+      socket.off("read:update", handleReadUpdate);
     };
-  }, [socket, handleNew, handleUpdated, handleDeleted, handleReactionAdd, handleReactionRemove, handlePinBroadcast]);
+  }, [socket, handleNew, handleUpdated, handleDeleted, handleReactionAdd, handleReactionRemove, handlePinBroadcast, handleReadUpdate]);
+
+  const readersMap = useMemo(() => {
+    const map = new Map<string, ReadReceiptUser[]>();
+    if (messages.length === 0) return map;
+    const tailStart = Math.max(0, messages.length - READ_RECEIPT_TAIL);
+    const tailIds = new Set(messages.slice(tailStart).map((m) => m.id));
+    for (const r of readReceipts) {
+      if (tailIds.has(r.lastReadMessageId)) {
+        const list = map.get(r.lastReadMessageId) ?? [];
+        list.push(r);
+        map.set(r.lastReadMessageId, list);
+      }
+    }
+    return map;
+  }, [messages, readReceipts]);
 
   if (loading) {
     return (
@@ -364,6 +413,11 @@ export default function MessageList({ channelId, serverId, onReply, onOpenThread
                 <Typography variant="caption" fontWeight={600}>
                   {msg.thread.messageCount} {msg.thread.messageCount === 1 ? "reply" : "replies"}
                 </Typography>
+              </Box>
+            )}
+            {readersMap.has(msg.id) && (
+              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0.25 }}>
+                <ReadReceipts readers={readersMap.get(msg.id)!} />
               </Box>
             )}
           </Box>

@@ -888,3 +888,13 @@
 - Updated ServerSettings.tsx — added Bans tab for OWNER/ADMIN, refactored tab system to use key-based approach instead of index-based to handle conditional tabs correctly
 - Lesson: When MUI Tabs have conditional tabs, using index-based content rendering breaks. Use a key-based approach (build tabs array with keys, match activeKey) to avoid index shifting issues.
 - Lesson: Use `domcontentloaded` instead of `networkidle` for Nova Act page.goto — Socket.io connections keep the network active and cause networkidle to timeout.
+
+## TASK-107: Implement read receipts (2026-03-27)
+- Added `read:update` Socket.io event (client→server and server→client) with types in socket.ts
+- Added `read:update` handler in server.js that upserts ChannelRead and broadcasts to channel room
+- Added GET handler to `/api/channels/[channelId]/read` to fetch all read receipts for a channel
+- Created `ReadReceipts.tsx` component showing small AvatarGroup with tooltip
+- Updated MessageList to fetch initial receipts, listen for real-time updates, and display on last 10 messages
+- Updated channel page to emit `read:update` via socket after marking channel as read via REST API
+- Lesson: The server build can take a long time and sometimes gets killed (OOM). If deploy webhook log shows build stuck at "Linting and checking validity of types...", manually SSH in and run `npm run build && pm2 restart discord-alt`.
+- Lesson: ReadUpdatePayload needs username included since the socket event is the only source of user info for real-time updates.
