@@ -21,5 +21,8 @@ export const EMOJI_NAME_MAX = 32;
 export const EMOJI_NAME_PATTERN = /^[a-zA-Z0-9_]+$/;
 export const EMOJI_MAX_BYTES = 256 * 1024;
 
+export const THREAD_NAME_MIN = 1;
+export const THREAD_NAME_MAX = 100;
+
 export const USER_STATUSES = ["online", "away", "dnd", "offline"] as const;
 export type UserStatus = (typeof USER_STATUSES)[number];

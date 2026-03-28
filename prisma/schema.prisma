@@ -23,6 +23,7 @@ model User {
   receivedDMs  DirectMessage[] @relation("DMReceiver")
   auditLogs    AuditLog[]
   uploadedEmoji ServerEmoji[]
+  threads      Thread[]
 }
 
 model Server {
@@ -54,6 +55,7 @@ model Channel {
   updatedAt        DateTime         @updatedAt
   messages         Message[]
   reads            ChannelRead[]
+  threads          Thread[]
 }
 
 model Message {
@@ -69,9 +71,29 @@ model Message {
   replyToId String?
   replyTo   Message?   @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
   replies   Message[]  @relation("MessageReplies")
+  threadId  String?
+  thread    Thread?    @relation("ThreadMessages", fields: [threadId], references: [id], onDelete: Cascade)
+  spawnedThread Thread? @relation("ThreadParent")
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   reactions Reaction[]
+
+  @@index([channelId])
+  @@index([threadId])
+}
+
+model Thread {
+  id              String    @id @default(cuid())
+  name            String
+  parentMessageId String    @unique
+  parentMessage   Message   @relation("ThreadParent", fields: [parentMessageId], references: [id], onDelete: Cascade)
+  channelId       String
+  channel         Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  creatorId       String
+  creator         User      @relation(fields: [creatorId], references: [id])
+  archived        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  messages        Message[] @relation("ThreadMessages")
 
   @@index([channelId])
 }

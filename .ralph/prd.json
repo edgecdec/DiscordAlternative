@@ -1061,7 +1061,7 @@
       "title": "Implement thread creation from messages",
       "spec": "specs/database.md",
       "priority": 109,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add Thread model: id, name, parentMessageId, channelId, creatorId, createdAt, archived Boolean. A thread is a sub-conversation spawned from a message. Create POST /api/messages/[messageId]/thread \u2014 creates a thread. Messages in a thread have a threadId field. Create GET /api/threads/[threadId]/messages."
     },

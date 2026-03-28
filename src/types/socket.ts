@@ -18,6 +18,13 @@ export interface MessageReplyTo {
   deleted: boolean;
 }
 
+export interface MessageThread {
+  id: string;
+  name: string;
+  archived: boolean;
+  messageCount: number;
+}
+
 export interface SocketMessage {
   id: string;
   content: string;
@@ -30,6 +37,8 @@ export interface SocketMessage {
   author: MessageAuthor;
   reactions?: Record<string, ReactionGroup>;
   replyTo?: MessageReplyTo | null;
+  thread?: MessageThread | null;
+  threadId?: string | null;
 }
 
 // Client → Server payloads

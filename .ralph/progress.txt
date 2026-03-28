@@ -808,3 +808,14 @@
 - Used a simple in-memory cache (Map) in MentionText to avoid re-fetching emoji on every message render
 - Lesson: The EmojiPicker only shows the Server tab when custom emoji exist — no empty tab shown
 - Lesson: Need to pass serverId through the component chain (ChannelPage → MessageList → MentionText) for emoji rendering
+
+## TASK-098: Implement thread creation from messages (2026-03-27)
+- Added Thread model to Prisma schema with parentMessageId (unique), channelId, creatorId, archived, name fields
+- Added threadId field to Message model for thread messages, plus spawnedThread reverse relation
+- Created POST /api/messages/[messageId]/thread — creates thread from a message, returns existing thread if already spawned, prevents creating threads from thread messages
+- Created GET/POST /api/threads/[threadId]/messages — paginated thread message retrieval and creation with auth/membership checks
+- Updated GET /api/channels/[channelId]/messages to filter out thread messages (threadId: null) and include spawnedThread info with message count
+- Added MessageThread type to socket.ts and thread field to SocketMessage
+- Added THREAD_NAME_MIN/MAX constants
+- Lesson: After prisma migrate dev, must run prisma generate before tsc --noEmit will pass — the client types aren't updated until generation runs
+- Lesson: curl without Accept header against Next.js API routes may return HTML 404 pages instead of JSON — use cookie jar (-b flag) for proper auth

@@ -4,7 +4,22 @@ import { getAuthUser } from "@/lib/auth";
 import { MESSAGES_PER_PAGE, MESSAGE_MAX } from "@/lib/constants";
 
 interface RouteParams {
-  params: Promise<{ channelId: string }>;
+  params: Promise<{ threadId: string }>;
+}
+
+async function getThreadWithAuth(threadId: string, userId: string) {
+  const thread = await prisma.thread.findUnique({
+    where: { id: threadId },
+    select: { id: true, archived: true, channelId: true, channel: { select: { serverId: true } } },
+  });
+  if (!thread) return null;
+
+  const membership = await prisma.serverMember.findUnique({
+    where: { userId_serverId: { userId, serverId: thread.channel.serverId } },
+  });
+  if (!membership) return null;
+
+  return thread;
 }
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
@@ -13,27 +28,16 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { channelId } = await params;
-
-  const channel = await prisma.channel.findUnique({
-    where: { id: channelId },
-    select: { serverId: true },
-  });
-  if (!channel) {
-    return NextResponse.json({ error: "Channel not found" }, { status: 404 });
-  }
-
-  const membership = await prisma.serverMember.findUnique({
-    where: { userId_serverId: { userId: user.userId, serverId: channel.serverId } },
-  });
-  if (!membership) {
-    return NextResponse.json({ error: "Not a member of this server" }, { status: 403 });
+  const { threadId } = await params;
+  const thread = await getThreadWithAuth(threadId, user.userId);
+  if (!thread) {
+    return NextResponse.json({ error: "Thread not found or access denied" }, { status: 404 });
   }
 
   const cursor = req.nextUrl.searchParams.get("cursor");
 
   const messages = await prisma.message.findMany({
-    where: { channelId, threadId: null },
+    where: { threadId },
     orderBy: { createdAt: "desc" },
     take: MESSAGES_PER_PAGE,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
@@ -46,14 +50,6 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
           content: true,
           deleted: true,
           author: { select: { id: true, username: true } },
-        },
-      },
-      spawnedThread: {
-        select: {
-          id: true,
-          name: true,
-          archived: true,
-          _count: { select: { messages: true } },
         },
       },
     },
@@ -69,10 +65,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const replyTo = m.replyTo
       ? { id: m.replyTo.id, content: m.replyTo.deleted ? "" : m.replyTo.content, author: m.replyTo.author, deleted: m.replyTo.deleted }
       : null;
-    const thread = m.spawnedThread
-      ? { id: m.spawnedThread.id, name: m.spawnedThread.name, archived: m.spawnedThread.archived, messageCount: m.spawnedThread._count.messages }
-      : null;
-    return { ...m, reactions: reactionMap, replyTo, thread, spawnedThread: undefined };
+    return { ...m, reactions: reactionMap, replyTo };
   });
 
   const nextCursor = messages.length === MESSAGES_PER_PAGE ? messages[messages.length - 1].id : null;
@@ -86,7 +79,15 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { channelId } = await params;
+  const { threadId } = await params;
+  const thread = await getThreadWithAuth(threadId, user.userId);
+  if (!thread) {
+    return NextResponse.json({ error: "Thread not found or access denied" }, { status: 404 });
+  }
+
+  if (thread.archived) {
+    return NextResponse.json({ error: "Thread is archived" }, { status: 403 });
+  }
 
   const body = await req.json().catch(() => null);
   if (!body || typeof body.content !== "string" || !body.content.trim()) {
@@ -95,21 +96,6 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
   if (body.content.length > MESSAGE_MAX) {
     return NextResponse.json({ error: `Message must be ${MESSAGE_MAX} characters or less` }, { status: 400 });
-  }
-
-  const channel = await prisma.channel.findUnique({
-    where: { id: channelId },
-    select: { serverId: true },
-  });
-  if (!channel) {
-    return NextResponse.json({ error: "Channel not found" }, { status: 404 });
-  }
-
-  const membership = await prisma.serverMember.findUnique({
-    where: { userId_serverId: { userId: user.userId, serverId: channel.serverId } },
-  });
-  if (!membership) {
-    return NextResponse.json({ error: "Not a member of this server" }, { status: 403 });
   }
 
   const fileUrl = typeof body.fileUrl === "string" ? body.fileUrl : undefined;
@@ -121,7 +107,8 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       fileUrl,
       replyToId,
       authorId: user.userId,
-      channelId,
+      channelId: thread.channelId,
+      threadId,
     },
     include: {
       author: { select: { id: true, username: true, avatarUrl: true } },
