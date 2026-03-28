@@ -907,3 +907,12 @@
 - API already supported `imageUrl` on both POST `/api/servers` and PATCH `/api/servers/[serverId]`, so no backend changes needed.
 - Added `imageUrl` to `ServerData` interface in `ChannelPanel.tsx` and passed it as prop to `ServerSettings`.
 - Lesson: Check existing API support before implementing — both create and update already accepted imageUrl, so this was purely a frontend task.
+
+## TASK-109: Add drag-and-drop file upload to chat (2026-03-27)
+- Created `FileDropZone.tsx` component in `src/components/chat/` — wraps children with drag event handlers, shows a dashed-border overlay with CloudUpload icon when files are dragged over.
+- Used a `dragCounter` ref to handle nested element drag enter/leave events correctly (prevents flickering).
+- Updated channel page to wrap the text channel content area with `FileDropZone`.
+- On drop, each file is uploaded to `/api/upload` sequentially, then sent as a message via `socket.emit("message:create")` with the `fileUrl`.
+- Files exceeding `FILE_UPLOAD_MAX_BYTES` are silently skipped.
+- Supports multiple files — one message per file.
+- Lesson: Synthetic DragEvent dispatching in headless browsers doesn't reliably trigger React's onDragEnter — the overlay only renders during real user drag interactions, so Nova Act tests should verify deployment rather than overlay rendering.

@@ -16,6 +16,8 @@ import ChannelSettingsDialog from "@/components/layout/ChannelSettingsDialog";
 import PinnedMessagesDrawer from "@/components/chat/PinnedMessagesDrawer";
 import ThreadPanel from "@/components/chat/ThreadPanel";
 import ChannelTopicDisplay from "@/components/chat/ChannelTopicDisplay";
+import FileDropZone from "@/components/chat/FileDropZone";
+import { FILE_UPLOAD_MAX_BYTES } from "@/lib/constants";
 
 interface ChannelInfo {
   name: string;
@@ -120,6 +122,24 @@ export default function ChannelPage() {
     setChannel((prev) => prev ? { ...prev, topic: newTopic } : prev);
   }, []);
 
+  const handleFilesDropped = useCallback(
+    async (files: File[]) => {
+      if (!socket) return;
+      for (const file of files) {
+        if (file.size > FILE_UPLOAD_MAX_BYTES) continue;
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+          const res = await fetch("/api/upload", { method: "POST", body: formData });
+          if (!res.ok) continue;
+          const { url } = await res.json();
+          socket.emit("message:create", { channelId, content: "", fileUrl: url });
+        } catch { /* skip failed uploads */ }
+      }
+    },
+    [socket, channelId],
+  );
+
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
       <Box
@@ -186,28 +206,30 @@ export default function ChannelPage() {
         />
       )}
       {isText && channel ? (
-        <Box sx={{ flex: 1, display: "flex", overflow: "hidden" }}>
-          <Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-            <MessageList channelId={channelId} serverId={serverId} onReply={setReplyTo} onOpenThread={handleOpenThread} userRole={userRole} />
-            <TypingIndicator channelId={channelId} />
-            <MessageInput
-              channelId={channelId}
-              serverId={serverId}
-              slowModeSeconds={channel.slowModeSeconds}
-              replyTo={replyTo}
-              onCancelReply={() => setReplyTo(null)}
-            />
+        <FileDropZone onFilesDropped={handleFilesDropped}>
+          <Box sx={{ flex: 1, display: "flex", overflow: "hidden" }}>
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+              <MessageList channelId={channelId} serverId={serverId} onReply={setReplyTo} onOpenThread={handleOpenThread} userRole={userRole} />
+              <TypingIndicator channelId={channelId} />
+              <MessageInput
+                channelId={channelId}
+                serverId={serverId}
+                slowModeSeconds={channel.slowModeSeconds}
+                replyTo={replyTo}
+                onCancelReply={() => setReplyTo(null)}
+              />
+            </Box>
+            {activeThread && (
+              <ThreadPanel
+                threadId={activeThread.id}
+                threadName={activeThread.name}
+                channelId={channelId}
+                serverId={serverId}
+                onClose={() => setActiveThread(null)}
+              />
+            )}
           </Box>
-          {activeThread && (
-            <ThreadPanel
-              threadId={activeThread.id}
-              threadName={activeThread.name}
-              channelId={channelId}
-              serverId={serverId}
-              onClose={() => setActiveThread(null)}
-            />
-          )}
-        </Box>
+        </FileDropZone>
       ) : !channel ? (
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
           <Typography color="text.secondary">Loading...</Typography>

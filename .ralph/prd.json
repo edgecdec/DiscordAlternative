@@ -1160,7 +1160,7 @@
       "title": "Add drag-and-drop file upload to chat",
       "spec": "specs/ui-layout.md",
       "priority": 120,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add a drop zone overlay to the channel view. When user drags a file over the chat area, show a visual indicator. On drop, upload via /api/upload and send as a message with fileUrl. Support multiple files (one message per file)."
     },
