@@ -15,11 +15,13 @@ import SearchDialog from "@/components/chat/SearchDialog";
 import ChannelSettingsDialog from "@/components/layout/ChannelSettingsDialog";
 import PinnedMessagesDrawer from "@/components/chat/PinnedMessagesDrawer";
 import ThreadPanel from "@/components/chat/ThreadPanel";
+import ChannelTopicDisplay from "@/components/chat/ChannelTopicDisplay";
 
 interface ChannelInfo {
   name: string;
   type: string;
   slowModeSeconds: number;
+  topic: string | null;
 }
 
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
@@ -60,9 +62,9 @@ export default function ChannelPage() {
       .then((data) => {
         if (!data) return;
         const ch = data.server.channels.find(
-          (c: { id: string; name: string; type: string; slowModeSeconds: number }) => c.id === channelId
+          (c: { id: string; name: string; type: string; slowModeSeconds: number; topic?: string | null }) => c.id === channelId
         );
-        if (ch) setChannel({ name: ch.name, type: ch.type, slowModeSeconds: ch.slowModeSeconds ?? 0 });
+        if (ch) setChannel({ name: ch.name, type: ch.type, slowModeSeconds: ch.slowModeSeconds ?? 0, topic: ch.topic ?? null });
         if (user) {
           const member = data.server.members.find(
             (m: { user: { id: string }; role: string }) => m.user.id === user.id
@@ -108,6 +110,10 @@ export default function ChannelPage() {
     setActiveThread({ id: threadId, name: threadName });
   }, []);
 
+  const handleTopicUpdated = useCallback((newTopic: string | null) => {
+    setChannel((prev) => prev ? { ...prev, topic: newTopic } : prev);
+  }, []);
+
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
       <Box
@@ -130,6 +136,14 @@ export default function ChannelPage() {
           <Tooltip title={`Slow mode: ${formatSlowMode(channel.slowModeSeconds)}`}>
             <Schedule sx={{ fontSize: 16, color: "text.secondary" }} />
           </Tooltip>
+        )}
+        {isText && channel && (
+          <ChannelTopicDisplay
+            channelId={channelId}
+            topic={channel.topic}
+            canEdit={canManage}
+            onTopicUpdated={handleTopicUpdated}
+          />
         )}
         <Box sx={{ ml: "auto", display: "flex", gap: 0.5 }}>
           {isText && (

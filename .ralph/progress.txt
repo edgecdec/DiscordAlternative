@@ -863,3 +863,12 @@
 - Empty string topics are normalized to null.
 - Migration: `add_channel_topic` applied successfully.
 - Lessons: Prisma `include: { channels: true }` automatically includes new fields after migration + rebuild — no need to update select queries.
+
+## TASK-104: Display channel topic in header (2026-03-27)
+- Created `ChannelTopicDisplay` component in `src/components/chat/` to keep channel page under 150-line limit.
+- Topic shows as caption text with ellipsis truncation; click to expand full text.
+- OWNER/ADMIN see "Set a topic" placeholder when no topic is set; clicking opens inline TextField editor.
+- Enter saves, Escape cancels, click-away saves.
+- Uses existing PATCH /api/channels/[channelId] endpoint which already supports topic field.
+- Lesson: `networkidle` wait in Nova Act times out with Socket.io — use `domcontentloaded` + explicit wait instead.
+- Lesson: When testing text that also appears in a Tooltip, use `.first` on the locator to avoid strict mode violations.

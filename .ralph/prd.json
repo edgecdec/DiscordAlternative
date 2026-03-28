@@ -1115,7 +1115,7 @@
       "title": "Display channel topic in header",
       "spec": "specs/ui-layout.md",
       "priority": 115,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Show the channel topic as a subtitle in the channel header area. Truncate with ellipsis if long. Clicking expands to show full topic. Editable inline for OWNER/ADMIN."
     },
