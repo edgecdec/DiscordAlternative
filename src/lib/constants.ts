@@ -16,5 +16,10 @@ export const MESSAGES_PER_PAGE = 50;
 export const BCRYPT_ROUNDS = 10;
 export const SLOW_MODE_MAX_SECONDS = 300;
 
+export const EMOJI_NAME_MIN = 2;
+export const EMOJI_NAME_MAX = 32;
+export const EMOJI_NAME_PATTERN = /^[a-zA-Z0-9_]+$/;
+export const EMOJI_MAX_BYTES = 256 * 1024;
+
 export const USER_STATUSES = ["online", "away", "dnd", "offline"] as const;
 export type UserStatus = (typeof USER_STATUSES)[number];

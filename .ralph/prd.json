@@ -1043,7 +1043,7 @@
       "title": "Implement custom server emoji upload",
       "spec": "specs/database.md",
       "priority": 107,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add ServerEmoji model: id, name (String, unique per server), imageUrl, serverId, uploadedById, createdAt. Create POST /api/servers/[serverId]/emoji \u2014 upload custom emoji image (max 256KB, 128x128). Create GET /api/servers/[serverId]/emoji \u2014 list all. Create DELETE. OWNER/ADMIN only for upload/delete."
     },

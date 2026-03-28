@@ -791,3 +791,12 @@
 - Styled with italic and cursor:default to match Discord's pattern
 - SocketMessage type already had updatedAt field, no type changes needed
 - Lesson: Minimal UI changes like this are low-risk — just compare two existing fields and conditionally render a span
+
+## TASK-096: Implement custom server emoji upload (2026-03-27)
+- Added ServerEmoji model to Prisma schema with @@unique([serverId, name]) constraint
+- Created GET/POST /api/servers/[serverId]/emoji and DELETE /api/servers/[serverId]/emoji/[emojiId]
+- Added emoji constants: EMOJI_NAME_MIN=2, EMOJI_NAME_MAX=32, EMOJI_NAME_PATTERN, EMOJI_MAX_BYTES=256KB
+- Emoji images stored in uploads/emoji/ subdirectory with UUID filenames
+- DELETE also cleans up the file from disk
+- Lesson: After adding a new Prisma model, must run `npx prisma generate` before tsc will recognize the new model on PrismaClient
+- Lesson: After deploy webhook runs, sometimes need to wait or restart pm2 for new API routes to be served (build cache)

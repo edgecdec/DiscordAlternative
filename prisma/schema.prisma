@@ -22,6 +22,7 @@ model User {
   sentDMs      DirectMessage[] @relation("DMSender")
   receivedDMs  DirectMessage[] @relation("DMReceiver")
   auditLogs    AuditLog[]
+  uploadedEmoji ServerEmoji[]
 }
 
 model Server {
@@ -37,6 +38,7 @@ model Server {
   members    ServerMember[]
   categories ChannelCategory[]
   auditLogs  AuditLog[]
+  emoji      ServerEmoji[]
 }
 
 model Channel {
@@ -133,6 +135,20 @@ model AuditLog {
   details   String?
   createdAt DateTime @default(now())
 
+  @@index([serverId])
+}
+
+model ServerEmoji {
+  id           String   @id @default(cuid())
+  name         String
+  imageUrl     String
+  serverId     String
+  server       Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@unique([serverId, name])
   @@index([serverId])
 }
 
