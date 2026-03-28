@@ -998,7 +998,7 @@
       "title": "Add noise gate / voice activity detection to voice channels",
       "spec": "specs/webrtc.md",
       "priority": 96,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "BUG: Background noise is transmitted in voice channels. Enable LiveKit's built-in noise suppression by setting audioCaptureDefaults in the LiveKitRoom component: { noiseSuppression: true, autoGainControl: true, echoCancellation: true }. Additionally, configure voice activity detection so the mic only transmits when the user is actually speaking \u2014 set publishDefaults with dtx (discontinuous transmission) enabled. This prevents constant background noise from being broadcast."
     },

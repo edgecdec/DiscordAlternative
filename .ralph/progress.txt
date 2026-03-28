@@ -754,3 +754,9 @@
 - Key insight: LiveKitRoom must wrap descendant components for hooks to work — used display:contents style to make it a layout-transparent wrapper
 - Added VoiceProvider to root layout wrapping GlobalVoiceRoom wrapping children, so LiveKit context is available app-wide
 - Lesson: When lifting state from a page component to a global provider, ensure context providers wrap the tree correctly for hooks that depend on them
+
+## TASK-148: Add noise suppression, AGC, echo cancellation, and DTX to voice channels
+- Date: 2026-03-27
+- Status: done
+- Changes: Updated GlobalVoiceRoom.tsx to pass `options` prop to LiveKitRoom with audioCaptureDefaults (noiseSuppression, autoGainControl, echoCancellation) and publishDefaults (dtx: true).
+- Lessons: LiveKitRoom accepts an `options` prop of type `RoomOptions` which includes `audioCaptureDefaults` and `publishDefaults`. These are typed as `AudioCaptureOptions` and `TrackPublishDefaults` from `livekit-client`. Using module-level constants with useMemo avoids recreating the options object on every render.
