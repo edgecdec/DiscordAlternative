@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar, Box, CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
-import { PushPin, Reply as ReplyIcon } from "@mui/icons-material";
+import { ChatBubbleOutline, PushPin, Reply as ReplyIcon } from "@mui/icons-material";
 import type { SocketMessage, MessageDeletedPayload, ReactionBroadcastPayload, PinTogglePayload } from "@/types/socket";
 import { useSocket } from "@/hooks/useSocket";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,6 +16,7 @@ interface MessageListProps {
   channelId: string;
   serverId?: string;
   onReply?: (msg: SocketMessage) => void;
+  onOpenThread?: (threadId: string, threadName: string, messageId: string) => void;
   userRole?: string;
 }
 
@@ -31,7 +32,7 @@ function formatTimestamp(iso: string): string {
   });
 }
 
-export default function MessageList({ channelId, serverId, onReply, userRole }: MessageListProps) {
+export default function MessageList({ channelId, serverId, onReply, onOpenThread, userRole }: MessageListProps) {
   const [messages, setMessages] = useState<SocketMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -167,6 +168,31 @@ export default function MessageList({ channelId, serverId, onReply, userRole }: 
 
   const canPin = PIN_ROLES.includes(userRole ?? "");
 
+  const handleCreateThread = useCallback(async (msg: SocketMessage) => {
+    if (!onOpenThread) return;
+    if (msg.thread) {
+      onOpenThread(msg.thread.id, msg.thread.name, msg.id);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/messages/${msg.id}/thread`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: msg.content.slice(0, 100) || "Thread" }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.thread) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === msg.id ? { ...m, thread: { id: data.thread.id, name: data.thread.name, archived: false, messageCount: 0 } } : m
+          )
+        );
+        onOpenThread(data.thread.id, data.thread.name, msg.id);
+      }
+    } catch { /* ignore */ }
+  }, [onOpenThread]);
+
   const handlePinToggle = useCallback((messageId: string) => {
     if (!socket) return;
     socket.emit("pin:toggle", { messageId });
@@ -289,6 +315,19 @@ export default function MessageList({ channelId, serverId, onReply, userRole }: 
                       <ReplyIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   )}
+                  {onOpenThread && !msg.threadId && (
+                    <Tooltip title={msg.thread ? "View Thread" : "Create Thread"}>
+                      <IconButton
+                        size="small"
+                        className="reply-btn"
+                        onClick={() => handleCreateThread(msg)}
+                        sx={{ opacity: 0, p: 0.25 }}
+                        aria-label={msg.thread ? "View thread" : "Create thread"}
+                      >
+                        <ChatBubbleOutline sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Box>
               )}
             </Box>
@@ -315,6 +354,17 @@ export default function MessageList({ channelId, serverId, onReply, userRole }: 
                 reactions={msg.reactions ?? {}}
                 onToggle={(emoji) => handleReactionToggle(msg.id, emoji)}
               />
+            )}
+            {!msg.deleted && msg.thread && onOpenThread && (
+              <Box
+                onClick={() => onOpenThread(msg.thread!.id, msg.thread!.name, msg.id)}
+                sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, mt: 0.5, cursor: "pointer", color: "primary.main", "&:hover": { textDecoration: "underline" } }}
+              >
+                <ChatBubbleOutline sx={{ fontSize: 14 }} />
+                <Typography variant="caption" fontWeight={600}>
+                  {msg.thread.messageCount} {msg.thread.messageCount === 1 ? "reply" : "replies"}
+                </Typography>
+              </Box>
             )}
           </Box>
         </Box>

@@ -819,3 +819,12 @@
 - Added THREAD_NAME_MIN/MAX constants
 - Lesson: After prisma migrate dev, must run prisma generate before tsc --noEmit will pass — the client types aren't updated until generation runs
 - Lesson: curl without Accept header against Next.js API routes may return HTML 404 pages instead of JSON — use cookie jar (-b flag) for proper auth
+
+## TASK-099: Build thread UI (2026-03-27)
+- Created ThreadPanel component (src/components/chat/ThreadPanel.tsx) — side panel with message list, input, pagination
+- Added "Create Thread" button (ChatBubbleOutline icon) to MessageList message hover actions
+- Added thread reply count indicator below messages that have threads (clickable to open thread)
+- Wired ThreadPanel into channel page as a flex sibling beside the main chat area
+- Thread panel uses REST API (POST /api/messages/:id/thread to create, GET/POST /api/threads/:id/messages for messages)
+- Thread panel also listens for socket message:new events filtered by threadId for real-time updates
+- Lessons: Thread messages are sent via REST (not socket) since they go to a different endpoint than channel messages. The socket listener still picks up new thread messages broadcast to the channel room.

@@ -1070,7 +1070,7 @@
       "title": "Build thread UI",
       "spec": "specs/ui-layout.md",
       "priority": 110,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add a 'Create Thread' button on message hover. Clicking opens a side panel showing the thread conversation (reuse MessageList/MessageInput). Show thread reply count on the parent message. Thread panel slides in from the right, overlaying or beside the main chat."
     },

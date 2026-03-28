@@ -14,6 +14,7 @@ import VoiceChannel from "@/components/voice/VoiceChannel";
 import SearchDialog from "@/components/chat/SearchDialog";
 import ChannelSettingsDialog from "@/components/layout/ChannelSettingsDialog";
 import PinnedMessagesDrawer from "@/components/chat/PinnedMessagesDrawer";
+import ThreadPanel from "@/components/chat/ThreadPanel";
 
 interface ChannelInfo {
   name: string;
@@ -45,9 +46,11 @@ export default function ChannelPage() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pinsOpen, setPinsOpen] = useState(false);
+  const [activeThread, setActiveThread] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     setReplyTo(null);
+    setActiveThread(null);
   }, [channelId]);
 
   useEffect(() => {
@@ -99,6 +102,10 @@ export default function ChannelPage() {
 
   const handleSlowModeUpdated = useCallback((newSlowMode: number) => {
     setChannel((prev) => prev ? { ...prev, slowModeSeconds: newSlowMode } : prev);
+  }, []);
+
+  const handleOpenThread = useCallback((threadId: string, threadName: string) => {
+    setActiveThread({ id: threadId, name: threadName });
   }, []);
 
   return (
@@ -159,17 +166,28 @@ export default function ChannelPage() {
         />
       )}
       {isText && channel ? (
-        <>
-          <MessageList channelId={channelId} serverId={serverId} onReply={setReplyTo} userRole={userRole} />
-          <TypingIndicator channelId={channelId} />
-          <MessageInput
-            channelId={channelId}
-            serverId={serverId}
-            slowModeSeconds={channel.slowModeSeconds}
-            replyTo={replyTo}
-            onCancelReply={() => setReplyTo(null)}
-          />
-        </>
+        <Box sx={{ flex: 1, display: "flex", overflow: "hidden" }}>
+          <Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+            <MessageList channelId={channelId} serverId={serverId} onReply={setReplyTo} onOpenThread={handleOpenThread} userRole={userRole} />
+            <TypingIndicator channelId={channelId} />
+            <MessageInput
+              channelId={channelId}
+              serverId={serverId}
+              slowModeSeconds={channel.slowModeSeconds}
+              replyTo={replyTo}
+              onCancelReply={() => setReplyTo(null)}
+            />
+          </Box>
+          {activeThread && (
+            <ThreadPanel
+              threadId={activeThread.id}
+              threadName={activeThread.name}
+              channelId={channelId}
+              serverId={serverId}
+              onClose={() => setActiveThread(null)}
+            />
+          )}
+        </Box>
       ) : !channel ? (
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
           <Typography color="text.secondary">Loading...</Typography>
