@@ -989,7 +989,7 @@
       "title": "Persist voice channel connection across page navigation",
       "spec": "specs/webrtc.md",
       "priority": 95,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "BUG: Navigating away from a voice channel disconnects you. In Discord, voice persists while you browse text channels. Fix: lift the LiveKit connection state out of the channel page into a global context/provider (e.g. VoiceProvider wrapping the app in layout.tsx). Store the active voice channelId and token in context. The LiveKitRoom component renders in the layout, not the channel page. Show a small 'Connected to Voice' bar at the bottom of ChannelPanel showing the voice channel name, a disconnect button, and mic/deafen toggles \u2014 so the user can control voice from anywhere. Clicking the voice channel name navigates back to it."
     },

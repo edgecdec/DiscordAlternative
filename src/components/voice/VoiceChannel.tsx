@@ -1,23 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { Box, Typography, IconButton, CircularProgress, Avatar } from "@mui/material";
 import { Mic, MicOff, CallEnd } from "@mui/icons-material";
 import {
-  LiveKitRoom,
-  RoomAudioRenderer,
   useParticipants,
   useLocalParticipant,
   useConnectionState,
   useIsSpeaking,
 } from "@livekit/components-react";
-import { Track, ConnectionState } from "livekit-client";
+import { ConnectionState } from "livekit-client";
 import type { Participant } from "livekit-client";
-
-const LIVEKIT_URL = process.env.NEXT_PUBLIC_LIVEKIT_URL;
+import { useVoice } from "@/hooks/useVoice";
 
 interface VoiceChannelProps {
   channelId: string;
+  channelName: string;
+  serverId: string;
 }
 
 function ParticipantTile({ participant }: { participant: Participant }) {
@@ -48,7 +47,7 @@ function ParticipantTile({ participant }: { participant: Participant }) {
   );
 }
 
-function RoomContent({ onDisconnect }: { onDisconnect: () => void }) {
+function ConnectedView({ onDisconnect }: { onDisconnect: () => void }) {
   const participants = useParticipants();
   const { isMicrophoneEnabled, localParticipant } = useLocalParticipant();
   const connectionState = useConnectionState();
@@ -67,7 +66,6 @@ function RoomContent({ onDisconnect }: { onDisconnect: () => void }) {
 
   return (
     <>
-      <RoomAudioRenderer />
       <Box sx={{ flex: 1, overflowY: "auto", py: 1 }}>
         {participants.map((p) => (
           <ParticipantTile key={p.identity} participant={p} />
@@ -94,62 +92,24 @@ function RoomContent({ onDisconnect }: { onDisconnect: () => void }) {
   );
 }
 
-export default function VoiceChannel({ channelId }: VoiceChannelProps) {
-  const [token, setToken] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [joined, setJoined] = useState(false);
+export default function VoiceChannel({ channelId, channelName, serverId }: VoiceChannelProps) {
+  const { voice, joinVoice, disconnectVoice } = useVoice();
+  const isConnectedHere = voice?.channelId === channelId;
 
-  const fetchToken = useCallback(async () => {
-    setError(null);
+  const handleJoin = useCallback(async () => {
     try {
-      const res = await fetch("/api/livekit/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ channelId }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || "Failed to get token");
-        return;
-      }
-      const data = await res.json();
-      setToken(data.token);
+      await joinVoice({ channelId, channelName, serverId });
     } catch {
-      setError("Failed to connect to voice server");
+      // error handled by provider
     }
-  }, [channelId]);
+  }, [joinVoice, channelId, channelName, serverId]);
 
-  useEffect(() => {
-    setToken(null);
-    setJoined(false);
-    setError(null);
-  }, [channelId]);
-
-  const handleJoin = useCallback(() => {
-    setJoined(true);
-    fetchToken();
-  }, [fetchToken]);
-
-  const handleDisconnect = useCallback(() => {
-    setToken(null);
-    setJoined(false);
-  }, []);
-
-  if (error) {
+  if (!isConnectedHere) {
     return (
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 2 }}>
-        <Typography color="error">{error}</Typography>
-        <IconButton onClick={handleJoin} color="primary">
-          <Mic />
-        </IconButton>
-      </Box>
-    );
-  }
-
-  if (!joined) {
-    return (
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 2 }}>
-        <Typography color="text.secondary">Click to join voice channel</Typography>
+        <Typography color="text.secondary">
+          {voice ? "Connected to another voice channel" : "Click to join voice channel"}
+        </Typography>
         <IconButton onClick={handleJoin} color="primary" sx={{ bgcolor: "action.hover", p: 2 }}>
           <Mic sx={{ fontSize: 32 }} />
         </IconButton>
@@ -157,26 +117,9 @@ export default function VoiceChannel({ channelId }: VoiceChannelProps) {
     );
   }
 
-  if (!token) {
-    return (
-      <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <CircularProgress size={32} />
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-      <LiveKitRoom
-        serverUrl={LIVEKIT_URL}
-        token={token}
-        connect={true}
-        audio={true}
-        onDisconnected={handleDisconnect}
-        style={{ display: "flex", flexDirection: "column", flex: 1 }}
-      >
-        <RoomContent onDisconnect={handleDisconnect} />
-      </LiveKitRoom>
+      <ConnectedView onDisconnect={disconnectVoice} />
     </Box>
   );
 }

@@ -745,3 +745,12 @@
 - Verified: pinned Boolean field exists on Message model in Prisma schema
 - All APIs tested on production — pin/unpin/get pins all work correctly
 - Lesson: Always check if a task marked in_progress was already completed before re-implementing
+
+## TASK-151: Persist voice channel connection across page navigation (2026-03-27)
+- Created VoiceProvider context (useVoice.tsx) to hold global voice state (channelId, token, channelName, serverId)
+- Created GlobalVoiceRoom component that wraps children in LiveKitRoom when voice is active, using display:contents so it doesn't affect layout
+- Created VoiceBar component showing "Voice Connected" with channel name and disconnect button, placed above UserInfoPanel in ChannelPanel
+- Rewrote VoiceChannel to use global VoiceProvider instead of managing its own LiveKitRoom — ConnectedView uses LiveKit hooks from the ancestor LiveKitRoom context
+- Key insight: LiveKitRoom must wrap descendant components for hooks to work — used display:contents style to make it a layout-transparent wrapper
+- Added VoiceProvider to root layout wrapping GlobalVoiceRoom wrapping children, so LiveKit context is available app-wide
+- Lesson: When lifting state from a page component to a global provider, ensure context providers wrap the tree correctly for hooks that depend on them

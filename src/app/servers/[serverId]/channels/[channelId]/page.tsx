@@ -163,7 +163,7 @@ export default function ChannelPage() {
           <Typography color="text.secondary">Loading...</Typography>
         </Box>
       ) : (
-        <VoiceChannel channelId={channelId} />
+        <VoiceChannel channelId={channelId} channelName={channel?.name ?? ""} serverId={serverId} />
       )}
     </Box>
   );

@@ -17,6 +17,7 @@ import { Tag, VolumeUp, Add, Settings, FiberManualRecord, ExpandMore, ChevronRig
 import CreateChannelDialog from "@/components/layout/CreateChannelDialog";
 import ServerSettings from "@/components/layout/ServerSettings";
 import UserInfoPanel from "@/components/layout/UserInfoPanel";
+import VoiceBar from "@/components/voice/VoiceBar";
 
 const PANEL_WIDTH = 240;
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
@@ -252,6 +253,7 @@ export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) 
         onUpdated={fetchServer}
       />
 
+      <VoiceBar />
       <UserInfoPanel />
     </Box>
   );

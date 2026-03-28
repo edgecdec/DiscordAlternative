@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import ThemeRegistry from "@/components/common/ThemeRegistry";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SocketProvider } from "@/hooks/useSocket";
+import { VoiceProvider } from "@/hooks/useVoice";
+import GlobalVoiceRoom from "@/components/voice/GlobalVoiceRoom";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,7 +21,13 @@ export default function RootLayout({
       <body>
         <ThemeRegistry>
           <AuthProvider>
-            <SocketProvider>{children}</SocketProvider>
+            <SocketProvider>
+              <VoiceProvider>
+                <GlobalVoiceRoom>
+                  {children}
+                </GlobalVoiceRoom>
+              </VoiceProvider>
+            </SocketProvider>
           </AuthProvider>
         </ThemeRegistry>
       </body>
