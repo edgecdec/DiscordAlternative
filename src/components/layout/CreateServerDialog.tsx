@@ -12,6 +12,7 @@ import {
   Alert,
 } from "@mui/material";
 import { SERVER_NAME_MAX } from "@/lib/constants";
+import ServerIconUpload from "@/components/common/ServerIconUpload";
 
 interface CreateServerDialogProps {
   open: boolean;
@@ -23,6 +24,7 @@ export default function CreateServerDialog({
   onClose,
 }: CreateServerDialogProps) {
   const [name, setName] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -39,7 +41,7 @@ export default function CreateServerDialog({
       const res = await fetch("/api/servers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmed }),
+        body: JSON.stringify({ name: trimmed, imageUrl }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -48,6 +50,7 @@ export default function CreateServerDialog({
       }
       const data = await res.json();
       setName("");
+      setImageUrl(null);
       onClose();
       router.push(`/servers/${data.server.id}`);
     } catch {
@@ -59,6 +62,7 @@ export default function CreateServerDialog({
 
   const handleClose = () => {
     setName("");
+    setImageUrl(null);
     setError("");
     onClose();
   };
@@ -72,6 +76,11 @@ export default function CreateServerDialog({
             {error}
           </Alert>
         )}
+        <ServerIconUpload
+          imageUrl={imageUrl}
+          serverName={name || "S"}
+          onChange={setImageUrl}
+        />
         <TextField
           autoFocus
           label="Server Name"
@@ -82,7 +91,6 @@ export default function CreateServerDialog({
             if (e.key === "Enter" && !loading) handleSubmit();
           }}
           slotProps={{ htmlInput: { maxLength: SERVER_NAME_MAX } }}
-          sx={{ mt: 1 }}
         />
       </DialogContent>
       <DialogActions>

@@ -898,3 +898,12 @@
 - Updated channel page to emit `read:update` via socket after marking channel as read via REST API
 - Lesson: The server build can take a long time and sometimes gets killed (OOM). If deploy webhook log shows build stuck at "Linting and checking validity of types...", manually SSH in and run `npm run build && pm2 restart discord-alt`.
 - Lesson: ReadUpdatePayload needs username included since the socket event is the only source of user info for real-time updates.
+
+## TASK-108: Implement server icon upload (2026-03-27)
+- Created reusable `ServerIconUpload` component in `src/components/common/` with camera button overlay on avatar, upload progress indicator, and remove button.
+- Integrated into `CreateServerDialog` — users can upload an icon when creating a server.
+- Integrated into `ServerSettings` general tab — users can change/remove the server icon.
+- `ServerSidebar` already rendered `server.imageUrl` in Avatar, so no changes needed there.
+- API already supported `imageUrl` on both POST `/api/servers` and PATCH `/api/servers/[serverId]`, so no backend changes needed.
+- Added `imageUrl` to `ServerData` interface in `ChannelPanel.tsx` and passed it as prop to `ServerSettings`.
+- Lesson: Check existing API support before implementing — both create and update already accepted imageUrl, so this was purely a frontend task.

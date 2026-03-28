@@ -1151,7 +1151,7 @@
       "title": "Implement server icon upload",
       "spec": "specs/servers.md",
       "priority": 119,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Update server creation and settings to allow uploading a server icon image. Use the existing /api/upload endpoint. Store the URL in Server.imageUrl. In ServerSidebar, show the uploaded image in the Avatar instead of the first letter. Crop/resize to fit the circular avatar."
     },

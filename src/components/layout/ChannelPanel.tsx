@@ -45,6 +45,7 @@ interface Member {
 interface ServerData {
   id: string;
   name: string;
+  imageUrl: string | null;
   channels: Channel[];
   members: Member[];
   categories: Category[];
@@ -253,6 +254,7 @@ export default function ChannelPanel({ userId, onNavigate }: ChannelPanelProps) 
         onClose={() => setSettingsOpen(false)}
         serverId={server.id}
         serverName={server.name}
+        serverImageUrl={server.imageUrl}
         userRole={currentMember?.role || "GUEST"}
         onUpdated={fetchServer}
       />

@@ -22,6 +22,7 @@ import MembersTab from "@/components/layout/MembersTab";
 import BansTab from "@/components/layout/BansTab";
 import DangerZoneTab from "@/components/layout/DangerZoneTab";
 import AuditLogTab from "@/components/layout/AuditLogTab";
+import ServerIconUpload from "@/components/common/ServerIconUpload";
 
 const OWNER_ROLE = "OWNER";
 const ADMIN_ROLES = ["OWNER", "ADMIN"];
@@ -31,13 +32,15 @@ interface ServerSettingsProps {
   onClose: () => void;
   serverId: string;
   serverName: string;
+  serverImageUrl: string | null;
   userRole: string;
   onUpdated: () => void;
 }
 
-export default function ServerSettings({ open, onClose, serverId, serverName, userRole, onUpdated }: ServerSettingsProps) {
+export default function ServerSettings({ open, onClose, serverId, serverName, serverImageUrl, userRole, onUpdated }: ServerSettingsProps) {
   const [tab, setTab] = useState(0);
   const [name, setName] = useState(serverName);
+  const [imageUrl, setImageUrl] = useState<string | null>(serverImageUrl);
   const [inviteCode, setInviteCode] = useState("");
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
@@ -57,7 +60,8 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
 
   useEffect(() => {
     setName(serverName);
-  }, [serverName]);
+    setImageUrl(serverImageUrl);
+  }, [serverName, serverImageUrl]);
 
   const fetchInviteCode = useCallback(async () => {
     const res = await fetch(`/api/servers/${serverId}/invite`);
@@ -87,7 +91,7 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
     const res = await fetch(`/api/servers/${serverId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: trimmed }),
+      body: JSON.stringify({ name: trimmed, imageUrl }),
     });
     setSaving(false);
     if (res.ok) {
@@ -124,6 +128,11 @@ export default function ServerSettings({ open, onClose, serverId, serverName, us
         {activeKey === "general" && (
           <>
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            <ServerIconUpload
+              imageUrl={imageUrl}
+              serverName={name}
+              onChange={setImageUrl}
+            />
             <TextField
               label="Server Name"
               value={name}
