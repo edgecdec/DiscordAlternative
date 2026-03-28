@@ -1007,7 +1007,7 @@
       "title": "Preserve invite redirect through registration flow",
       "spec": "specs/auth.md",
       "priority": 97,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "BUG: If a user clicks an invite link (e.g. /invite/ABC123) but isn't logged in, they get redirected to the login page. After registering, they land on the home page instead of being taken to the invite. Fix: when redirecting unauthenticated users to login, store the original URL (e.g. in a query param like /login?redirect=/invite/ABC123 or in sessionStorage). After successful login/register, redirect to that stored URL instead of the default home page."
     },
