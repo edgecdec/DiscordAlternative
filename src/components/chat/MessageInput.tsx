@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ChangeEvent } from "react";
 import { Box, IconButton, LinearProgress, TextField, Typography } from "@mui/material";
 import { AttachFile, Close, EmojiEmotions, Reply as ReplyIcon, Send } from "@mui/icons-material";
-import EmojiPicker from "./EmojiPicker";
+import EmojiPicker, { type CustomEmoji } from "./EmojiPicker";
 import { useSocket } from "@/hooks/useSocket";
 import { FILE_UPLOAD_MAX_BYTES, MESSAGE_MAX } from "@/lib/constants";
 import type { SocketMessage, MessageErrorPayload } from "@/types/socket";
@@ -285,6 +285,21 @@ export default function MessageInput({ channelId, serverId, slowModeSeconds = 0,
     [content],
   );
 
+  const handleCustomEmojiSelect = useCallback(
+    (emoji: CustomEmoji) => {
+      const text = `:${emoji.name}:`;
+      const el = inputRef.current;
+      const pos = el?.selectionStart ?? content.length;
+      setContent((prev) => prev.slice(0, pos) + text + prev.slice(pos));
+      requestAnimationFrame(() => {
+        const newPos = pos + text.length;
+        el?.setSelectionRange(newPos, newPos);
+        el?.focus();
+      });
+    },
+    [content],
+  );
+
   return (
     <Box sx={{ px: 2, py: 1, position: "relative" }}>
       {replyTo && (
@@ -372,6 +387,8 @@ export default function MessageInput({ channelId, serverId, slowModeSeconds = 0,
         anchorEl={emojiAnchor}
         onClose={() => setEmojiAnchor(null)}
         onSelect={handleEmojiSelect}
+        onSelectCustom={handleCustomEmojiSelect}
+        serverId={serverId}
       />
     </Box>
   );

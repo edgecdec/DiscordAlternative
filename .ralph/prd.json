@@ -1052,7 +1052,7 @@
       "title": "Integrate custom emoji into emoji picker and messages",
       "spec": "specs/ui-layout.md",
       "priority": 108,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add a 'Server' tab to the emoji picker showing custom emoji for the current server. When a custom emoji is used in a message (syntax :emoji_name:), render the image inline. Parse and display in MessageList."
     },

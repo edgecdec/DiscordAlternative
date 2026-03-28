@@ -160,7 +160,7 @@ export default function ChannelPage() {
       )}
       {isText && channel ? (
         <>
-          <MessageList channelId={channelId} onReply={setReplyTo} userRole={userRole} />
+          <MessageList channelId={channelId} serverId={serverId} onReply={setReplyTo} userRole={userRole} />
           <TypingIndicator channelId={channelId} />
           <MessageInput
             channelId={channelId}

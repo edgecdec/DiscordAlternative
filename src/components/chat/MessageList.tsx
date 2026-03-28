@@ -14,6 +14,7 @@ import LinkPreview from "@/components/chat/LinkPreview";
 
 interface MessageListProps {
   channelId: string;
+  serverId?: string;
   onReply?: (msg: SocketMessage) => void;
   userRole?: string;
 }
@@ -30,7 +31,7 @@ function formatTimestamp(iso: string): string {
   });
 }
 
-export default function MessageList({ channelId, onReply, userRole }: MessageListProps) {
+export default function MessageList({ channelId, serverId, onReply, userRole }: MessageListProps) {
   const [messages, setMessages] = useState<SocketMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -300,7 +301,7 @@ export default function MessageList({ channelId, onReply, userRole }: MessageLis
                 fontStyle: msg.deleted ? "italic" : "normal",
               }}
             >
-              {msg.deleted ? "This message has been deleted" : <MentionText content={msg.content} />}
+              {msg.deleted ? "This message has been deleted" : <MentionText content={msg.content} serverId={serverId} />}
             </Typography>
             {!msg.deleted && msg.fileUrl && (
               <MessageAttachment fileUrl={msg.fileUrl} />

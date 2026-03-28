@@ -800,3 +800,11 @@
 - DELETE also cleans up the file from disk
 - Lesson: After adding a new Prisma model, must run `npx prisma generate` before tsc will recognize the new model on PrismaClient
 - Lesson: After deploy webhook runs, sometimes need to wait or restart pm2 for new API routes to be served (build cache)
+
+## TASK-097: Integrate custom emoji into emoji picker and messages (2026-03-27)
+- Added "Server" tab to EmojiPicker that fetches and displays custom emoji for the current server
+- Updated MentionText to parse `:emoji_name:` syntax and render custom emoji as inline images
+- Custom emoji inserted as `:name:` text in MessageInput, rendered as images in MessageList
+- Used a simple in-memory cache (Map) in MentionText to avoid re-fetching emoji on every message render
+- Lesson: The EmojiPicker only shows the Server tab when custom emoji exist — no empty tab shown
+- Lesson: Need to pass serverId through the component chain (ChannelPage → MessageList → MentionText) for emoji rendering
