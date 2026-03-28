@@ -48,6 +48,13 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Already a member" }, { status: 409 });
   }
 
+  const banned = await prisma.bannedUser.findUnique({
+    where: { userId_serverId: { userId: user.userId, serverId: server.id } },
+  });
+  if (banned) {
+    return NextResponse.json({ error: "You are banned from this server" }, { status: 403 });
+  }
+
   const member = await prisma.serverMember.create({
     data: { userId: user.userId, serverId: server.id, role: GUEST_ROLE },
   });

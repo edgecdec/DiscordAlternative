@@ -1124,7 +1124,7 @@
       "title": "Implement user ban API",
       "spec": "specs/database.md",
       "priority": 116,
-      "status": "open",
+      "status": "done",
       "dependencies": [],
       "description": "Add BannedUser model: id, userId, serverId, reason (optional String), bannedById, createdAt. @@unique([userId, serverId]). Create POST /api/servers/[serverId]/bans \u2014 ban a user (OWNER/ADMIN). Removes their ServerMember and prevents rejoin via invite. Create DELETE to unban. Create GET to list bans."
     },

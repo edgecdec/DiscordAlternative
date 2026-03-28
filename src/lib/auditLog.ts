@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 export type AuditAction =
   | "member_kick"
   | "member_role_change"
+  | "member_ban"
+  | "member_unban"
   | "channel_create"
   | "channel_delete"
   | "message_delete"

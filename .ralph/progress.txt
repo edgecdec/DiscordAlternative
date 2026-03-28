@@ -872,3 +872,11 @@
 - Uses existing PATCH /api/channels/[channelId] endpoint which already supports topic field.
 - Lesson: `networkidle` wait in Nova Act times out with Socket.io — use `domcontentloaded` + explicit wait instead.
 - Lesson: When testing text that also appears in a Tooltip, use `.first` on the locator to avoid strict mode violations.
+
+## TASK-105: Implement user ban API (2026-03-28)
+- Added BannedUser model to Prisma schema with @@unique([userId, serverId])
+- Created GET/POST/DELETE /api/servers/[serverId]/bans — list bans, ban user, unban user
+- POST bans a user: removes their ServerMember in a transaction, creates BannedUser record
+- Updated invite join route to check for bans before allowing join
+- Added member_ban and member_unban to AuditAction type and AuditLogTab labels
+- Lesson: After adding a new Prisma model, must run `npx prisma generate` to update the client types before tsc will pass — the migration alone doesn't regenerate the client.

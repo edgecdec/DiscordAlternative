@@ -24,6 +24,8 @@ model User {
   auditLogs    AuditLog[]
   uploadedEmoji ServerEmoji[]
   threads      Thread[]
+  bans         BannedUser[]  @relation("BannedUsers")
+  issuedBans   BannedUser[]  @relation("BanIssuer")
 }
 
 model Server {
@@ -40,6 +42,7 @@ model Server {
   categories ChannelCategory[]
   auditLogs  AuditLog[]
   emoji      ServerEmoji[]
+  bans       BannedUser[]
 }
 
 model Channel {
@@ -172,6 +175,21 @@ model ServerEmoji {
   createdAt    DateTime @default(now())
 
   @@unique([serverId, name])
+  @@index([serverId])
+}
+
+model BannedUser {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation("BannedUsers", fields: [userId], references: [id])
+  serverId   String
+  server     Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  reason     String?
+  bannedById String
+  bannedBy   User     @relation("BanIssuer", fields: [bannedById], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, serverId])
   @@index([serverId])
 }
 

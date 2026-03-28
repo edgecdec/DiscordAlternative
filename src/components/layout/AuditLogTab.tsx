@@ -26,6 +26,8 @@ interface AuditLogEntry {
 const ACTION_LABELS: Record<AuditAction, string> = {
   member_kick: "kicked a member",
   member_role_change: "changed a member's role",
+  member_ban: "banned a member",
+  member_unban: "unbanned a member",
   channel_create: "created a channel",
   channel_delete: "deleted a channel",
   message_delete: "deleted a message",
